@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic[email]
+firebase-admin
+psycopg2-binary
+python-multipart
