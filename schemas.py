@@ -24,8 +24,16 @@ class UserOut(BaseModel):
 
 
 class LoginIn(BaseModel):
-    email: EmailStr
+    email: str  # email OR phone number
     password: str
+
+
+class PhoneRegisterIn(BaseModel):
+    name: str
+    phone: str
+    password: str
+    role: str = "shipper"  # or "carrier"
+    referral_code: Optional[str] = None
 
 
 class LoadCreate(BaseModel):
@@ -124,10 +132,16 @@ class TruckOut(BaseModel):
         from_attributes = True
 
 
-# ---------- messaging / negotiation ----------
+class RegisterIn(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    role: str = "shipper"
+    referral_code: Optional[str] = None
+
 
 class ConversationStart(BaseModel):
-    carrier_id: Optional[int] = None  # required when the load owner starts the chat
+    carrier_id: Optional[int] = None
 
 
 class MessageCreate(BaseModel):
@@ -152,11 +166,9 @@ class MessageOut(BaseModel):
         from_attributes = True
 
 
-# ---------- account / ratings ----------
-
 class UserUpdate(BaseModel):
     company_name: Optional[str] = None
-    role: Optional[str] = None            # one-time change for Google-provisioned accounts
+    role: Optional[str] = None
     email_notifications: Optional[bool] = None
 
 
@@ -177,16 +189,6 @@ class RatingOut(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-# ---------- referrals / driver location ----------
-
-class RegisterIn(BaseModel):
-    name: str
-    email: EmailStr
-    password: str
-    role: str = "shipper"  # or "carrier"
-    referral_code: Optional[str] = None  # optional code of the referrer
 
 
 class LocationIn(BaseModel):
