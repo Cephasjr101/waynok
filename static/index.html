@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waynok — Ghana's Load Board</title>
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/static/icon-192.png">
+<style>
+:root{
+  --bg:#0b0e14; --card:#131826; --card2:#1a2135; --line:#242c44;
+  --text:#eef1f8; --muted:#8f98b3; --brand:#ffb020; --brand2:#ff7a1a;
+  --grad:linear-gradient(90deg,#ffb020,#ff7a1a); --ok:#2ecc71; --bad:#ff5c5c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+a{color:var(--brand);text-decoration:none}
+header{position:sticky;top:0;z-index:50;background:rgba(11,14,20,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.nav{display:flex;align-items:center;gap:14px;height:58px}
+.logo{font-weight:800;font-size:20px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer}
+.nav a.tab{color:var(--muted);font-weight:600;font-size:14px;padding:6px 10px;border-radius:8px}
+.nav a.tab.on,.nav a.tab:hover{color:var(--text);background:var(--card2)}
+.nav .sp{flex:1}
+.btn{display:inline-block;border:none;cursor:pointer;font-weight:700;border-radius:10px;padding:10px 18px;font-size:14px;color:#161006;background:var(--grad)}
+.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn.danger{background:transparent;border:1px solid var(--bad);color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+main{padding:24px 0 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+.card h2{font-size:18px;margin-bottom:4px}
+.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;gap:14px}
+.grid.cols2{grid-template-columns:1fr 1fr}
+@media(max-width:720px){.grid.cols2{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+input,select,textarea{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 12px;font-size:15px;outline:none}
+input:focus,select:focus{border-color:var(--brand)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:120px}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700}
+.pill.open{background:rgba(46,204,113,.15);color:var(--ok)}
+.pill.assigned{background:rgba(255,176,32,.15);color:var(--brand)}
+.pill.in_transit{background:rgba(91,157,255,.15);color:#5b9dff}
+.pill.delivered{background:rgba(143,152,179,.2);color:var(--muted)}
+.pill.cancelled,.pill.expired{background:rgba(255,92,92,.15);color:var(--bad)}
+.pill.paid{background:rgba(46,204,113,.15);color:var(--ok)}
+.pill.unpaid{background:rgba(255,92,92,.12);color:var(--bad)}
+.pill.released{background:rgba(91,157,255,.15);color:#5b9dff}
+.item{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;background:var(--card)}
+.item .route{font-weight:700;font-size:15px}
+.item .meta{color:var(--muted);font-size:13px;margin-top:4px}
+.item .actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:12px 20px;border-radius:12px;font-size:14px;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.hidden{display:none!important}
+.hero{padding:40px 0 24px}
+.hero h1{font-size:34px;line-height:1.15}
+.hero h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.stat b{font-size:22px;display:block}
+.chatlog{max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.bubble{padding:10px 14px;border-radius:12px;max-width:80%;white-space:pre-wrap;font-size:14px}
+.bubble.me{align-self:flex-end;background:var(--grad);color:#161006;font-weight:600}
+.bubble.bot{align-self:flex-start;background:var(--card2);border:1px solid var(--line)}
+.seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:8px}
+.seg button{flex:1;border:none;background:transparent;color:var(--muted);padding:9px;font-weight:700;cursor:pointer;font-size:14px}
+.seg button.on{background:var(--grad);color:#161006}
+.code-boxes{display:flex;gap:8px;margin-top:10px}
+.code-boxes input{text-align:center;font-size:20px;font-weight:800;letter-spacing:2px}
+</style>
+</head>
+<body>
+<header><div class="wrap nav" id="nav"></div></header>
+<main><div class="wrap" id="app"></div></main>
+
+<script>
+/* ================= config ================= */
+const API_BASE = "";                       // same origin
+const LS = { token:"waynok_token", user:"waynok_user" };
+let me = null;
+let chatHistory = [];
+
+/* Ghana cities matching the backend pricing engine */
+const CITIES = {accra:[5.6037,-0.1870],kumasi:[6.6885,-1.6244],tema:[5.6698,-0.0166],takoradi:[4.8982,-1.7603],tamale:[9.4034,-0.8424],ho:[6.6,0.4667],"cape coast":[5.1053,-1.2466],sunyani:[7.3399,-2.3268]};
+const GOOD_ROADS = ["accra","tema","kumasi"];
+function estPrice(km, kg, origin){
+  const d=Math.max(km,0.5), t=Math.max((kg||0)/1000,0.5);
+  if(km<0.5 && (kg||0)/1000<0.5) return 300;
+  const factor = GOOD_ROADS.includes((origin||"").toLowerCase()) ? 1 : 1.15;
+  return Math.max(300, Math.round(1000*d*t*factor));
+}
+
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+function esc(s){return (s??"").toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(msg, ms=3200){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), ms); }
+async function api(path, opts={}){
+  const headers = Object.assign({}, opts.headers||{});
+  if(!(opts.body instanceof FormData)) headers["Content-Type"]="application/json";
+  const tok = localStorage.getItem(LS.token);
+  if(tok) headers["Authorization"]="Bearer "+tok;
+  const r = await fetch(API_BASE+path, Object.assign({}, opts, {headers}));
+  if(r.status===401){ logout(false); throw new Error("Session expired — please sign in again."); }
+  const data = r.status===204 ? null : await r.json().catch(()=>null);
+  if(!r.ok) throw new Error((data&&data.detail)||("Error "+r.status));
+  return data;
+}
+function cityKey(v){ return (v||"").split(",")[0].trim().toLowerCase(); }
+function haversine(a,b,c,d){const R=6371,x=Math.PI/180;const dLat=(c-a)*x,dLon=(d-b)*x;const h=Math.sin(dLat/2)**2+Math.cos(a*x)*Math.cos(c*x)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+
+/* ================= auth state ================= */
+function setSession(token, user){ localStorage.setItem(LS.token, token); if(user) localStorage.setItem(LS.user, JSON.stringify(user)); }
+function logout(showMsg=true){ localStorage.removeItem(LS.token); localStorage.removeItem(LS.user); me=null; if(showMsg) toast("Signed out"); location.hash="#auth"; render(); }
+
+async function boot(){
+  const tok = localStorage.getItem(LS.token);
+  if(tok){ try{ me = await api("/me"); }catch(e){ me=null; } }
+  render();
+}
+
+/* ================= nav ================= */
+function renderNav(){
+  const n = $("#nav");
+  if(!me){
+    n.innerHTML = `<span class="logo" onclick="location.hash='#home'">Waynok</span>
+      <span class="sp"></span>
+      <a class="tab" href="#home">Home</a>
+      <a class="tab" href="#loads">Load Board</a>
+      <a class="tab" href="#track">Track</a>
+      <a class="tab" href="#agent">AI Agent</a>
+      <button class="btn sm" onclick="location.hash='#auth'">Sign in</button>`;
+    return;
+  }
+  const tabs = `<a class="tab" href="#home">Home</a>
+    <a class="tab" href="#loads">Load Board</a>
+    ${me.role==="carrier" ? `<a class="tab" href="#drive">Drive</a>` : ""}
+    <a class="tab" href="#track">Track</a>
+    <a class="tab" href="#agent">AI Agent</a>
+    <a class="tab" href="#profile">Profile</a>`;
+  n.innerHTML = `<span class="logo" onclick="location.hash='#home'">Waynok</span>
+    <span class="sp"></span>${tabs}
+    <span class="muted" style="font-size:13px">${esc(me.company_name)}</span>
+    <button class="btn ghost sm" onclick="logout()">Sign out</button>`;
+}
+
+/* ================= router ================= */
+const routes = { home:vHome, auth:vAuth, loads:vLoads, trucks:vTrucks, drive:vDrive, track:vTrack, agent:vAgent, profile:vProfile };
+function render(){
+  renderNav();
+  const hash = (location.hash||"#home").slice(1).split("?")[0] || "home";
+  (routes[hash]||vHome)();
+}
+window.addEventListener("hashchange", render);
+
+/* ================= views ================= */
+function vHome(){
+  $("#app").innerHTML = `
+  <div class="hero">
+    <h1>Freight matching in Ghana,<br><span>priced by km, ton & road.</span></h1>
+    <p class="muted" style="margin-top:10px;max-width:560px">Post a load or list a truck. Waynok auto-prices every haul — GHS 1,000 per km per ton on good roads, +15% on bad routes, GHS 300 minimum — and pings nearby drivers.</p>
+    <div class="row" style="margin-top:18px;max-width:420px">
+      <button class="btn" onclick="location.hash='#auth'">Get started</button>
+      <button class="btn ghost" onclick="location.hash='#loads'">Browse loads</button>
+    </div>
+  </div>
+  <div class="grid cols2">
+    <div class="card"><h2>🚛 For shippers</h2><p class="muted">Post freight, negotiate in chat, pay by mobile money (Paystack), track the truck live and release payment on delivery.</p></div>
+    <div class="card"><h2>📦 For carriers</h2><p class="muted">List trucks, share your live position, accept nearby load offers instantly and get rated for every job.</p></div>
+  </div>`;
+}
+
+/* ---------- AUTH: login card (NO referral) + create card (referral only here) ---------- */
+let pendingPhone = null;
+
+function vAuth(){
+  if(me){ location.hash = "#home"; return; }
+  const refFromUrl = (location.hash.match(/ref=([A-Z0-9]+)/i)||[])[1] || "";
+  $("#app").innerHTML = `
+  <div class="grid cols2" style="margin-top:24px">
+
+    <div class="card">
+      <h2>Sign in</h2>
+      <p class="muted">Email or phone number + password.</p>
+      <form id="loginForm">
+        <label>Email or phone</label>
+        <input id="liId" required placeholder="you@company.com or 0544123456">
+        <label>Password</label>
+        <input id="liPass" type="password" required placeholder="••••••••">
+        <div style="margin-top:16px"><button class="btn" style="width:100%">Sign in</button></div>
+      </form>
+      <p class="muted" style="margin-top:12px"><a href="#" onclick="forgotPass();return false">Forgot password?</a></p>
+    </div>
+
+    <div class="card">
+      <h2>Create account</h2>
+      <p class="muted">Referral code? Enter it here — it's only collected when you sign up.</p>
+      <div class="seg" id="regSeg">
+        <button type="button" class="on" data-m="email" onclick="regMode('email')">Email</button>
+        <button type="button" data-m="phone" onclick="regMode('phone')">Phone + SMS</button>
+      </div>
+      <form id="regForm">
+        <label>Name / company</label>
+        <input id="rgName" required placeholder="Kwame Haulage Ltd">
+        <div id="rgEmailWrap">
+          <label>Email</label>
+          <input id="rgEmail" type="email" placeholder="you@company.com">
+        </div>
+        <div id="rgPhoneWrap" class="hidden">
+          <label>Phone (Ghana)</label>
+          <input id="rgPhone" placeholder="0544123456">
+        </div>
+        <div class="row">
+          <div><label>Password</label><input id="rgPass" type="password" required minlength="6" placeholder="min 6 chars"></div>
+          <div><label>Role</label>
+            <select id="rgRole"><option value="shipper">Shipper (I need trucks)</option><option value="carrier">Carrier (I have trucks)</option></select>
+          </div>
+        </div>
+        <label>Referral code <span style="text-transform:none;font-weight:400">(optional)</span></label>
+        <input id="rgRef" placeholder="e.g. WAYNOK8X" value="${esc(refFromUrl)}" style="text-transform:uppercase">
+        <div style="margin-top:16px"><button class="btn" style="width:100%">Create account</button></div>
+      </form>
+
+      <div id="codeStep" class="hidden">
+        <p style="margin-top:14px">We sent a 6-digit code to <b id="codePhone"></b>.</p>
+        <div class="code-boxes"><input id="rgCode" maxlength="6" inputmode="numeric" placeholder="••••••"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" onclick="verifyPhone()">Verify & sign in</button>
+          <button class="btn ghost" onclick="resendCode()">Resend code</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  regMode("email");
+  $("#loginForm").onsubmit = doLogin;
+  $("#regForm").onsubmit = doRegister;
+}
+
+function regMode(m){
+  document.querySelectorAll("#regSeg button").forEach(b=>b.classList.toggle("on", b.dataset.m===m));
+  $("#rgEmailWrap").classList.toggle("hidden", m!=="email");
+  $("#rgPhoneWrap").classList.toggle("hidden", m!=="phone");
+  $("#regForm").dataset.mode = m;
+  $("#codeStep").classList.add("hidden");
+}
+
+async function doLogin(e){
+  e.preventDefault();
+  try{
+    const r = await api("/auth/login",{method:"POST",body:JSON.stringify({email:$("#liId").value.trim(),password:$("#liPass").value})});
+    setSession(r.access_token); me = await api("/me");
+    toast("Welcome back, "+me.company_name); location.hash="#loads"; render();
+  }catch(err){ toast(err.message); }
+}
+
+async function doRegister(e){
+  e.preventDefault();
+  const mode = $("#regForm").dataset.mode;
+  const role = $("#rgRole").value;
+  const ref = $("#rgRef").value.trim().toUpperCase() || undefined;
+  const body = { name:$("#rgName").value.trim(), password:$("#rgPass").value, role, referral_code:ref };
+  try{
+    if(mode==="phone"){
+      if(!$("#rgPhone").value.trim()) return toast("Enter your phone number");
+      const r = await api("/auth/register-phone",{method:"POST",body:JSON.stringify({...body, phone:$("#rgPhone").value.trim()})});
+      pendingPhone = r.phone;
+      $("#codeStep").classList.remove("hidden");
+      $("#codePhone").textContent = r.phone;
+      $("#rgCode").focus();
+      toast("Verification code sent");
+    }else{
+      if(!$("#rgEmail").value.trim()) return toast("Enter your email");
+      const r = await api("/auth/register",{method:"POST",body:JSON.stringify({...body, email:$("#rgEmail").value.trim()})});
+      setSession(r.access_token); me = await api("/me");
+      toast("Account created"); location.hash="#loads"; render();
+    }
+  }catch(err){ toast(err.message); }
+}
+
+async function verifyPhone(){
+  try{
+    const r = await api("/auth/verify-phone",{method:"POST",body:JSON.stringify({phone:pendingPhone, code:$("#rgCode").value.trim()})});
+    setSession(r.access_token); me = await api("/me");
+    toast("Phone verified — welcome!"); location.hash="#loads"; render();
+  }catch(err){ toast(err.message); }
+}
+async function resendCode(){
+  try{ await api("/auth/resend-code",{method:"POST",body:JSON.stringify({phone:pendingPhone})}); toast("Code re-sent"); }
+  catch(err){ toast(err.message); }
+}
+
+async function forgotPass(){
+  const id = $("#liId").value.trim();
+  if(!id || !id.includes("@")) return toast("Enter your email above first");
+  try{ await api("/auth/forgot",{method:"POST",body:JSON.stringify({email:id,password:"x"})}); toast("Reset link sent if the account exists"); }
+  catch(err){ toast(err.message); }
+}
+
+/* ---------- LOADS ---------- */
+async function vLoads(){
+  const app = $("#app");
+  app.innerHTML = `<div class="row" style="margin:16px 0">
+      <select id="fCity"><option value="">All origins</option>${Object.keys(CITIES).map(c=>`<option>${c}</option>`).join("")}</select>
+      <select id="fEquip"><option value="">All equipment</option><option>flatbed</option><option>reefer</option><option>dry_van</option><option>tanker</option></select>
+      <button class="btn ghost" onclick="vLoads()">Filter</button>
+    </div><div id="loadList"><p class="muted">Loading…</p></div>`;
+  const q = new URLSearchParams({status:"open"});
+  if($("#fCity").value) q.set("origin_city", $("#fCity").value);
+  if($("#fEquip").value) q.set("equipment_type", $("#fEquip").value);
+  let loads=[];
+  try{ loads = await api("/loads?"+q); }catch(e){ return $("#loadList").innerHTML=`<p class="muted">${esc(e.message)}</p>`; }
+  let html = "";
+  if(me && me.role==="shipper"){
+    html += `<div class="card"><h2>Post a load</h2><form id="loadForm">
+      <div class="row">
+        <div><label>Title</label><input id="ldTitle" placeholder="e.g. Steel coils"></div>
+        <div><label>Weight (kg)</label><input id="ldWeight" type="number" min="1" value="1000"></div>
+      </div>
+      <div class="row">
+        <div><label>Origin</label><select id="ldOrigin">${Object.keys(CITIES).map(c=>`<option>${c}</option>`).join("")}</select></div>
+        <div><label>Destination</label><select id="ldDest">${Object.keys(CITIES).map(c=>`<option>${c}</option>`).join("")}</select></div>
+      </div>
+      <div class="row">
+        <div><label>Equipment</label><select id="ldEquip"><option>flatbed</option><option>reefer</option><option>dry_van</option><option>tanker</option></select></div>
+        <div><label>Pickup time</label><input id="ldTime" type="datetime-local"></div>
+      </div>
+      <p class="muted" style="margin-top:10px" id="priceHint"></p>
+      <div style="margin-top:12px"><button class="btn">Post load — auto-priced</button></div>
+    </form></div>`;
+  }
+  html += loads.length ? "" : `<p class="muted">No open loads right now.</p>`;
+  html += loads.map(l=>{
+    const km = haversine(l.origin_lat,l.origin_lng,l.dest_lat,l.dest_lng);
+    return `<div class="item">
+      <div class="route">${esc(l.title||"Load")}: ${esc(l.origin_city)} → ${esc(l.dest_city)} <span class="pill ${l.status}">${l.status}</span> <span class="pill ${l.payment_status}">${l.payment_status}</span></div>
+      <div class="meta">${l.weight_kg.toLocaleString()} kg · ${esc(l.equipment_type)} · ~${km.toFixed(0)} km · pickup ${new Date(l.pickup_time).toLocaleString()}</div>
+      <div class="meta">Auto price: <b>GHS ${estPrice(km,l.weight_kg,l.origin_city).toLocaleString()}</b>${l.budget_ghs?` · budget GHS ${l.budget_ghs.toLocaleString()}`:""}</div>
+      <div class="actions">
+        ${me&&me.role==="shipper"&&l.shipper_id===me.id&&l.status==="open"&&l.payment_status==="unpaid"?`<button class="btn sm" onclick="payLoad(${l.id})">Pay now</button>`:""}
+        ${me&&me.role==="carrier"&&l.status==="open"?`<button class="btn ghost sm" onclick="negotiate(${l.id})">Negotiate</button>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  app.innerHTML = html;
+  if($("#loadForm")){
+    const upd = ()=>{ const o=$("#ldOrigin").value,d=$("#ldDest").value;
+      const km=haversine(...CITIES[o],...CITIES[d]);
+      $("#priceHint").textContent = `~${km.toFixed(0)} km → auto price GHS ${estPrice(km, +$("#ldWeight").value, o).toLocaleString()} (min GHS 300; bad routes +15%)`; };
+    ["ldOrigin","ldDest","ldWeight"].forEach(id=>$("#"+id).addEventListener("input",upd)); upd();
+    $("#loadForm").onsubmit = postLoad;
+  }
+}
+
+async function postLoad(e){
+  e.preventDefault();
+  const o=$("#ldOrigin").value, d=$("#ldDest").value;
+  const body = { title:$("#ldTitle").value.trim(), origin_city:o, origin_lat:CITIES[o][0], origin_lng:CITIES[o][1],
+    dest_city:d, dest_lat:CITIES[d][0], dest_lng:CITIES[d][1], equipment_type:$("#ldEquip").value,
+    weight_kg:+$("#ldWeight").value, pickup_time:new Date($("#ldTime").value).toISOString() };
+  try{ await api("/loads",{method:"POST",body:JSON.stringify(body)}); toast("Load posted — nearby drivers pinged"); vLoads(); }
+  catch(err){ toast(err.message); }
+}
+
+async function payLoad(id){
+  try{ const r = await api(`/loads/${id}/pay`,{method:"POST"}); location.href = r.authorization_url; }
+  catch(err){ toast(err.message); }
+}
+
+async function negotiate(loadId){
+  if(!me){ location.hash="#auth"; return; }
+  try{
+    const conv = await api(`/loads/${loadId}/conversations`,{method:"POST",body:"{}"});
+    location.hash = "#agent";
+    toast("Negotiation opened — chat below");
+  }catch(err){ toast(err.message); }
+}
+
+/* ---------- TRUCKS ---------- */
+async function vTrucks(){
+  const app=$("#app");
+  let trucks=[];
+  try{ trucks = await api("/trucks"); }catch(e){}
+  let html = me&&me.role==="carrier" ? `<div class="card"><h2>List your truck</h2><form id="truckForm">
+    <div class="row">
+      <div><label>Name</label><input id="tkName" placeholder="FL-101"></div>
+      <div><label>Plate</label><input id="tkPlate" placeholder="GT 101-22"></div>
+    </div>
+    <div class="row">
+      <div><label>Equipment</label><select id="tkEquip"><option>flatbed</option><option>reefer</option><option>dry_van</option><option>tanker</option></select></div>
+      <div><label>Capacity (kg)</label><input id="tkCap" type="number" min="1" value="10000"></div>
+      <div><label>Base city</label><select id="tkCity">${Object.keys(CITIES).map(c=>`<option>${c}</option>`).join("")}</select></div>
+    </div>
+    <div style="margin-top:12px"><button class="btn">Add truck</button></div>
+  </form></div>` : "";
+  html += trucks.length ? trucks.map(t=>`<div class="item">
+    <div class="route">${esc(t.name||"Truck")} · ${esc(t.plate_no||"")} <span class="pill ${t.status==="available"?"open":"assigned"}">${t.status}</span></div>
+    <div class="meta">${esc(t.equipment_type)} · ${t.capacity_kg.toLocaleString()} kg · ${esc(t.origin_city||"")}${t.rating_avg?` · ⭐ ${t.rating_avg} (${t.rating_count})`:""}</div>
+  </div>`).join("") : `<p class="muted">No trucks listed yet.</p>`;
+  app.innerHTML = html;
+  if($("#truckForm")) $("#truckForm").onsubmit = async e=>{
+    e.preventDefault();
+    const c=$("#tkCity").value;
+    try{ await api("/trucks",{method:"POST",body:JSON.stringify({name:$("#tkName").value.trim(),plate_no:$("#tkPlate").value.trim(),equipment_type:$("#tkEquip").value,capacity_kg:+$("#tkCap").value,origin_city:c,origin_lat:CITIES[c][0],origin_lng:CITIES[c][1]})}); toast("Truck listed"); vTrucks(); }
+    catch(err){ toast(err.message); }
+  };
+}
+
+/* ---------- DRIVE (carrier live position + offers) ---------- */
+async function vDrive(){
+  if(!me){ location.hash="#auth"; return; }
+  if(me.role!=="carrier"){ location.hash="#loads"; return; }
+  $("#app").innerHTML = `<div class="card">
+    <h2>Driver dashboard</h2>
+    <p class="muted">Share your position to get load offers within 60 km of you.</p>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" onclick="pingLoc()">📍 Share my location</button>
+      <button class="btn ghost" onclick="vDrive()">Refresh offers</button>
+    </div></div><div id="offers"><p class="muted">Loading…</p></div>`;
+  try{
+    const offers = await api("/drivers/offers");
+    $("#offers").innerHTML = offers.length ? offers.map(o=>`<div class="item">
+      <div class="route">${esc(o.load.title||"Load")}: ${esc(o.load.origin_city)} → ${esc(o.load.dest_city)}</div>
+      <div class="meta">${o.distance_km!=null?o.distance_km+" km away · ":""}${o.load.weight_kg.toLocaleString()} kg · GHS ${(o.load.budget_ghs||estPrice(haversine(...CITIES[cityKey(o.load.origin_city)]||[0,0],...CITIES[cityKey(o.load.dest_city)]||[0,0]),o.load.weight_kg,o.load.origin_city)).toLocaleString()}</div>
+      <div class="actions"><button class="btn sm" onclick="acceptOffer(${o.offer_id})">Accept load</button></div>
+    </div>`).join("") : `<p class="muted">No offers right now — share your location above.</p>`;
+  }catch(e){ $("#offers").innerHTML=`<p class="muted">${esc(e.message)}</p>`; }
+}
+
+function pingLoc(){
+  if(!navigator.geolocation) return toast("Geolocation not supported");
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    try{
+      const r = await api("/drivers/location",{method:"POST",body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude})});
+      toast(r.new_offers?`${r.new_offers} new offer(s) nearby`:"Location updated"); vDrive();
+    }catch(err){ toast(err.message); }
+  }, ()=>toast("Could not get your location"));
+}
+
+async function acceptOffer(id){
+  try{ await api(`/offers/${id}/accept`,{method:"POST"}); toast("Load accepted! Head to pickup."); vDrive(); }
+  catch(err){ toast(err.message); }
+}
+
+/* ---------- TRACK ---------- */
+async function vTrack(){
+  $("#app").innerHTML = `<div class="card"><h2>Live drivers</h2><p class="muted">Carriers sharing their position in the last 10 minutes.</p></div><div id="drv"><p class="muted">Loading…</p></div>`;
+  try{
+    const drv = await api("/drivers/locations");
+    $("#drv").innerHTML = drv.length ? drv.map(d=>`<div class="item">
+      <div class="route">${esc(d.name)} ${d.live?'<span class="pill open">LIVE</span>':""}</div>
+      <div class="meta">${esc(d.truck)} ${esc(d.plate)} · updated ${d.updated_at?new Date(d.updated_at).toLocaleTimeString():"—"}</div>
+    </div>`).join("") : `<p class="muted">No drivers broadcasting yet.</p>`;
+  }catch(e){ $("#drv").innerHTML=`<p class="muted">${esc(e.message)}</p>`; }
+}
+
+/* ---------- AI AGENT ---------- */
+function vAgent(){
+  $("#app").innerHTML = `<div class="card">
+    <h2>AI dispatcher</h2>
+    <p class="muted">Try: "price Accra to Kumasi" or "find a load from Tema".</p>
+    <div class="chatlog" id="chatlog"><div class="bubble bot">I can price routes and find open loads — ask me anything.</div></div>
+    <div class="row"><input id="chatIn" placeholder="Ask about prices or loads…" onkeydown="if(event.key==='Enter')sendChat()"><button class="btn" onclick="sendChat()">Send</button></div>
+  </div>`;
+}
+async function sendChat(){
+  const inp=$("#chatIn"), msg=inp.value.trim(); if(!msg) return;
+  inp.value="";
+  $("#chatlog").insertAdjacentHTML("beforeend",`<div class="bubble me">${esc(msg)}</div>`);
+  try{
+    const r = await api("/agent/chat",{method:"POST",body:JSON.stringify({message:msg,history:chatHistory})});
+    chatHistory.push({role:"user",content:msg},{role:"assistant",content:r.reply});
+    $("#chatlog").insertAdjacentHTML("beforeend",`<div class="bubble bot">${esc(r.reply)}</div>`);
+  }catch(err){ $("#chatlog").insertAdjacentHTML("beforeend",`<div class="bubble bot">${esc(err.message)}</div>`); }
+  $("#chatlog").scrollTop = $("#chatlog").scrollHeight;
+}
+
+/* ---------- PROFILE (referral lives here after signup) ---------- */
+async function vProfile(){
+  if(!me){ location.hash="#auth"; return; }
+  let ref=null, bal=null;
+  try{ ref = await api("/me/referral"); bal = await api("/me/balance"); }catch(e){}
+  $("#app").innerHTML = `<div class="card">
+    <h2>${esc(me.company_name)}</h2>
+    <p class="muted">${esc(me.email)} · ${me.role}${me.is_admin?" · admin":""}</p>
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="stat"><b>GHS ${(bal?.available_ghs??0).toFixed(0)}</b><span class="muted">available</span></div>
+      <div class="stat"><b>GHS ${(bal?.pending_ghs??0).toFixed(0)}</b><span class="muted">pending</span></div>
+    </div></div>
+  ${ref?`<div class="card"><h2>Referrals</h2>
+    <p class="muted">Earn GHS ${ref.reward_ghs} when a referral completes their first paid order.</p>
+    <label>Your code</label><input readonly value="${esc(ref.code)}" onclick="this.select();navigator.clipboard&&navigator.clipboard.writeText(this.value);toast('Copied')">
+    <label>Share link</label><input readonly value="${esc(ref.link)}" onclick="this.select();navigator.clipboard&&navigator.clipboard.writeText(this.value);toast('Copied')">
+    <p class="muted" style="margin-top:10px">${ref.referred.length} referral(s) joined.</p>
+  </div>`:""}`;
+}
+
+boot();
+</script>
+</body>
+</html>
