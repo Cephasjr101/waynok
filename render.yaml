@@ -1,0 +1,43 @@
+# Render Blueprint — one-click deploy of Waynok WITH its database.
+# Push this repo to GitHub, then in Render: New -> Blueprint -> pick the repo.
+# It creates: a Postgres database + the web service, fully wired.
+
+services:
+  - type: web
+    name: waynok
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      # Wired straight to the database below — no manual copying of URLs.
+      # (Render's internal URL starts with postgres:// ; database.py rewrites it.)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: waynok-db
+          property: connectionString
+      # Auto-generated on first deploy — override in the dashboard if you ever need to.
+      - key: SECRET_KEY
+        generateValue: true
+      # Fill these in the Render dashboard after deploy:
+      - key: PUBLIC_BASE_URL
+        sync: false          # e.g. https://waynok.net
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false          # optional, server-side Routes API
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false          # e.g. /etc/secrets/firebase-key.json (use a Secret File)
+      - key: ADMIN_EMAILS
+        sync: false          # comma-separated admin emails
+      - key: PAYSTACK_SECRET_KEY
+        sync: false          # enables mobile-money payments
+      - key: PAYSTACK_CALLBACK_URL
+        sync: false          # e.g. https://waynok.net/payments/callback
+      - key: SMTP_HOST
+        sync: false          # enables outgoing email notifications
+
+databases:
+  - name: waynok-db
+    plan: starter
+    databaseName: waynok
+    user: waynok
