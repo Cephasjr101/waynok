@@ -29,6 +29,16 @@ def ensure_columns():
     insp = inspect(engine)
     wanted = {
         "users": [
+            ("phone", "VARCHAR"),
+            ("phone_verified", "INTEGER DEFAULT 0"),
+            ("verify_code_hash", "VARCHAR"),
+            ("verify_expires_at", "DATETIME"),
+            ("verify_attempts", "INTEGER DEFAULT 0"),
+            ("momo_provider", "VARCHAR"),
+            ("momo_number", "VARCHAR"),
+            ("bank_name", "VARCHAR"),
+            ("bank_account_name", "VARCHAR"),
+            ("bank_account_number", "VARCHAR"),
             ("email_notifications", "INTEGER DEFAULT 1"),
             ("disabled", "INTEGER DEFAULT 0"),
             ("role_source", "VARCHAR DEFAULT 'self'"),

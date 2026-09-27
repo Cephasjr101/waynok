@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waynok — Ghana's Load Board | Match Freight with Nearby Trucks</title>
+<meta name="description" content="Waynok connects shippers and carriers across Ghana. Post freight, get matched with available drivers within 50 miles, and track trucks live.">
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Waynok">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb020'/%3E%3Cstop offset='1' stop-color='%23ff7a1a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230b0e14'/%3E%3Cpath d='M12 22h24v22H12zM36 28h9l7 7v9H36z' fill='none' stroke='url(%23g)' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='20' cy='46' r='4' fill='url(%23g)'/%3E%3Ccircle cx='44' cy='46' r='4' fill='url(%23g)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>:root {
+    --bg:#0b0e14; --bg2:#0f1420; --panel:#141a28; --panel2:#1a2133;
+    --line:#232c42; --txt:#eef1f8; --dim:#8f98b3; --acc:#ffb020; --acc2:#ff7a1a;
+    --ok:#34d399; --bad:#ff5c5c; --blue:#5b9dff;
+  }
+  * { box-sizing:border-box; margin:0; }
+  html { scroll-behavior:smooth; }
+  body { background:radial-gradient(1200px 600px at 80% -10%, #182238 0%, var(--bg) 55%); color:var(--txt);
+         font:15px/1.55 "Sora",system-ui,sans-serif; min-height:100vh; }
+  ::selection { background:var(--acc); color:#111; }
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-track { background:var(--bg2); }
+  ::-webkit-scrollbar-thumb { background:var(--line); border-radius:6px; }
+  ::-webkit-scrollbar-thumb:hover { background:#32405f; }
+
+  /* ================= HEADER ================= */
+  header { display:flex; align-items:center; gap:18px; padding:14px 26px; border-bottom:1px solid var(--line);
+           background:rgba(9,12,19,.8); backdrop-filter:blur(16px); position:sticky; top:0; z-index:50; }
+  .logo { font-weight:800; font-size:21px; letter-spacing:2px; display:flex; align-items:center; gap:9px;
+          background:linear-gradient(90deg,var(--acc),var(--acc2)); -webkit-background-clip:text; background-clip:text; color:transparent; cursor:pointer; }
+  .logo::before { content:""; width:26px; height:26px; border-radius:8px; flex:none;
+          background:linear-gradient(135deg,var(--acc),var(--acc2));
+          -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7h11v10H3zM14 10h4l3 3v4h-7z'/%3E%3Ccircle cx='7' cy='17' r='2'/%3E%3Ccircle cx='17' cy='17' r='2'/%3E%3C/svg%3E") center/contain no-repeat, linear-gradient(#fff,#fff);
+          -webkit-mask-composite:destination-out; mask-composite:exclude; }
+  .logo span { color:var(--txt); -webkit-text-fill-color:var(--txt); }
+  nav { display:flex; gap:2px; background:rgba(255,255,255,.03); border:1px solid var(--line); padding:4px; border-radius:12px; }
+  nav button { background:none; border:none; color:var(--dim); font:600 13px "Sora"; padding:8px 16px; cursor:pointer; border-radius:9px; transition:.2s; }
+  nav button.active { color:#161006; background:linear-gradient(90deg,var(--acc),var(--acc2)); box-shadow:0 4px 14px rgba(255,140,20,.35); }
+  nav button:not(.active):hover { color:var(--txt); background:var(--panel2); }
+  .spacer { flex:1; }
+  .pill { font:600 12px "IBM Plex Mono",monospace; padding:5px 12px; border-radius:20px; border:1px solid var(--line); color:var(--dim); }
+  .pill.on { color:var(--ok); border-color:#1f4636; background:rgba(52,211,153,.08); }
+  button.ghost { background:rgba(255,255,255,.03); border:1px solid var(--line); color:var(--dim); padding:7px 14px; border-radius:10px; cursor:pointer; font:600 13px "Sora"; transition:.2s; }
+  button.ghost:hover { color:var(--txt); border-color:var(--acc); box-shadow:0 0 0 3px rgba(255,176,32,.1); }
+
+  main { max-width:1180px; margin:26px auto; padding:0 20px; }
+  .tabpage { animation:fadeUp .35s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+  /* ================= PANELS ================= */
+  .panel { background:linear-gradient(160deg,rgba(26,33,51,.75),rgba(15,20,32,.85)); border:1px solid var(--line); border-radius:18px; padding:22px; margin-bottom:20px;
+           box-shadow:0 14px 40px rgba(0,0,0,.35); backdrop-filter:blur(8px); position:relative; overflow:hidden; }
+  .panel::before { content:""; position:absolute; inset:0 0 auto 0; height:1px;
+           background:linear-gradient(90deg,transparent,rgba(255,176,32,.35),transparent); }
+  h2 { font-size:16px; font-weight:700; letter-spacing:.4px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+  h2::before { content:""; width:4px; height:16px; border-radius:2px; background:linear-gradient(var(--acc),var(--acc2)); box-shadow:0 0 10px rgba(255,140,20,.5); }
+
+  input, textarea, select { width:100%; padding:11px 14px; border-radius:11px; border:1px solid var(--line); background:#0d1220; color:var(--txt); font:14px "Sora"; margin-bottom:10px; transition:.2s; }
+  input::placeholder, textarea::placeholder { color:#5a6480; }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--acc); box-shadow:0 0 0 3px rgba(255,176,32,.14), 0 0 20px rgba(255,140,20,.08); }
+  select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238f98b3' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
+
+  button.btn { background:linear-gradient(90deg,var(--acc),var(--acc2)); color:#161006; font-weight:700; border:none; padding:11px 20px; border-radius:11px; cursor:pointer; font:700 14px "Sora"; transition:.2s; box-shadow:0 6px 18px rgba(255,140,20,.25); }
+  button.btn:hover { filter:brightness(1.12); transform:translateY(-1px); box-shadow:0 10px 24px rgba(255,140,20,.35); }
+  button.btn:active { transform:translateY(0); }
+  button.btn:disabled { opacity:.5; cursor:default; transform:none; box-shadow:none; }
+
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:11px 12px; border-bottom:1px solid var(--line); }
+  th { color:var(--dim); font:600 11px "IBM Plex Mono",monospace; text-transform:uppercase; letter-spacing:1.2px; }
+  tbody tr { transition:background .15s; }
+  tbody tr:hover td { background:rgba(255,176,32,.04); }
+  tbody tr:last-child td { border-bottom:none; }
+  .badge { padding:4px 11px; border-radius:20px; font:600 11px "IBM Plex Mono",monospace; white-space:nowrap; }
+  .open { background:rgba(91,157,255,.14); color:var(--blue); border:1px solid rgba(91,157,255,.25); }
+  .assigned, .on_trip { background:rgba(255,176,32,.12); color:var(--acc); border:1px solid rgba(255,176,32,.25); }
+  .delivered { background:rgba(52,211,153,.12); color:var(--ok); border:1px solid rgba(52,211,153,.25); }
+  .cancelled { background:rgba(143,152,179,.1); color:var(--dim); border:1px solid var(--line); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width:820px){ .grid2,.grid3{grid-template-columns:1fr;} }
+  .stat { background:linear-gradient(160deg,var(--panel2),rgba(20,26,40,.9)); border:1px solid var(--line); border-radius:14px; padding:18px; position:relative; overflow:hidden; transition:.25s; }
+  .stat:hover { transform:translateY(-2px); border-color:#32405f; }
+  .stat::after { content:""; position:absolute; inset:auto 0 0 0; height:2px; background:linear-gradient(90deg,var(--acc),transparent); }
+  .stat .num { font:800 26px "Sora"; background:linear-gradient(90deg,#fff,#cfd8ee); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .stat .lbl { color:var(--dim); font-size:11px; margin-top:4px; letter-spacing:1.5px; }
+  #map { height:460px; border-radius:14px; background:var(--bg2); border:1px solid var(--line); }
+  .err { color:var(--bad); font-size:13px; margin-top:6px; }
+  .hint { color:var(--dim); font-size:13px; }
+  .hidden { display:none !important; }
+  .row { display:flex; gap:10px; } .row > * { flex:1; }
+  .skel { height:14px; border-radius:6px; background:linear-gradient(90deg,var(--panel2) 25%,var(--line) 50%,var(--panel2) 75%); background-size:200% 100%; animation:sh 1.2s infinite; }
+  @keyframes sh { to { background-position:-200% 0; } }
+
+  #toast { position:fixed; bottom:24px; right:24px; background:var(--panel2); border:1px solid var(--line); border-left:3px solid var(--acc);
+           padding:13px 20px; border-radius:12px; font-size:13px; opacity:0; transform:translateY(10px); transition:.3s; z-index:99; max-width:340px;
+           box-shadow:0 16px 40px rgba(0,0,0,.5); }
+  #toast.show { opacity:1; transform:none; }
+  #toast.bad { border-left-color:var(--bad); }
+
+  /* ================= HOME HERO ================= */
+  .home-hero { position:relative; overflow:hidden; border-radius:20px; border:1px solid var(--line); margin-bottom:20px;
+    background:linear-gradient(120deg,#131b30 0%,#17264a 60%,#1d3055 100%); min-height:240px; display:flex; align-items:center;
+    box-shadow:0 18px 50px rgba(0,0,0,.35); }
+  .home-hero::before { content:""; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+    background-size:44px 44px; mask-image:radial-gradient(600px 300px at 70% 30%, black, transparent); }
+  .home-hero::after { content:""; position:absolute; width:340px; height:340px; right:-60px; top:-120px; border-radius:50%;
+    background:radial-gradient(circle,rgba(255,140,20,.18),transparent 65%); animation:blob 9s ease-in-out infinite alternate; }
+  @keyframes blob { from { transform:translate(0,0) scale(1);} to { transform:translate(-30px,25px) scale(1.15);} }
+  .home-hero .inner { position:relative; z-index:2; padding:38px 42px; max-width:580px; }
+  .home-hero h1 { font-size:clamp(26px,3.4vw,38px); font-weight:800; line-height:1.15; letter-spacing:-.5px; }
+  .home-hero h1 em { font-style:normal; background:linear-gradient(90deg,var(--acc),var(--acc2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .home-hero p { color:#b9c3dd; margin:12px 0 20px; font-size:14.5px; }
+  .live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok); margin-right:7px; animation:pulse-dot 1.6s infinite; }
+  @keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.5)} 50%{box-shadow:0 0 0 6px rgba(52,211,153,0)} }
+  .qa { background:linear-gradient(160deg,var(--panel2),rgba(20,26,40,.9)); border:1px solid var(--line); border-radius:16px; padding:20px; cursor:pointer; transition:.25s; position:relative; overflow:hidden; }
+  .qa::after { content:"→"; position:absolute; right:16px; top:14px; color:var(--dim); transition:.25s; }
+  .qa:hover { transform:translateY(-4px); border-color:var(--acc); box-shadow:0 14px 34px rgba(0,0,0,.4); }
+  .qa:hover::after { color:var(--acc); transform:translateX(3px); }
+  .qa .ic { width:44px; height:44px; border-radius:13px; display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+            background:linear-gradient(135deg,rgba(255,176,32,.18),rgba(255,122,26,.08)); border:1px solid rgba(255,176,32,.25); }
+  .qa .ic svg { width:22px; height:22px; stroke:var(--acc); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .qa h3 { font-size:15px; margin-bottom:5px; }
+  .qa p { color:var(--dim); font-size:13px; }
+
+  /* ================= LOGIN SCENE ================= */
+  #hero { min-height:calc(100vh - 63px); display:grid; grid-template-columns:1.15fr .85fr; }
+  @media (max-width:900px){ #hero{grid-template-columns:1fr;} }
+  #sceneWrap { position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center;
+               background:linear-gradient(180deg,#0d1526 0%,#14203c 55%,#1b2a4d 100%); border-right:1px solid var(--line); padding:40px; }
+  .scene { position:absolute; inset:0; z-index:1; pointer-events:none; }
+  .scene svg { width:100%; height:100%; display:block; }
+  .truck-anim { animation:drive 12s linear infinite; }
+  @keyframes drive { from { transform:translateX(-180px); } to { transform:translateX(920px); } }
+  .road-dash { animation:dashmove 1s linear infinite; }
+  @keyframes dashmove { to { stroke-dashoffset:-48; } }
+  .star { animation:twinkle 3.5s ease-in-out infinite; }
+  @keyframes twinkle { 0%,100% { opacity:.15; } 50% { opacity:.9; } }
+  .hero-copy { position:relative; z-index:2; max-width:430px; background:rgba(11,14,20,.45); border:1px solid rgba(35,44,66,.6);
+  border-radius:18px; padding:22px 24px; backdrop-filter:blur(6px); }
+  .hero-copy h1 { font-size:clamp(30px,4.2vw,46px); font-weight:800; line-height:1.1; letter-spacing:-.6px; text-shadow:0 4px 30px rgba(0,0,0,.5); }
+  .hero-copy h1 em { font-style:normal; background:linear-gradient(90deg,var(--acc),var(--acc2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-copy p { color:var(--dim); margin-top:14px; font-size:15px; }
+  .chips { display:flex; gap:8px; margin-top:20px; flex-wrap:wrap; }
+  .chip { font:600 11px "IBM Plex Mono",monospace; color:var(--acc); border:1px solid #4a3814; background:rgba(255,176,32,.07); padding:5px 11px; border-radius:20px; }
+
+  #loginSide { position:relative; display:flex; align-items:center; justify-content:center; padding:40px 28px;
+               background:radial-gradient(700px 500px at 50% 0%, #131b2e 0%, var(--bg) 70%); }
+  .login-card { width:100%; max-width:390px; background:rgba(20,26,40,.55); border:1px solid var(--line); border-radius:22px; padding:30px 28px;
+                backdrop-filter:blur(12px); box-shadow:0 24px 60px rgba(0,0,0,.45); animation:fadeUp .5s ease; }
+  .login-card h2 { font-size:23px; } .login-card h2::before{ display:none; }
+  .login-card .sub { color:var(--dim); font-size:13px; margin:-6px 0 18px; }
+  .divider { display:flex; align-items:center; gap:12px; color:var(--dim); font:600 11px "IBM Plex Mono",monospace; margin:16px 0; }
+  .divider::before,.divider::after { content:""; flex:1; height:1px; background:var(--line); }
+
+  /* ================= CHAT ================= */
+  #chatLog, #chatThread { scrollbar-width:thin; }
+  .msg { margin-bottom:12px; max-width:80%; padding:11px 15px; border-radius:14px; white-space:pre-wrap; font-size:14px; animation:fadeUp .25s ease; }
+  .msg.user { background:linear-gradient(135deg,#28406b,#1b2b4a); margin-left:auto; border-bottom-right-radius:4px; border:1px solid #2c4470; }
+  .msg.bot { background:var(--panel2); border:1px solid var(--line); border-bottom-left-radius:4px; }
+  .msg .who { font:600 10px "IBM Plex Mono",monospace; color:var(--dim); display:block; margin-bottom:4px; letter-spacing:1px; }
+
+  /* ================= MENU & PAGES ================= */
+  .avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--acc),var(--acc2));
+            color:#161006; font:800 15px "Sora"; display:flex; align-items:center; justify-content:center; cursor:pointer;
+            border:2px solid var(--line); user-select:none; transition:.2s; }
+  .avatar:hover { transform:scale(1.06); border-color:var(--acc); box-shadow:0 0 16px rgba(255,140,20,.35); }
+  .menu-wrap { position:relative; }
+  .menu { position:absolute; right:0; top:46px; width:235px; background:rgba(26,33,51,.97); border:1px solid var(--line); border-radius:14px;
+          box-shadow:0 22px 50px rgba(0,0,0,.55); padding:6px; z-index:60; animation:fadeUp .18s ease; }
+  .menu-item { display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:9px; cursor:pointer; font-size:14px; color:var(--txt); }
+  .menu-item:hover { background:var(--line); }
+  .menu-item .mi { width:20px; text-align:center; color:var(--dim); }
+  .menu-item:hover .mi { color:var(--acc); }
+  .menu-sep { height:1px; background:var(--line); margin:5px 8px; }
+  .profile-head { display:flex; align-items:center; gap:16px; margin-bottom:18px; }
+  .profile-head .big-av { width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,var(--acc),var(--acc2));
+            color:#161006; font:800 28px "Sora"; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(255,140,20,.3); }
+  .faq-item { border:1px solid var(--line); border-radius:12px; margin-bottom:10px; overflow:hidden; background:rgba(255,255,255,.015); transition:.2s; }
+  .faq-q { padding:14px 16px; cursor:pointer; font-weight:600; font-size:14px; display:flex; justify-content:space-between; align-items:center; }
+  .faq-q::after { content:"+"; color:var(--acc); font-size:18px; transition:.2s; }
+  .faq-item.open { border-color:rgba(255,176,32,.4); }
+  .faq-item.open .faq-q::after { transform:rotate(45deg); }
+  .faq-a { max-height:0; overflow:hidden; transition:max-height .3s ease; color:var(--dim); font-size:13.5px; }
+  .faq-item.open .faq-a { max-height:220px; }
+  .faq-a > div { padding:0 16px 14px; }
+  .tip { display:flex; gap:12px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; font-size:14px; background:rgba(255,255,255,.015); }
+  .tip .ti { color:var(--acc); font-weight:700; }
+  .kv { display:flex; justify-content:space-between; padding:12px 2px; border-bottom:1px solid var(--line); font-size:14px; }
+  .kv .k { color:var(--dim); }
+  .toggle { position:relative; width:42px; height:23px; background:var(--line); border-radius:20px; cursor:pointer; transition:.2s; flex:none; }
+  .toggle::after { content:""; position:absolute; top:3px; left:3px; width:17px; height:17px; border-radius:50%; background:var(--txt); transition:.2s; }
+  .toggle.on { background:var(--ok); }
+  .toggle.on::after { left:22px; background:#0b0e14; }
+  .promo { border:1px dashed rgba(255,176,32,.5); border-radius:14px; padding:18px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:12px;
+           background:rgba(255,176,32,.03); transition:.2s; }
+  .promo:hover { background:rgba(255,176,32,.06); }
+  .promo .code { font:600 13px "IBM Plex Mono",monospace; color:var(--acc); letter-spacing:1px; }
+  .place-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:11px; margin-bottom:8px; font-size:14px; background:rgba(255,255,255,.015); }
+  .place-row .pn { font-weight:600; }
+  .act-item { display:flex; gap:12px; padding:11px 2px; border-bottom:1px solid var(--line); font-size:14px; align-items:baseline; }
+  .act-item .at { font:500 11px "IBM Plex Mono",monospace; color:var(--dim); flex:none; }
+
+  /* ================= DRIVERS ================= */
+  .filter-bar { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .fchip { padding:6px 15px; border-radius:20px; border:1px solid var(--line); color:var(--dim); font:600 12px "Sora"; cursor:pointer; transition:.2s; }
+  .fchip:hover { color:var(--txt); }
+  .fchip.active { background:linear-gradient(90deg,var(--acc),var(--acc2)); color:#161006; border-color:transparent; box-shadow:0 4px 12px rgba(255,140,20,.3); }
+  .drv { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--line); border-radius:13px; margin-bottom:9px; transition:.2s; background:rgba(255,255,255,.015); }
+  .drv:hover { border-color:var(--acc); transform:translateX(3px); }
+  .drv .dot { width:10px; height:10px; border-radius:50%; flex:none; }
+  .dot.avail { background:var(--ok); box-shadow:0 0 0 3px rgba(52,211,153,.15); }
+  .dot.trip { background:var(--acc); box-shadow:0 0 0 3px rgba(255,176,32,.15); animation:pulse-dot 1.6s infinite; }
+  .dot.off { background:var(--dim); }
+  .drv .info { flex:1; min-width:0; }
+  .drv .nm { font-weight:700; font-size:14px; }
+  .drv .meta { color:var(--dim); font-size:12px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .drv .plate { font:600 11px "IBM Plex Mono",monospace; color:var(--acc); border:1px solid var(--line); border-radius:7px; padding:3px 8px; flex:none; background:rgba(255,176,32,.06); }
+  .drv button { flex:none; padding:7px 14px; font-size:12px; }
+
+  /* ================= MATCHING ================= */
+  .match { border:1px solid var(--line); border-radius:13px; padding:15px 16px; margin-bottom:10px; background:rgba(255,255,255,.015); transition:.2s; }
+  .match:hover { border-color:#32405f; }
+  .match .route { font-weight:700; font-size:14px; }
+  .match .route .arrow { color:var(--acc); margin:0 6px; }
+  .match .ldmeta { color:var(--dim); font-size:12px; margin-top:3px; }
+  .match .drivers { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .dchip { display:flex; align-items:center; gap:6px; font-size:12px; padding:5px 11px; border-radius:20px;
+           border:1px solid var(--line); background:var(--panel2); cursor:pointer; transition:.15s; }
+  .dchip:hover { border-color:var(--acc); background:rgba(255,176,32,.08); }
+  .dchip .dot { width:7px; height:7px; border-radius:50%; }
+  .match .none { color:var(--dim); font-size:12.5px; margin-top:10px; }
+  .match .none b { color:var(--bad); font-weight:600; }
+
+  /* ================= MOBILE ================= */
+  @media (max-width: 820px) {
+    header { padding: 10px 12px; gap: 8px; }
+    nav { overflow-x:auto; max-width:100%; }
+    nav button { padding: 8px 10px; white-space: nowrap; }
+    main { margin: 16px auto; }
+    .panel { padding: 16px; }
+    .panel table { display: block; overflow-x: auto; white-space: nowrap; }
+    .row { flex-direction: column; }
+    .home-hero .inner { padding: 26px; }
+    #sceneWrap { min-height: 340px; padding: 28px; border-right: none; border-bottom: 1px solid var(--line); }
+    .login-card { max-width: 100%; }
+    .stat .num { font-size: 21px; }
+    .msg { max-width: 92%; }
+    .drv { flex-wrap: wrap; }
+  }
+  .expired { background:rgba(143,152,179,.1); color:var(--dim); border:1px solid var(--line); }
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+  @media (max-width:1100px){ .grid4{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:820px){ .grid4{grid-template-columns:1fr;} }
+  .stars { color:var(--acc); letter-spacing:2px; }
+  #modalOverlay:not(.hidden), #roleOverlay:not(.hidden), #resetOverlay:not(.hidden) { animation:fadeUp .25s ease; }
+  :focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" id="logoHome">WAY<span>NOK</span></div>
+  <nav id="tabs" class="hidden">
+    <button data-tab="home" class="active">Home</button>
+    <button data-tab="loads">Loads</button>
+    <button data-tab="map">Map</button>
+    <button data-tab="track">Track</button>
+    <button data-tab="agent">AI Dispatcher</button>
+  </nav>
+  <div class="spacer"></div>
+  <div class="menu-wrap hidden" id="menuWrap">
+    <div class="avatar" id="avatarBtn">?</div>
+    <div class="menu hidden" id="userMenu">
+      <div class="menu-item" data-page="msgs"><span class="mi">✉</span>Messages <span id="msgBadge" class="hidden" style="margin-left:auto;background:var(--bad);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;"></span></div>
+      <div class="menu-item" data-page="activities"><span class="mi">▤</span>Activities</div>
+      <div class="menu-item" data-page="profile"><span class="mi">◉</span>Profile</div>
+      <div class="menu-item" data-page="earn"><span class="mi">₵</span>Earn</div>
+      <div class="menu-item" data-page="listtruck"><span class="mi">▣</span>List your truck</div>
+      <div class="menu-item" data-page="promos"><span class="mi">✦</span>Promotions</div>
+      <div class="menu-item" data-page="saved"><span class="mi">◈</span>Saved places</div>
+      <div class="menu-item" data-page="safety"><span class="mi">✚</span>Safety</div>
+      <div class="menu-item" data-page="terms"><span class="mi">§</span>Terms</div>
+      <div class="menu-item" data-page="privacy"><span class="mi">◈</span>Privacy</div>
+      <div class="menu-item" data-page="refunds"><span class="mi">↩</span>Refunds</div>
+      <div class="menu-sep"></div>
+      <div class="menu-item" data-page="dash"><span class="mi">▶</span>Driver dashboard</div>
+      <div class="menu-item" data-page="referrals"><span class="mi">✦</span>Refer &amp; earn</div>
+      <div class="menu-item hidden" data-page="admin" id="adminMenuItem"><span class="mi">⚙</span>Admin</div>
+      <div class="menu-item" data-page="support"><span class="mi">?</span>Support</div>
+      <div class="menu-item" data-page="settings"><span class="mi">⚙</span>Settings</div>
+    </div>
+  </div>
+  <span id="authState" class="pill">guest</span>
+  <button class="ghost hidden" id="logoutBtn">Log out</button>
+</header>
+
+<!-- ================= LOGIN ================= -->
+<section id="hero">
+  <div id="sceneWrap">
+    <div class="scene" aria-hidden="true">
+      <svg viewBox="0 0 800 620" preserveAspectRatio="xMidYMax slice">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0d1526"/><stop offset=".65" stop-color="#16264a"/><stop offset="1" stop-color="#1d3258"/>
+          </linearGradient>
+          <linearGradient id="roadG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1a2338"/><stop offset="1" stop-color="#0b0e14"/>
+          </linearGradient>
+          <linearGradient id="cargoG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#2a3854"/><stop offset="1" stop-color="#1f2c46"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="620" fill="url(#sky)"/>
+        <g fill="#cfe0ff">
+          <circle class="star" cx="90" cy="70" r="1.6"/><circle class="star" cx="210" cy="120" r="1.2" style="animation-delay:.7s"/>
+          <circle class="star" cx="340" cy="55" r="1.8" style="animation-delay:1.4s"/><circle class="star" cx="470" cy="110" r="1.3" style="animation-delay:2.1s"/>
+          <circle class="star" cx="590" cy="60" r="1.7" style="animation-delay:.4s"/><circle class="star" cx="700" cy="130" r="1.2" style="animation-delay:1.8s"/>
+          <circle class="star" cx="150" cy="180" r="1.1" style="animation-delay:2.6s"/><circle class="star" cx="650" cy="200" r="1.4" style="animation-delay:1.1s"/>
+        </g>
+        <circle cx="655" cy="105" r="42" fill="#f4ead0" opacity=".85"/>
+        <circle cx="655" cy="105" r="58" fill="#f4ead0" opacity=".12"/>
+        <g fill="#131c31">
+          <rect x="0" y="300" width="70" height="220"/><rect x="80" y="250" width="56" height="270"/>
+          <rect x="146" y="320" width="80" height="200"/><rect x="238" y="210" width="60" height="310"/>
+          <rect x="310" y="290" width="72" height="230"/><rect x="540" y="240" width="62" height="280"/>
+          <rect x="614" y="300" width="76" height="220"/><rect x="702" y="260" width="60" height="260"/>
+        </g>
+        <g fill="#ffb020" opacity=".55">
+          <rect x="92" y="270" width="8" height="8"/><rect x="112" y="292" width="8" height="8"/><rect x="92" y="314" width="8" height="8"/>
+          <rect x="250" y="232" width="8" height="8"/><rect x="270" y="258" width="8" height="8"/><rect x="250" y="286" width="8" height="8"/>
+          <rect x="552" y="262" width="8" height="8"/><rect x="572" y="290" width="8" height="8"/>
+          <rect x="714" y="282" width="8" height="8"/><rect x="734" y="310" width="8" height="8"/>
+        </g>
+        <rect x="430" y="330" width="7" height="45" fill="#233250"/>
+        <circle cx="433.5" cy="322" r="12" fill="#ff5c5c" opacity=".9"><animate attributeName="opacity" values=".9;.25;.9" dur="2s" repeatCount="indefinite"/></circle>
+        <polygon points="0,620 800,620 800,470 0,505" fill="url(#roadG)"/>
+        <line class="road-dash" x1="0" y1="545" x2="800" y2="515" stroke="#ffb020" stroke-width="5" stroke-dasharray="34 26" opacity=".8"/>
+        <line x1="0" y1="516" x2="800" y2="486" stroke="#2a3854" stroke-width="3" opacity=".6"/>
+        <g class="truck-anim">
+          <g transform="translate(0,428)">
+            <ellipse cx="105" cy="118" rx="95" ry="7" fill="#000" opacity=".35"/>
+            <rect x="10" y="30" width="120" height="72" rx="6" fill="url(#cargoG)" stroke="#ffb020" stroke-width="2"/>
+            <rect x="130" y="52" width="42" height="50" rx="7" fill="#2a3854" stroke="#3a4a6e" stroke-width="2"/>
+            <rect x="136" y="58" width="26" height="20" rx="3" fill="#9fc2ff" opacity=".85"/>
+            <rect x="118" y="88" width="14" height="14" fill="#ffb020"/>
+            <circle cx="45" cy="106" r="15" fill="#0b0e14" stroke="#3a4a6e" stroke-width="4"/>
+            <circle cx="105" cy="106" r="15" fill="#0b0e14" stroke="#3a4a6e" stroke-width="4"/>
+            <circle cx="155" cy="106" r="13" fill="#0b0e14" stroke="#3a4a6e" stroke-width="4"/>
+            <circle cx="45" cy="106" r="5" fill="#ffb020"/><circle cx="105" cy="106" r="5" fill="#ffb020"/><circle cx="155" cy="106" r="4" fill="#ffb020"/>
+            <rect x="18" y="40" width="62" height="6" rx="3" fill="#ffb020" opacity=".85"/>
+            <rect x="18" y="52" width="40" height="6" rx="3" fill="#3a4a6e"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="hero-copy">
+      <h1>Every mile<br><em>pays for itself.</em></h1>
+      <p>The load board that hunts deadhead miles. Match freight, track trucks live, dispatch by chat.</p>
+      <div class="chips">
+        <span class="chip">LIVE TRACKING</span><span class="chip">AI DISPATCHER</span><span class="chip">SMART MATCHING</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginSide">
+    <div class="login-card">
+      <h2 id="authTitle">Join Waynok.</h2>
+      <p class="sub" id="authSub">Create your dispatch account in seconds.</p>
+      <input id="regName" type="text" placeholder="Full name" autocomplete="name" aria-label="Full name">
+      <div id="regRoleWrap" style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="fchip active" data-r="shipper">Shipper (post loads)</div>
+        <div class="fchip" data-r="carrier">Carrier / Driver (haul loads)</div>
+      </div>
+      <div id="authModeWrap" class="hidden" style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="fchip active" data-am="email">&#64; Email</div>
+        <div class="fchip" data-am="phone">&#128241; Phone number</div>
+      </div>
+      <input id="refCode" type="text" placeholder="Referral code (optional)" maxlength="12" style="text-transform:uppercase;" aria-label="Referral code (optional)">
+      <div id="emailWrap"><input id="loginEmail" type="text" placeholder="Email or phone number" autocomplete="username" aria-label="Email address or phone number"></div>
+      <div id="phoneWrap" class="hidden"><input id="regPhone" type="tel" placeholder="Phone (e.g. 0544123456)" autocomplete="tel" aria-label="Phone number"></div>
+      <input id="loginPass" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password" aria-label="Password">
+      <p class="hint" style="text-align:right;margin:-4px 2px 10px 0;"><a href="#" id="forgotLink" style="color:var(--dim);font-size:12px;">Forgot password?</a></p>
+      <button class="btn" id="loginBtn" style="width:100%;">Create account</button>
+      <div class="err" id="loginErr"></div>
+      <p class="hint" style="margin-top:14px; text-align:center;">
+        <span id="authSwitchText">Already have an account?</span>
+        <a href="#" id="authSwitch" style="color:var(--acc); font-weight:600; text-decoration:none;"> Sign in</a>
+      </p>
+      <div class="divider">OR</div>
+      <button class="ghost" id="guestBtn" style="width:100%;">Continue as guest</button>
+      <p class="hint" style="margin-top:14px; text-align:center;">
+        <a href="#" data-page-link="terms" style="color:var(--dim); text-decoration:none;">Terms</a>
+        &nbsp;·&nbsp;
+        <a href="#" data-page-link="privacy" style="color:var(--dim); text-decoration:none;">Privacy</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APP ================= -->
+<main id="app" class="hidden">
+
+  <!-- HOME -->
+  <section id="home" class="tabpage">
+    <div class="home-hero">
+      <div class="inner">
+        <p style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:2px;color:var(--acc);margin-bottom:10px;">
+          <span class="live-dot"></span>DISPATCH CONSOLE · LIVE
+        </p>
+        <h1 id="greeting">Welcome back, <em>driver.</em></h1>
+        <p id="greetingSub">Here's what's moving across the board right now.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn" data-goto="loads">Post a load</button>
+          <button class="ghost" data-goto="agent" style="padding:11px 20px;">Ask the AI dispatcher</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3" style="margin-bottom:20px;">
+      <div class="stat"><div class="num" id="statLoads">–</div><div class="lbl">ACTIVE LOADS</div></div>
+      <div class="stat"><div class="num" id="statMiles">–</div><div class="lbl">TOTAL MILES</div></div>
+      <div class="stat"><div class="num" id="statValue">–</div><div class="lbl">FREIGHT VALUE</div></div>
+    </div>
+
+    <div class="grid3" style="margin-bottom:20px;">
+      <div class="qa" data-goto="loads">
+        <div class="ic"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+        <h3>Post freight</h3><p>List a new load on the board in seconds — pickup, dropoff, weight, price.</p>
+      </div>
+      <div class="qa" data-goto="map">
+        <div class="ic"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg></div>
+        <h3>Plan a route</h3><p>Get road miles and drive time between any two points.</p>
+      </div>
+      <div class="qa" data-goto="agent">
+        <div class="ic"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"/><path d="M8 9h8M8 12h5"/></svg></div>
+        <h3>AI dispatcher</h3><p>Ask in plain English — find loads, price hauls, check distances.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Recent loads <button class="ghost" id="viewAllBtn" style="margin-left:auto;">View all</button></h2>
+      <table>
+        <thead><tr><th>Pickup</th><th>Dropoff</th><th>Miles</th><th>Weight</th><th>Price</th><th>Status</th></tr></thead>
+        <tbody id="recentRows"><tr><td colspan="6"><div class="skel"></div></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LOADS -->
+  <section id="loads" class="tabpage hidden">
+    <div class="panel">
+      <h2>Post a load</h2>
+      <div class="grid2">
+        <input id="ldPickup" placeholder="Pickup city (Accra, Kumasi, Tema…)" aria-label="Pickup city">
+        <input id="ldDropoff" placeholder="Dropoff city (Accra, Kumasi, Tema…)" aria-label="Dropoff city">
+        <input id="ldWeight" type="number" min="1" placeholder="Weight (kg)" aria-label="Weight in kilograms">
+        <input id="ldPrice" type="number" min="0" placeholder="Offered price (₵)" aria-label="Offered price in cedi">
+      </div>
+      <select id="ldEquip" aria-label="Equipment type">
+        <option value="dry_van">Dry van</option><option value="flatbed">Flatbed</option>
+        <option value="reefer">Reefer</option><option value="box_truck">Box truck</option>
+        <option value="tanker">Tanker</option>
+      </select>
+      <button class="btn" id="postLoadBtn">Post load</button>
+      <div class="err" id="loadErr"></div>
+      <p class="hint" style="margin-top:8px;">Requires a signed-in <b>Shipper</b> account. Pickup is set to 24h from now.</p>
+    </div>
+    <div class="panel">
+      <h2>Load board <button class="ghost" id="refreshBtn" style="margin-left:auto;">Refresh</button></h2>
+      <div class="row" style="margin-bottom:14px;">
+        <input id="fltCity" placeholder="Filter by city…" style="margin-bottom:0;">
+        <select id="fltEquip" style="margin-bottom:0;">
+          <option value="">All equipment</option>
+          <option value="dry_van">Dry van</option><option value="flatbed">Flatbed</option>
+          <option value="reefer">Reefer</option><option value="box_truck">Box truck</option>
+          <option value="tanker">Tanker</option>
+        </select>
+      </div>
+      <table>
+        <thead><tr><th>Pickup</th><th>Dropoff</th><th>Miles</th><th>Weight</th><th>Price</th><th>Status</th></tr></thead>
+        <tbody id="loadRows"><tr><td colspan="6"><div class="skel"></div></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section id="mapTab" class="tabpage hidden">
+    <div class="panel">
+      <h2>Route planner</h2>
+      <div class="row">
+        <input id="mpOrigin" placeholder="Origin (e.g. Accra, Ghana)">
+        <input id="mpDest" placeholder="Destination (e.g. Kumasi, Ghana)">
+      </div>
+      <button class="btn" id="routeBtn">Get route &amp; distance</button>
+      <p class="hint" id="routeInfo" style="margin-top:12px;"></p>
+    </div>
+    <div class="panel"><div id="map"></div></div>
+  </section>
+
+  <!-- TRACK -->
+  <section id="track" class="tabpage hidden">
+    <div class="panel">
+      <h2>Drivers <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;" id="drvCount"></span>
+        <button class="ghost" id="gotoListTruck" style="margin-left:auto;">+ List your truck</button></h2>
+      <input id="drvSearch" placeholder="Search driver, truck, plate or location…" style="margin-bottom:12px;" aria-label="Search drivers">
+      <div class="filter-bar" id="drvFilters">
+        <div class="fchip active" data-f="all">All</div>
+        <div class="fchip" data-f="available">Available</div>
+        <div class="fchip" data-f="on_trip">On trip</div>
+      </div>
+      <div id="drvList"><div class="skel"></div><div class="skel" style="margin-top:8px;"></div></div>
+      <p class="hint" id="drvHint" style="margin-top:10px;"></p>
+    </div>
+    <div class="panel" id="trackMapPanel">
+      <h2>Live map <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· drivers online now</span></h2>
+      <div id="trackMap" style="height:380px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);"></div>
+      <p class="hint" id="trackMapHint" style="margin-top:8px;">Add a Maps key in index.html to see live driver positions.</p>
+    </div>
+    <div class="panel">
+      <h2>Loads matched to drivers <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· within 50 mi of pickup</span></h2>
+      <div id="matchList"><div class="skel"></div></div>
+    </div>
+  </section>
+
+  <!-- LIST TRUCK -->
+  <section id="listtruck" class="tabpage hidden">
+    <div class="panel">
+      <h2>List your truck</h2>
+      <p class="hint" style="margin-bottom:16px;">Go live on the customer board in seconds. Available trucks appear in the Track listing immediately.</p>
+      <div class="grid2">
+        <div><label class="hint">Driver name</label><input id="ltName" placeholder="e.g. Kwame Mensah" aria-label="Driver name"></div>
+        <div><label class="hint">Truck type</label>
+          <select id="ltType" aria-label="Truck type">
+            <option>Box truck</option><option>Trailer</option><option>Semi</option><option>Delivery van</option><option>Tanker</option><option>Flatbed</option>
+          </select>
+        </div>
+        <div><label class="hint">Plate number</label><input id="ltPlate" placeholder="e.g. GT 4521-24" aria-label="Plate number"></div>
+        <div><label class="hint">Current city / area</label><input id="ltCity" placeholder="e.g. Accra, Tema, Kumasi…" aria-label="Current city or area"></div>
+        <div><label class="hint">Capacity (kg)</label><input id="ltCap" type="number" min="1" placeholder="e.g. 8000" aria-label="Truck capacity in kilograms"></div>
+      </div>
+      <div id="ltCoords" class="hint" style="margin:6px 0 12px;"></div>
+      <button class="btn" id="ltSubmit">Go live on the board</button>
+      <div class="err" id="ltErr"></div>
+      <p class="hint" style="margin-top:8px;">Requires a signed-in <b>Carrier</b> account to publish to the server board.</p>
+    </div>
+    <div class="panel">
+      <h2>Your listed trucks</h2>
+      <div id="ltMine"><p class="hint">You haven't listed any trucks yet.</p></div>
+    </div>
+  </section>
+
+  <!-- AGENT -->
+  <section id="agentTab" class="tabpage hidden">
+    <div class="panel">
+      <h2>AI Dispatcher</h2>
+      <div id="chatLog"></div>
+      <div class="row">
+        <input id="chatInput" placeholder='Try: "find a load from Accra to Kumasi"' aria-label="Message the AI dispatcher">
+        <button class="btn" id="sendBtn" style="flex:0 0 100px;">Send</button>
+      </div>
+      <div class="err" id="chatErr"></div>
+    </div>
+  </section>
+
+  <!-- ACTIVITIES -->
+  <section id="activities" class="tabpage hidden">
+    <div class="panel">
+      <h2>Activities <button class="ghost" id="clearActBtn" style="margin-left:auto;">Clear history</button></h2>
+      <div id="actList"></div>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="profile" class="tabpage hidden">
+    <div class="panel">
+      <h2>Profile</h2>
+      <div class="profile-head">
+        <div class="big-av" id="profileAv">?</div>
+        <div>
+          <div style="font-weight:700;font-size:18px;" id="profileName">Guest</div>
+          <div class="hint" id="profileEmail">Not signed in</div>
+        </div>
+      </div>
+      <div class="kv"><span class="k">Display name</span><span id="kvName">—</span></div>
+      <div class="kv"><span class="k">Email</span><span id="kvEmail">—</span></div>
+      <div class="kv"><span class="k">Account type</span><span id="kvType">Guest</span></div>
+      <div class="kv" style="border-bottom:none;"><span class="k">Member since</span><span id="kvSince">—</span></div>
+      <div style="margin-top:16px;">
+        <input id="editName" placeholder="Set your display name">
+        <button class="btn" id="saveNameBtn">Save name</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section id="support" class="tabpage hidden">
+    <div class="panel">
+      <h2>Support</h2>
+      <div class="faq-item"><div class="faq-q">How do I post a load?</div><div class="faq-a"><div>Sign in as a Shipper, go to the Loads tab, fill in pickup, dropoff, weight and price, then hit "Post load". It appears on the board instantly.</div></div></div>
+      <div class="faq-item"><div class="faq-q">How does the AI dispatcher work?</div><div class="faq-a"><div>Open the AI Dispatcher tab and type naturally — e.g. "find me a load from Accra to Kumasi". The agent searches the board, computes distances, and estimates prices for you.</div></div></div>
+      <div class="faq-item"><div class="faq-q">How do I list my truck?</div><div class="faq-a"><div>Sign in as a Carrier, open "List your truck" from the menu, and submit your truck details. Available trucks appear on the Track tab immediately.</div></div></div>
+      <div class="faq-item"><div class="faq-q">Who do I contact for payment issues?</div><div class="faq-a"><div>Email dispatch@waynok.com. Payouts are processed weekly every Friday.</div></div></div>
+      <p class="hint" style="margin-top:14px;">Still stuck? Reach us at <b>dispatch@waynok.com</b> — average response under 4 hours.</p>
+    </div>
+  </section>
+
+  <!-- SAFETY -->
+  <section id="safety" class="tabpage hidden">
+    <div class="panel">
+      <h2>Safety on the road</h2>
+      <div class="tip"><span class="ti">✚</span><span><b>Rest every 4 hours.</b> Fatigue is the #1 cause of haulage accidents. Plan breaks into every route.</span></div>
+      <div class="tip"><span class="ti">✚</span><span><b>Verify loads before pickup.</b> Confirm weight and paperwork match the board listing before loading.</span></div>
+      <div class="tip"><span class="ti">✚</span><span><b>Share your live location.</b> Keep tracking on so dispatch always knows where you are.</span></div>
+      <div class="tip"><span class="ti">✚</span><span><b>Never share your login.</b> Waynok staff will never ask for your password or token.</span></div>
+      <div class="tip"><span class="ti">✚</span><span><b>Emergency?</b> Call Ghana emergency services on <b>112</b>, then notify dispatch.</span></div>
+    </div>
+  </section>
+
+  <!-- SAVED PLACES -->
+  <section id="saved" class="tabpage hidden">
+    <div class="panel">
+      <h2>Saved places</h2>
+      <div class="row">
+        <input id="spName" placeholder="Name (e.g. Accra Depot)">
+        <input id="spAddr" placeholder="Address / area">
+        <button class="btn" id="spAdd" style="flex:0 0 90px;">Add</button>
+      </div>
+      <div id="spList" style="margin-top:12px;"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings" class="tabpage hidden">
+    <div class="panel">
+      <h2>Settings</h2>
+      <div class="kv"><span class="k">Push notifications</span><div class="toggle" id="tgNotify"></div></div>
+      <div class="kv"><span class="k">Currency</span>
+        <select id="selCurrency" style="width:auto;margin-bottom:0;">
+          <option value="GHS">GHS — Ghana Cedi</option>
+          <option value="USD">USD — US Dollar</option>
+        </select>
+      </div>
+      <div class="kv" style="border-bottom:none;"><span class="k">Map region</span><span>West Africa</span></div>
+      <div style="margin-top:18px;">
+        <button class="ghost" id="clearDataBtn">Clear saved data</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMOTIONS -->
+  <section id="promos" class="tabpage hidden">
+    <div class="panel">
+      <h2>Promotions</h2>
+      <div class="promo">
+        <div><b>New driver bonus</b><div class="hint">Complete your first 5 deliveries and earn a ₵200 bonus.</div><div class="code" style="margin-top:6px;">WAYNOK200</div></div>
+        <button class="btn" data-code="WAYNOK200" style="flex:0 0 90px;">Apply</button>
+      </div>
+      <div class="promo">
+        <div><b>Weekend warrior</b><div class="hint">Haul on Saturdays and Sundays — 10% extra on every weekend load.</div><div class="code" style="margin-top:6px;">WEEKEND10</div></div>
+        <button class="btn" data-code="WEEKEND10" style="flex:0 0 90px;">Apply</button>
+      </div>
+      <div class="promo">
+        <div><b>Refer a driver</b><div class="hint">Get ₵150 for every driver you refer who completes 3 loads.</div><div class="code" style="margin-top:6px;">REFER150</div></div>
+        <button class="btn" data-code="REFER150" style="flex:0 0 90px;">Apply</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- EARN -->
+  <section id="earn" class="tabpage hidden">
+    <div class="panel">
+      <h2>Earn</h2>
+      <p class="hint" style="margin-bottom:16px;">Estimate your weekly earnings. Payouts are processed every Friday.</p>
+      <div class="grid2">
+        <div><label class="hint">Loads per week</label><input id="erLoads" type="number" value="6"></div>
+        <div><label class="hint">Average price per load (₵)</label><input id="erPrice" type="number" value="2500"></div>
+      </div>
+      <div class="grid3" style="margin-top:8px;">
+        <div class="stat"><div class="num" id="erWeek">₵0</div><div class="lbl">PER WEEK</div></div>
+        <div class="stat"><div class="num" id="erMonth">₵0</div><div class="lbl">PER MONTH</div></div>
+        <div class="stat"><div class="num" id="erYear">₵0</div><div class="lbl">PER YEAR</div></div>
+      </div>
+      <p class="hint" style="margin-top:12px;">Estimate only — actual earnings depend on distance, fuel and market rates.</p>
+    </div>
+  </section>
+
+  <!-- TERMS -->
+  <section id="terms" class="tabpage hidden">
+    <div class="panel">
+      <h2>Terms &amp; Conditions</h2>
+      <p class="hint" style="margin-bottom:14px;">Last updated: September 2026. By using Waynok you agree to these terms.</p>
+      <div class="tip"><span class="ti">1</span><span><b>Service.</b> Waynok is a marketplace that connects shippers who post freight with carriers who haul it. Waynok is not itself a carrier, broker, or insurer; the transport contract is strictly between the shipper and the carrier.</span></div>
+      <div class="tip"><span class="ti">2</span><span><b>Accounts.</b> Choose the right role — Shipper to post loads, Carrier to haul them. You are responsible for everything done under your account and must keep your password confidential.</span></div>
+      <div class="tip"><span class="ti">3</span><span><b>Accuracy.</b> Shippers must list accurate weights, dimensions, pickup windows, and equipment needs. Carriers must list a truthful capacity, equipment type, and current location.</span></div>
+      <div class="tip"><span class="ti">4</span><span><b>Cancellations.</b> A load may be cancelled any time before pickup; cancellations after a driver is en route should be reported to support immediately so the driver is released promptly.</span></div>
+      <div class="tip"><span class="ti">5</span><span><b>Payments.</b> Payouts to carriers are processed weekly (Fridays) unless otherwise agreed. Waynok may charge a platform commission on matched loads, displayed before you accept.</span></div>
+      <div class="tip"><span class="ti">6</span><span><b>Prohibited goods.</b> No hazardous, illegal, or unmanifested cargo. Violations terminate the account and may be reported to authorities.</span></div>
+      <div class="tip"><span class="ti">7</span><span><b>Liability.</b> Waynok provides the platform "as is" and is not liable for cargo damage, delays, losses, or disputes between users. Carry appropriate insurance.</span></div>
+      <div class="tip"><span class="ti">8</span><span><b>Contact.</b> Questions about these terms: <b>dispatch@waynok.com</b>.</span></div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section id="privacy" class="tabpage hidden">
+    <div class="panel">
+      <h2>Privacy Policy</h2>
+      <p class="hint" style="margin-bottom:14px;">Last updated: September 2026. We collect the minimum data needed to run the load board.</p>
+      <div class="tip"><span class="ti">◈</span><span><b>What we collect.</b> Account details (name, email, role), your listings (loads or trucks, including cities and coordinates you enter), and activity such as logins and matches.</span></div>
+      <div class="tip"><span class="ti">◈</span><span><b>How we use it.</b> To match loads with nearby drivers, display your listings to other users, keep you safe, prevent fraud, and improve the service. We do not sell personal data.</span></div>
+      <div class="tip"><span class="ti">◈</span><span><b>Storage.</b> Preferences and activity on your device are stored in your browser's local storage. Server data is retained while your account is active and deleted on request.</span></div>
+      <div class="tip"><span class="ti">◈</span><span><b>Security.</b> Passwords are hashed and API traffic is encrypted in transit (HTTPS).</span></div>
+      <div class="tip"><span class="ti">◈</span><span><b>Your rights.</b> You may request a copy, correction, or deletion of your data at any time by emailing <b>dispatch@waynok.com</b>.</span></div>
+    </div>
+  </section>
+
+  <!-- REFUNDS -->
+  <section id="refunds" class="tabpage hidden">
+    <div class="panel">
+      <h2>Refund Policy</h2>
+      <p class="hint" style="margin-bottom:14px;">Last updated: September 2026.</p>
+      <div class="tip"><span class="ti">1</span><span><b>Cancelled loads.</b> Loads cancelled before a driver is assigned carry no charge. Loads cancelled after connection but before pickup are reviewed; repeated cancellations may limit account features.</span></div>
+      <div class="tip"><span class="ti">2</span><span><b>Carrier payouts.</b> Payouts for completed deliveries are processed every Friday. A delivery is considered complete when the load is marked delivered in the app.</span></div>
+      <div class="tip"><span class="ti">3</span><span><b>Disputes.</b> Raise any refund request within 14 days of the charge by emailing <b>dispatch@waynok.com</b> with the load ID. We aim to resolve disputes within 7 business days.</span></div>
+    </div>
+  </section>
+
+
+  <!-- MESSAGES (conversation list) -->
+  <section id="msgs" class="tabpage hidden">
+    <div class="panel">
+      <h2>Messages</h2>
+      <div id="convList"><div class="skel"></div></div>
+      <p class="hint" id="convHint" style="margin-top:10px;">Negotiations appear here — open one from a load on the board or a driver in Track.</p>
+    </div>
+  </section>
+
+  <!-- CHAT (negotiation thread) -->
+  <section id="chat" class="tabpage hidden">
+    <div class="panel">
+      <h2 style="justify-content:flex-start;"><button class="ghost" id="chatBack" style="padding:4px 14px;">← Back</button>
+        <span id="chatTitle" style="margin-left:6px;">Negotiation</span></h2>
+      <p class="hint" id="chatLoadInfo" style="margin:-6px 0 14px;"></p>
+      <div id="chatThread" style="height:380px;overflow-y:auto;border:1px solid var(--line);border-radius:14px;padding:16px;background:#0c111f;margin-bottom:12px;"></div>
+      <div id="propPanel" class="hidden" style="border:1px dashed var(--acc);border-radius:12px;padding:12px;margin-bottom:10px;">
+        <p class="hint" style="margin-bottom:10px;">Propose terms — the other party can accept them with one tap (fill at least one):</p>
+        <div class="grid3">
+          <input id="ppPrice" type="number" min="0" placeholder="Price (₵)">
+          <input id="ppTime" type="datetime-local" aria-label="Proposed pickup time">
+          <input id="ppLoc" placeholder="Pickup location">
+        </div>
+        <button class="btn" id="ppSend" style="width:100%;">Send terms proposal</button>
+      </div>
+      <div class="row">
+        <input id="msgInput" placeholder="Type a message — discuss price, time, location…" aria-label="Message">
+        <button class="btn" id="msgSend" style="flex:0 0 90px;">Send</button>
+      </div>
+      <button class="ghost" id="propToggle" style="margin-top:10px;">📋 Propose price / time / location</button>
+    </div>
+  </section>
+
+
+  <!-- ADMIN DASHBOARD -->
+  <section id="admin" class="tabpage hidden">
+    <div class="grid4" style="margin-bottom:20px;">
+      <div class="stat"><div class="num" id="adStatUsers">–</div><div class="lbl">TOTAL USERS</div></div>
+      <div class="stat"><div class="num" id="adStatShippers">–</div><div class="lbl">SHIPPERS</div></div>
+      <div class="stat"><div class="num" id="adStatCarriers">–</div><div class="lbl">CARRIERS</div></div>
+      <div class="stat"><div class="num" id="adStatLoads">–</div><div class="lbl">LOADS POSTED</div></div>
+      <div class="stat"><div class="num" id="adStatOpen">–</div><div class="lbl">OPEN LOADS</div></div>
+      <div class="stat"><div class="num" id="adStatGHS">–</div><div class="lbl">GHS PAID</div></div>
+      <div class="stat"><div class="num" id="adStatConvos">–</div><div class="lbl">NEGOTIATIONS</div></div>
+      <div class="stat"><div class="num" id="adStatRating">–</div><div class="lbl">AVG RATING</div></div>
+    </div>
+    <div class="panel">
+      <h2>Activity — last 14 days</h2>
+      <div id="adChart"><div class="skel" style="height:180px;"></div></div>
+      <p class="hint" style="margin-top:10px;"><span style="color:var(--acc);">■</span> signups &nbsp;&nbsp; <span style="color:var(--blue);">■</span> loads posted</p>
+    </div>
+    <div class="panel">
+      <h2>Users <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;" id="admUsersCount"></span></h2>
+      <div style="overflow-x:auto;">
+        <table><thead><tr><th>ID</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th></th></tr></thead>
+        <tbody id="admUsers"><tr><td colspan="6"><div class="skel"></div></td></tr></tbody></table>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Recent loads</h2>
+      <div style="overflow-x:auto;">
+        <table><thead><tr><th>ID</th><th>Route</th><th>Status</th><th>Payment</th><th></th></tr></thead>
+        <tbody id="admLoads"><tr><td colspan="5"><div class="skel"></div></td></tr></tbody></table>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- DRIVER DASHBOARD -->
+  <section id="dash" class="tabpage hidden">
+    <div class="grid3" style="margin-bottom:20px;">
+      <div class="stat"><div class="num" id="dAvail">₵0</div><div class="lbl">AVAILABLE BALANCE</div></div>
+      <div class="stat"><div class="num" id="dCurrent">₵0</div><div class="lbl">CURRENT BALANCE</div></div>
+      <div class="stat"><div class="num" id="dPending">₵0</div><div class="lbl">PENDING</div></div>
+    </div>
+    <div class="panel">
+      <h2>Go online</h2>
+      <button class="btn" id="dOnline">Go online — share my location</button>
+      <p class="hint" id="dStatus" style="margin-top:10px;">When you're online, nearby loads are sent straight to you and customers can see your live position on the map.</p>
+    </div>
+    <div class="panel">
+      <h2>Payout method <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· where your money goes when clients pay on the site</span></h2>
+      <div class="grid2">
+        <div>
+          <label class="hint">Mobile money</label>
+          <select id="pdMomoProvider" aria-label="MoMo provider">
+            <option value="">— choose provider —</option>
+            <option>MTN</option><option>Vodafone</option><option>Telecel</option><option>AirtelTigo</option>
+          </select>
+          <input id="pdMomoNumber" type="tel" placeholder="MoMo number (e.g. 0544123456)" aria-label="MoMo number">
+        </div>
+        <div>
+          <label class="hint">Bank account</label>
+          <input id="pdBankName" placeholder="Bank (e.g. Ecobank, GCB, Stanbic)" aria-label="Bank name">
+          <input id="pdAcctName" placeholder="Account name" aria-label="Bank account name">
+          <input id="pdAcctNumber" placeholder="Account number" aria-label="Bank account number">
+        </div>
+      </div>
+      <button class="btn" id="pdSave">Save payout details</button>
+      <div class="err" id="pdMsg"></div>
+      <p class="hint" style="margin-top:8px;">Fill MoMo <b>or</b> bank (or both). Payouts are processed by the Waynok team after each paid delivery.</p>
+    </div>
+    <div class="panel">
+      <h2>Load offers <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· sent to you, first accept wins</span></h2>
+      <div id="dOffers"><p class="hint">No offers yet — go online and loads near you will appear here.</p></div>
+    </div>
+    <div class="panel">
+      <h2>Nearby loads</h2>
+      <div id="dNearby"><p class="hint">Go online to see open loads around you.</p></div>
+    </div>
+  </section>
+
+  <!-- REFERRALS -->
+  <section id="referrals" class="tabpage hidden">
+    <div class="panel" style="text-align:center;">
+      <h2 style="justify-content:center;">Refer &amp; earn GHS 20 per driver</h2>
+      <p class="hint" style="margin-bottom:16px;">Share your code — when someone signs up with it and completes their first paid order, you get <b style="color:var(--acc);">GHS 20</b>.</p>
+      <div style="font:800 34px 'IBM Plex Mono',monospace;letter-spacing:6px;color:var(--acc);margin:10px 0;" id="rfCodeBig">········</div>
+      <div class="row" style="max-width:560px;margin:0 auto 14px;">
+        <input id="rfLink" readonly style="margin-bottom:0;" aria-label="Your referral link">
+        <button class="btn" id="rfCopy" style="flex:0 0 110px;">Copy link</button>
+      </div>
+      <div class="grid3" style="max-width:640px;margin:0 auto;">
+        <div class="stat"><div class="num" id="rfAvail">₵0</div><div class="lbl">AVAILABLE</div></div>
+        <div class="stat"><div class="num" id="rfPending">₵0</div><div class="lbl">PENDING</div></div>
+        <div class="stat"><div class="num" id="rfCount">0</div><div class="lbl">PEOPLE REFERRED</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Withdraw</h2>
+      <div class="row">
+        <input id="wdAmt" type="number" min="10" placeholder="Amount (min GHS 10)">
+        <button class="btn" id="wdBtn" style="flex:0 0 140px;">Request payout</button>
+      </div>
+      <div class="err" id="wdMsg"></div>
+      <div id="wdList" style="margin-top:12px;"></div>
+    </div>
+    <div class="panel">
+      <h2>People you referred</h2>
+      <div id="rfList"></div>
+    </div>
+  </section>
+
+</main>
+
+<div id="consent" class="hidden" role="dialog" aria-label="Cookie and storage consent" style="position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--panel2);border-top:1px solid var(--line);padding:14px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:13px;">
+  <span style="flex:1;min-width:220px;">We store preferences in your browser. Read our <a href="#" data-page-link="privacy" style="color:var(--acc);">Privacy Policy</a>.</span>
+  <button class="btn" id="consentOk" style="padding:8px 18px;">Accept</button>
+  <button class="ghost" id="consentNo" style="padding:8px 14px;">Essential only</button>
+</div>
+
+<div id="modalOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(5,7,12,.72);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="panel" style="max-width:520px;width:100%;margin:0;max-height:85vh;overflow-y:auto;">
+    <h2 style="justify-content:space-between;"><span id="modalTitle">Details</span><button class="ghost" id="modalClose" style="padding:2px 12px;">✕</button></h2>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div id="roleOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(5,7,12,.8);z-index:210;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="panel" style="max-width:460px;width:100%;margin:0;text-align:center;">
+    <h2 style="justify-content:center;">How will you use Waynok?</h2>
+    <p class="hint" style="margin-bottom:16px;">One choice — it sets what your account can do.</p>
+    <button class="btn" id="roleShipper" style="width:100%;margin-bottom:10px;">📦 I post loads — Shipper</button>
+    <button class="btn" id="roleCarrier" style="width:100%;🚚 I haul loads — Carrier</button>
+  </div>
+</div>
+
+<div id="resetOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(5,7,12,.8);z-index:210;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="panel" style="max-width:400px;width:100%;margin:0;">
+    <h2 style="justify-content:space-between;">Reset password <button class="ghost" id="resetClose" style="padding:2px 12px;">✕</button></h2>
+    <div id="rsStep1">
+      <input id="rsEmail" type="email" placeholder="Your account email" aria-label="Account email">
+      <button class="btn" id="rsSend" style="width:100%;">Email me a reset link</button>
+    </div>
+    <div id="rsStep2" class="hidden">
+      <input id="npToken" type="text" placeholder="Paste the reset token" aria-label="Reset token">
+      <input id="npPass" type="password" placeholder="New password (min 6 chars)" aria-label="New password">
+      <button class="btn" id="npSend" style="width:100%;">Set new password</button>
+    </div>
+    <div class="err" id="rsMsg"></div>
+    <p class="hint" id="rsHint" style="margin-top:8px;"></p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ================= CONFIG ================= */
+const API_BASE = "";   // same origin — always talks to the backend that served this page
+const MAPS_KEY = "AIzaSyA5Oo54DZ8HmM3WFKSi_nxRlDHMK2uXFiE";  // Google Maps JS key (referrer-restricted)
+const MAP_ID = "6817d9f8bc77499c68ff1242";  // cloud map style (Google Cloud -> Map Management)
+
+// Sign-in: email/password or phone number + password (SMS verification coming soon).
+/* ========================================== */
+
+const $ = id => document.getElementById(id);
+const esc = s => { const d = document.createElement("div"); d.textContent = String(s ?? ""); return d.innerHTML; };
+const CITY_COORDS = { accra:[5.6037,-0.1870], kumasi:[6.6885,-1.6244], tema:[5.6698,-0.0166], takoradi:[4.8982,-1.7603], tamale:[9.4034,-0.8424], ho:[6.6,0.4667], "cape coast":[5.1053,-1.2466], sunyani:[7.3399,-2.3268] };
+function geocodeCity(addr) { const k = (addr || "").split(",")[0].trim().toLowerCase(); return CITY_COORDS[k] || null; }
+function havKm(a, b, c, d) { const R = 6371, rad = x => x * Math.PI / 180; const h = Math.sin(rad(c - a) / 2) ** 2 + Math.cos(rad(a)) * Math.cos(rad(c)) * Math.sin(rad(d - b) / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+
+let regRole = "shipper";
+let token = localStorage.getItem("waynok_token") || "";
+let chatHistory = [];
+let map = null, polyline = null, trackedMarker = null, trackTimer = null, mapLoading = false;
+let cachedLoads = [];
+let drivers = [], drvFilter = "all";
+let matchChips = [];  // flat list of driver candidates behind the match chips
+
+function toast(msg, bad=false) {
+  const t = $("toast");
+  t.textContent = msg; t.className = "show" + (bad ? " bad" : "");
+  clearTimeout(t._t); t._t = setTimeout(() => t.className = "", 3500);
+}
+
+async function api(path, opts = {}) {
+  opts.headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
+  if (token) opts.headers["Authorization"] = "Bearer " + token;
+  const r = await fetch(API_BASE + path, opts);
+  if (!r.ok) {
+    let detail = "HTTP " + r.status;
+    try {
+      const j = await r.json();
+      if (j && j.detail) detail = typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail);
+    } catch (e) { /* keep default */ }
+    throw new Error(detail);
+  }
+  return r.json();
+}
+
+/* ---------- auth / view switching ---------- */
+function enterApp() {
+  $("hero").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("tabs").classList.remove("hidden");
+  $("authState").textContent = token ? (myRole || "driver") : "guest";
+  $("authState").classList.toggle("on", !!token);
+  $("logoutBtn").classList.remove("hidden");
+  $("menuWrap").classList.remove("hidden");
+  syncAvatar();
+  const h = new Date().getHours();
+  $("greeting").innerHTML = (h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening") +
+    ", <em>" + (localStorage.getItem("waynok_name") || (token ? "driver" : "guest")) + ".</em>";
+  goTab("home");
+  loadMe();
+  loadLoads();
+  startBadgePolling();
+}
+
+function exitApp() {
+  token = ""; chatHistory = []; cachedLoads = [];
+  localStorage.removeItem("waynok_token");
+  $("hero").classList.remove("hidden");
+  $("app").classList.add("hidden");
+  $("tabs").classList.add("hidden");
+  $("logoutBtn").classList.add("hidden");
+  $("authState").textContent = "guest"; $("authState").classList.remove("on");
+  $("menuWrap").classList.add("hidden");
+  $("userMenu").classList.add("hidden");
+  $("chatLog").innerHTML = "";
+  stopBadgePolling();
+  stopThreadPoll();
+  convCache = []; curConv = null;
+  myUid = null; myRole = null;
+  $("msgBadge").classList.add("hidden");
+  $("convList").innerHTML = "";
+  toast("Signed out");
+}
+
+function syncAvatar() {
+  const name = localStorage.getItem("waynok_name") || "";
+  const ch = (name || "G").trim().charAt(0).toUpperCase();
+  $("avatarBtn").textContent = ch;
+  $("profileAv").textContent = ch;
+}
+
+/* ---------- register / login ---------- */
+let isRegister = true;  // first-time visitors see Create account first
+$("authSwitch").onclick = e => {
+  e.preventDefault();
+  isRegister = !isRegister;
+  $("authTitle").textContent = isRegister ? "Join Waynok." : "Welcome back, driver.";
+  $("authSub").textContent = isRegister ? "Create your dispatch account in seconds." : "Sign in with your email/phone and password.";
+  $("loginBtn").textContent = isRegister ? "Create account" : "Sign in";
+  $("authSwitchText").textContent = isRegister ? "Already have an account?" : "New to Waynok?";
+  $("authSwitch").textContent = isRegister ? " Sign in" : " Create account";
+  $("loginErr").textContent = "";
+  syncAuthMode();
+};
+
+$("regRoleWrap").onclick = e => {
+  const c = e.target.closest(".fchip"); if (!c) return;
+  regRole = c.dataset.r;
+  document.querySelectorAll("#regRoleWrap .fchip").forEach(x => x.classList.toggle("active", x === c));
+};
+
+async function doLogin() {
+  $("loginErr").textContent = "";
+  try {
+    const id = $("loginEmail").value.trim(), pass = $("loginPass").value;
+    if (!id || !pass) throw new Error("Enter your email/phone and password");
+    if (pass.length < 6) throw new Error("Password must be at least 6 characters");
+    const d = await api("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email: id, password: pass })
+    });
+    token = d.access_token || d.token || "";
+    if (!token) throw new Error("No token in response — check the API");
+    localStorage.setItem("waynok_token", token);
+    localStorage.setItem("waynok_email", id);
+    enterApp();
+    logActivity("Signed in");
+    toast("Welcome back to Waynok");
+  } catch (e) { $("loginErr").textContent = e.message; }
+}
+
+async function doRegister() {
+  $("loginErr").textContent = "";
+  try {
+    const name = $("regName").value.trim(), pass = $("loginPass").value;
+    if (!name) throw new Error("Enter your name");
+    if (pass.length < 6) throw new Error("Password must be at least 6 characters");
+    const base = { name, password: pass, role: regRole,
+      referral_code: $("refCode").value.trim() || localStorage.getItem("waynok_ref") || null };
+    if (authMode === "phone") {
+      const phone = $("regPhone").value.trim();
+      if (!phone) throw new Error("Enter your phone number (e.g. 0544123456)");
+      const d = await api("/auth/register-phone", { method: "POST", body: JSON.stringify({ ...base, phone }) });
+      token = d.access_token || "";
+      localStorage.setItem("waynok_token", token);
+      localStorage.setItem("waynok_name", name);
+      localStorage.setItem("waynok_phone", d.phone || phone);
+      enterApp();
+      logActivity("Created account with phone " + (d.phone || phone));
+      toast("Account created — welcome to Waynok");
+    } else {
+      const email = $("loginEmail").value.trim();
+      if (!email || !email.includes("@")) throw new Error("Enter a valid email address");
+      const d = await api("/auth/register", { method: "POST", body: JSON.stringify({ ...base, email }) });
+      token = d.access_token || d.token || "";
+      if (!token) throw new Error("No token in response — check the API");
+      localStorage.setItem("waynok_token", token);
+      localStorage.setItem("waynok_email", email);
+      localStorage.setItem("waynok_name", name);
+      enterApp();
+      logActivity("Created account");
+      toast("Account created — welcome to Waynok");
+    }
+  } catch (e) { $("loginErr").textContent = e.message; }
+}
+
+$("loginBtn").onclick = () => (isRegister ? doRegister() : doLogin());
+$("loginPass").onkeydown = e => { if (e.key === "Enter") (isRegister ? doRegister() : doLogin()); };
+$("guestBtn").onclick = () => { enterApp(); logActivity("Continued as guest"); };
+
+document.querySelectorAll("[data-page-link]").forEach(a => a.onclick = e => {
+  e.preventDefault();
+  $("hero").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("tabs").classList.remove("hidden");
+  goTab(a.dataset.pageLink);
+});
+$("logoutBtn").onclick = exitApp;
+
+/* ---------- tabs & navigation ---------- */
+const PAGE_IDS = { home:"home", loads:"loads", map:"mapTab", agent:"agentTab",
+  activities:"activities", profile:"profile", support:"support", safety:"safety",
+  saved:"saved", settings:"settings", promos:"promos", earn:"earn", track:"track",
+  listtruck:"listtruck", terms:"terms", privacy:"privacy", refunds:"refunds", msgs:"msgs", chat:"chat", admin:"admin", dash:"dash", referrals:"referrals" };
+
+function goTab(name) {
+  if (name !== "chat") stopThreadPoll();
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("active", x.dataset.tab === name));
+  Object.entries(PAGE_IDS).forEach(([k, id]) => $(id).classList.toggle("hidden", k !== name));
+  if (name === "map") initMap();
+  if (name === "profile") renderProfile();
+  if (name === "activities") renderActivities();
+  if (name === "saved") renderPlaces();
+  if (name === "earn") calcEarn();
+  if (name === "track") loadDrivers();
+  if (name === "listtruck") renderMyTrucks();
+  if (name === "msgs") renderConvList(convCache);
+  if (name === "admin") loadAdmin();
+  if (name === "dash") loadDashboard();
+  if (name === "referrals") loadReferrals();
+  if (name === "track") initTrackMap();
+}
+$("tabs").onclick = e => { const b = e.target.closest("button"); if (b) goTab(b.dataset.tab); };
+$("logoHome").onclick = () => { if (!$("app").classList.contains("hidden")) goTab("home"); };
+document.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => goTab(el.dataset.goto)));
+$("viewAllBtn").onclick = () => goTab("loads");
+
+/* ---------- loads ---------- */
+function normLoad(l) {
+  const km = (l.origin_lat != null && l.dest_lat != null) ? havKm(l.origin_lat, l.origin_lng, l.dest_lat, l.dest_lng) : null;
+  return {
+    id: l.id, title: l.title, shipper_id: l.shipper_id,
+    pickup: l.origin_city, dropoff: l.dest_city,
+    miles: km != null ? Math.round(km * 0.621371) : null,
+    weight_kg: l.weight_kg, price: l.budget_ghs, status: l.status,
+    equip: l.equipment_type || "",
+    payment_status: l.payment_status || "unpaid",
+    shipper_confirmed: !!l.shipper_confirmed,
+    proof_image: l.proof_image || null,
+  };
+}
+function loadRowHtml(l) {
+  return `<tr>
+    <td>${esc(l.pickup)}</td>
+    <td>${esc(l.dropoff)}</td>
+    <td>${l.miles ?? "—"}</td>
+    <td>${l.weight_kg != null ? l.weight_kg.toLocaleString() + " kg" : "—"}</td>
+    <td>${l.price != null ? "₵" + l.price.toLocaleString() : "—"}</td>
+    <td><span class="badge ${l.status}">${esc(l.status)}</span>${l.payment_status === "paid" ? ' <span class="badge delivered">PAID</span>' : ""}${l.payment_status === "released" ? ' <span class="badge delivered">RELEASED</span>' : ""}${negBtnHtml(l)}${loadActions(l)}</td>
+  </tr>`;
+}
+async function loadLoads() {
+  try {
+    const raw = await api("/loads");
+    cachedLoads = (Array.isArray(raw) ? raw : []).map(normLoad);
+    const active = cachedLoads.filter(l => !["delivered", "cancelled"].includes(l.status));
+    countUp($("statLoads"), active.length);
+    countUp($("statMiles"), cachedLoads.reduce((s, l) => s + (l.miles || 0), 0));
+    countUp($("statValue"), cachedLoads.reduce((s, l) => s + (l.price || 0), 0), "₵");
+    renderBoard();
+    $("recentRows").innerHTML = cachedLoads.length ? cachedLoads.slice(0, 5).map(loadRowHtml).join("")
+      : `<tr><td colspan="6" class="hint">No loads yet — post the first one above.</td></tr>`;
+    if (!$("track").classList.contains("hidden")) renderMatches();
+  } catch (e) {
+    $("loadRows").innerHTML = $("recentRows").innerHTML =
+      `<tr><td colspan="6" class="err">Failed to load: ${esc(e.message)}</td></tr>`;
+  }
+}
+$("refreshBtn").onclick = loadLoads;
+$("postLoadBtn").onclick = async () => {
+  $("loadErr").textContent = "";
+  try {
+    const pickup = $("ldPickup").value.trim(), dropoff = $("ldDropoff").value.trim();
+    const a = geocodeCity(pickup), b = geocodeCity(dropoff);
+    if (!a || !b) throw new Error("Start pickup/dropoff with a known city: Accra, Kumasi, Tema, Takoradi, Tamale, Ho, Cape Coast, Sunyani");
+    if (!$("ldWeight").value) throw new Error("Enter the weight in kg");
+    await api("/loads", { method: "POST", body: JSON.stringify({
+      title: "",
+      origin_city: pickup, origin_lat: a[0], origin_lng: a[1],
+      dest_city: dropoff, dest_lat: b[0], dest_lng: b[1],
+      equipment_type: $("ldEquip").value,
+      weight_kg: +$("ldWeight").value,
+      budget_ghs: +$("ldPrice").value || null,
+      pickup_time: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    })});
+    ["ldPickup", "ldDropoff", "ldWeight", "ldPrice"].forEach(i => $(i).value = "");
+    loadLoads(); toast("Load posted"); logActivity("Posted a load: " + pickup + " → " + dropoff);
+  } catch (e) { $("loadErr").textContent = e.message; toast("Post failed: " + e.message, true); }
+};
+
+/* ---------- map ---------- */
+function initMap() {
+  if (map || mapLoading) return;
+  if (MAPS_KEY.includes("YOUR_")) {
+    $("routeInfo").textContent = "Add your Google Maps JS key (MAPS_KEY in index.html) to enable the map. Distances still work via the API.";
+    return;
+  }
+  mapLoading = true;
+  const s = document.createElement("script");
+  s.src = "https://maps.googleapis.com/maps/api/js?key=" + MAPS_KEY + "&callback=bootMap&libraries=maps,marker&v=beta";
+  s.async = true; document.head.appendChild(s);
+}
+window.bootMap = () => {
+  map = new google.maps.Map($("map"), { mapId: MAP_ID, center: { lat: 8.0, lng: -1.2 }, zoom: 6, styles: [
+    { elementType: "geometry", stylers: [{ color: "#10151f" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#8f98b3" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#10151f" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#232c42" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0d1526" }] },
+    { featureType: "poi", stylers: [{ visibility: "off" }] }
+  ]});
+};
+function decodePolyline(encoded) {
+  const pts = []; let i = 0, lat = 0, lng = 0;
+  while (i < encoded.length) {
+    let r, sh = 0;
+    do { r = encoded.charCodeAt(i++) - 63; lat |= (r & 31) << sh; sh += 5; } while (r > 31);
+    lat += (lat & 1) ? ~(lat >> 1) : lat >> 1;
+    sh = 0;
+    do { r = encoded.charCodeAt(i++) - 63; lng |= (r & 31) << sh; sh += 5; } while (r > 31);
+    lng += (lng & 1) ? ~(lng >> 1) : lng >> 1;
+    pts.push({ lat: lat / 1e5, lng: lng / 1e5 });
+  }
+  return pts;
+}
+$("routeBtn").onclick = async () => {
+  const o = $("mpOrigin").value.trim(), d = $("mpDest").value.trim();
+  if (!o || !d) return;
+  $("routeInfo").textContent = "Loading route…";
+  try {
+    const r = await api("/maps/directions?origin=" + encodeURIComponent(o) + "&destination=" + encodeURIComponent(d));
+    $("routeInfo").textContent = "Route: " + (r.summary || "") + " — " +
+      (r.legs && r.legs[0] && r.legs[0].distance ? r.legs[0].distance.text : "") +
+      ", about " + (r.legs && r.legs[0] && r.legs[0].duration ? r.legs[0].duration.text : "");
+    if (map && r.polyline) {
+      if (polyline) polyline.setMap(null);
+      const path = decodePolyline(r.polyline);
+      polyline = new google.maps.Polyline({ path, geodesic: true, strokeColor: "#ffb020", strokeWeight: 5, map });
+      const b = new google.maps.LatLngBounds();
+      path.forEach(p => b.extend(p));
+      map.fitBounds(b);
+    }
+  } catch (e) { $("routeInfo").textContent = "Error: " + e.message; }
+};
+
+/* ---------- agent chat ---------- */
+function addMsg(text, who) {
+  const d = document.createElement("div");
+  d.className = "msg " + who;
+  d.innerHTML = `<span class="who">${who === "user" ? "YOU" : "WAYNOK AI"}</span>${esc(text)}`;
+  $("chatLog").appendChild(d); $("chatLog").scrollTop = 1e9;
+}
+async function sendChat() {
+  const q = $("chatInput").value.trim(); if (!q) return;
+  $("chatInput").value = ""; $("chatErr").textContent = "";
+  addMsg(q, "user");
+  try {
+    const d = await api("/agent/chat", { method: "POST", body: JSON.stringify({ message: q, history: chatHistory }) });
+    const reply = d.reply || d.response || JSON.stringify(d);
+    chatHistory.push({ role: "user", content: q }, { role: "assistant", content: reply });
+    addMsg(reply, "bot");
+  } catch (e) { $("chatErr").textContent = e.message; addMsg("(error — " + e.message + ")", "bot"); }
+}
+$("sendBtn").onclick = sendChat;
+$("chatInput").onkeydown = e => { if (e.key === "Enter") sendChat(); };
+
+/* ---------- account menu ---------- */
+$("avatarBtn").onclick = e => { e.stopPropagation(); $("userMenu").classList.toggle("hidden"); };
+document.addEventListener("click", e => {
+  if (!e.target.closest(".menu-wrap")) $("userMenu").classList.add("hidden");
+});
+document.querySelectorAll("#userMenu .menu-item").forEach(el =>
+  el.addEventListener("click", () => { $("userMenu").classList.add("hidden"); goTab(el.dataset.page); }));
+
+/* ---------- activity log ---------- */
+function getActs() { try { return JSON.parse(localStorage.getItem("waynok_activity") || "[]"); } catch (e) { return []; } }
+function logActivity(text) {
+  const a = getActs();
+  a.unshift({ t: Date.now(), text });
+  localStorage.setItem("waynok_activity", JSON.stringify(a.slice(0, 30)));
+}
+function renderActivities() {
+  const a = getActs();
+  $("actList").innerHTML = a.length ? a.map(x => {
+    const d = new Date(x.t);
+    const when = d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return `<div class="act-item"><span class="at">${when}</span><span>${esc(x.text)}</span></div>`;
+  }).join("") : `<p class="hint">No activity yet — post a load or sign in to start your timeline.</p>`;
+}
+$("clearActBtn").onclick = () => { localStorage.removeItem("waynok_activity"); renderActivities(); toast("Activity history cleared"); };
+
+/* ---------- profile ---------- */
+function renderProfile() {
+  const name = localStorage.getItem("waynok_name") || "";
+  const email = localStorage.getItem("waynok_email") || "";
+  $("profileName").textContent = name || (token ? "Driver" : "Guest");
+  $("profileEmail").textContent = email || "Not signed in";
+  $("kvName").textContent = name || "—";
+  $("kvEmail").textContent = email || "—";
+  $("kvType").textContent = token ? "Member account" : "Guest";
+  $("kvSince").textContent = localStorage.getItem("waynok_since") || new Date().toLocaleDateString();
+  if (!localStorage.getItem("waynok_since")) localStorage.setItem("waynok_since", $("kvSince").textContent);
+  $("editName").value = name;
+}
+$("saveNameBtn").onclick = async () => {
+  const n = $("editName").value.trim();
+  if (!n) return toast("Enter a name first", true);
+  localStorage.setItem("waynok_name", n);
+  try { if (token) await api("/me", { method: "PATCH", body: JSON.stringify({ company_name: n }) }); } catch (e) {}
+  syncAvatar(); renderProfile(); toast("Profile updated");
+};
+
+/* ---------- saved places ---------- */
+function getPlaces() { try { return JSON.parse(localStorage.getItem("waynok_places") || "[]"); } catch (e) { return []; } }
+function renderPlaces() {
+  const p = getPlaces();
+  $("spList").innerHTML = p.length ? p.map((x, i) => `
+    <div class="place-row">
+      <span style="color:var(--acc);">◈</span>
+      <span class="pn">${esc(x.name)}</span>
+      <span class="hint" style="flex:1;">${esc(x.addr)}</span>
+      <button class="ghost" data-use="${i}" style="padding:4px 10px;font-size:12px;">Use in planner</button>
+      <button class="ghost" data-del="${i}" style="padding:4px 10px;font-size:12px;">✕</button>
+    </div>`).join("") : `<p class="hint">No saved places yet — add your depots and regular stops here.</p>`;
+  $("spList").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+    const p2 = getPlaces(); p2.splice(+b.dataset.del, 1);
+    localStorage.setItem("waynok_places", JSON.stringify(p2)); renderPlaces();
+  });
+  $("spList").querySelectorAll("[data-use]").forEach(b => b.onclick = () => {
+    const x = getPlaces()[+b.dataset.use];
+    goTab("map"); $("mpOrigin").value = x.addr; toast(x.name + " set as origin");
+  });
+}
+$("spAdd").onclick = () => {
+  const name = $("spName").value.trim(), addr = $("spAddr").value.trim();
+  if (!name || !addr) return toast("Name and address required", true);
+  const p = getPlaces(); p.push({ name, addr });
+  localStorage.setItem("waynok_places", JSON.stringify(p));
+  $("spName").value = $("spAddr").value = "";
+  renderPlaces(); logActivity("Saved place: " + name); toast("Place saved");
+};
+
+/* ---------- settings ---------- */
+const tg = $("tgNotify");
+tg.classList.toggle("on", localStorage.getItem("waynok_notify") === "1");
+tg.onclick = async () => {
+  const on = !tg.classList.contains("on");
+  tg.classList.toggle("on", on);
+  localStorage.setItem("waynok_notify", on ? "1" : "0");
+  try { if (token) await api("/me", { method: "PATCH", body: JSON.stringify({ email_notifications: on }) }); } catch (e) {}
+  toast("Notifications " + (on ? "enabled" : "disabled"));
+};
+$("selCurrency").value = localStorage.getItem("waynok_currency") || "GHS";
+$("selCurrency").onchange = e => { localStorage.setItem("waynok_currency", e.target.value); toast("Currency set to " + e.target.value); };
+$("clearDataBtn").onclick = () => {
+  ["waynok_places", "waynok_name", "waynok_notify", "waynok_currency", "waynok_since"].forEach(k => localStorage.removeItem(k));
+  toast("Saved data cleared"); goTab("settings");
+};
+
+/* ---------- promotions ---------- */
+document.querySelectorAll("#promos [data-code]").forEach(b => b.onclick = () => {
+  const applied = JSON.parse(localStorage.getItem("waynok_promos") || "[]");
+  if (!applied.includes(b.dataset.code)) {
+    applied.push(b.dataset.code);
+    localStorage.setItem("waynok_promos", JSON.stringify(applied));
+    logActivity("Applied promo " + b.dataset.code);
+  }
+  b.textContent = "Applied"; b.disabled = true; toast("Promo " + b.dataset.code + " applied");
+});
+(function restorePromos() {
+  const applied = JSON.parse(localStorage.getItem("waynok_promos") || "[]");
+  document.querySelectorAll("#promos [data-code]").forEach(b => {
+    if (applied.includes(b.dataset.code)) { b.textContent = "Applied"; b.disabled = true; }
+  });
+})();
+
+/* ---------- FAQ accordion ---------- */
+document.querySelectorAll(".faq-q").forEach(q => q.onclick = () => q.parentElement.classList.toggle("open"));
+
+/* ---------- earnings estimator ---------- */
+function calcEarn() {
+  const loads = +$("erLoads").value || 0, price = +$("erPrice").value || 0;
+  const cur = localStorage.getItem("waynok_currency") || "GHS";
+  const sym = cur === "GHS" ? "₵" : "$";
+  const w = loads * price;
+  $("erWeek").textContent = sym + w.toLocaleString();
+  $("erMonth").textContent = sym + Math.round(w * 4.33).toLocaleString();
+  $("erYear").textContent = sym + Math.round(w * 52).toLocaleString();
+}
+["erLoads", "erPrice"].forEach(i => $(i).oninput = calcEarn);
+
+/* ---------- phone auth mode: Email vs Phone+SMS ---------- */
+let authMode = "email";
+
+function syncAuthMode() {
+  $("authModeWrap").classList.toggle("hidden", !isRegister);
+  $("regName").classList.toggle("hidden", !isRegister);
+  $("regRoleWrap").classList.toggle("hidden", !isRegister);
+  $("refCode").classList.toggle("hidden", !isRegister);   // referral code: create-account only, never on sign-in
+  $("emailWrap").classList.toggle("hidden", !(isRegister ? authMode === "email" : true));
+  $("phoneWrap").classList.toggle("hidden", !(isRegister && authMode === "phone"));
+  $("loginEmail").placeholder = isRegister ? "Email address" : "Email or phone number";
+}
+$("authModeWrap").onclick = e => {
+  const c = e.target.closest(".fchip"); if (!c) return;
+  authMode = c.dataset.am;
+  document.querySelectorAll("#authModeWrap .fchip").forEach(x => x.classList.toggle("active", x === c));
+  syncAuthMode();
+};
+syncAuthMode();
+
+/* ---------- drivers ---------- */
+const DEMO_DRIVERS = [
+  { name: "Kwame Mensah", truck: "Flatbed", plate: "GT 1234-22", status: "on_trip", location: "Kumasi → Accra", lat: 6.7, lng: -1.6 },
+  { name: "Yaw Osei", truck: "Box truck", plate: "GC 589-22", status: "available", location: "Tema depot", lat: 5.66, lng: -0.01 },
+  { name: "Ama Kusi", truck: "Trailer", plate: "GW 7710-21", status: "on_trip", location: "Takoradi → Kumasi", lat: 5.0, lng: -2.0 },
+  { name: "Kofi Asante", truck: "Delivery van", plate: "GS 3350-20", status: "offline", location: "Accra", lat: 5.55, lng: -0.2 },
+  { name: "Efua Boateng", truck: "Box truck", plate: "GE 9021-23", status: "available", location: "Accra yard", lat: 5.6, lng: -0.18 },
+];
+
+function normDriver(d) {
+  return {
+    id: d.id,
+    cid: d.carrier_id ?? null,
+    rating_avg: d.rating_avg ?? null,
+    rating_count: d.rating_count ?? 0,
+    name: d.name || d.driver_name || "Driver",
+    truck: d.truck_type || d.equipment_type || d.truck || "Truck",
+    plate: d.plate_no || d.plate || "—",
+    status: (d.status || "available").toLowerCase().replace(/[\s-]+/g, "_"),
+    location: d.origin_city || d.location || "—",
+    lat: d.origin_lat ?? d.lat ?? null,
+    lng: d.origin_lng ?? d.lng ?? null,
+  };
+}
+
+async function loadDrivers() {
+  try {
+    const rows = await api("/trucks");
+    drivers = (Array.isArray(rows) ? rows : []).map(normDriver);
+    $("drvHint").textContent = "Live data from the server.";
+  } catch (e) {
+    drivers = DEMO_DRIVERS.slice();
+    $("drvHint").textContent = "Could not reach the server (" + e.message + ") — showing demo drivers.";
+  }
+  renderDrivers();
+  if (!$("track").classList.contains("hidden")) renderMatches();
+}
+
+function renderDrivers() {
+  const q = ($("drvSearch").value || "").toLowerCase();
+  const list = drivers.filter(d =>
+    (drvFilter === "all" || d.status === drvFilter) &&
+    (!q || (d.name + " " + d.truck + " " + d.plate + " " + d.location).toLowerCase().includes(q)));
+  $("drvCount").textContent = "· " + list.length + " shown";
+  const statusLabel = { available: "Available", on_trip: "On trip", offline: "Offline" };
+  $("drvList").innerHTML = list.length ? list.map((d, i) => `
+    <div class="drv">
+      <span class="dot ${d.status === "on_trip" ? "trip" : d.status === "available" ? "avail" : "off"}"></span>
+      <div class="info">
+        <div class="nm">${esc(d.name)} <span class="hint" style="font-weight:400;">· ${esc(d.truck)}</span></div>
+        <div class="meta">${esc(statusLabel[d.status] || d.status)} · ${esc(d.location)}${d.rating_avg ? ` · <span class="stars">★ ${d.rating_avg}</span> <span class="hint">(${d.rating_count})</span>` : ""}</div>
+      </div>
+      <span class="plate">${esc(d.plate)}</span>
+      <button class="btn" data-track="${i}" ${d.lat == null ? "disabled" : ""}>Track</button>
+    </div>`).join("") : `<p class="hint">No drivers match this filter.</p>`;
+  $("drvList").querySelectorAll("[data-track]").forEach(b => b.onclick = () => trackDriver(list[+b.dataset.track]));
+}
+$("drvSearch").oninput = renderDrivers;
+$("gotoListTruck").onclick = () => goTab("listtruck");
+$("drvFilters").onclick = e => {
+  const c = e.target.closest(".fchip"); if (!c) return;
+  drvFilter = c.dataset.f;
+  document.querySelectorAll("#drvFilters .fchip").forEach(x => x.classList.toggle("active", x === c));
+  renderDrivers();
+};
+
+/* ---------- city matching: loads ↔ drivers ---------- */
+function renderMatches() {
+  const RADIUS_MI = 50;
+  matchChips = [];
+  $("matchList").innerHTML = cachedLoads.length ? cachedLoads.map((l, li) => {
+    const pc = geocodeCity(l.pickup);
+    let chipsHtml = "", matches = [];
+    if (pc) {
+      matches = drivers
+        .filter(d => d.status === "available" && d.lat != null)
+        .map(d => ({ ...d, dist_mi: havKm(pc[0], pc[1], d.lat, d.lng) * 0.621371 }))
+        .filter(d => d.dist_mi <= RADIUS_MI)
+        .sort((a, b) => a.dist_mi - b.dist_mi);
+      chipsHtml = matches.map((d, di) => {
+        matchChips.push(d);
+        const gi = matchChips.length - 1;
+        const msgBtn = (token && myRole === "shipper" && d.cid)
+          ? ` <span data-negc="${d.cid}" data-load="${l.id}" title="Message driver" style="color:var(--acc);cursor:pointer;margin-left:4px;">✉</span>` : "";
+        return `<span class="dchip" data-chip="${gi}"><span class="dot avail"></span>${esc(d.name)} · ${esc(d.plate)} · ${d.dist_mi.toFixed(0)} mi${msgBtn}</span>`;
+      }).join("");
+    }
+    const canConnect = l.id && l.status === "open" && myUid && l.shipper_id === myUid;
+    return `<div class="match">
+      <div class="route">${esc(l.pickup)}<span class="arrow">→</span>${esc(l.dropoff)}
+        <span class="badge ${l.status}" style="margin-left:8px;">${esc(l.status)}</span></div>
+      <div class="ldmeta">${l.weight_kg != null ? l.weight_kg.toLocaleString() + " kg" : ""}${l.price != null ? " · ₵" + l.price.toLocaleString() : ""}</div>
+      ${chipsHtml
+        ? `<div class="drivers">${chipsHtml}</div>
+           ${canConnect ? `<button class="btn" data-connect="${l.id}" style="margin-top:10px;padding:8px 16px;font-size:13px;">Connect nearest driver</button>` : ""}`
+        : `<div class="none">No available driver within <b>${RADIUS_MI} mi</b> of ${esc(l.pickup)} — matching stays open.</div>`}
+    </div>`;
+  }).join("") : `<p class="hint">No loads on the board yet.</p>`;
+}
+
+$("matchList").onclick = async e => {
+  const nc = e.target.closest("[data-negc]");
+  if (nc) {
+    try {
+      const c = await api(`/loads/${nc.dataset.load}/conversations`, { method: "POST", body: JSON.stringify({ carrier_id: +nc.dataset.negc }) });
+      openConversation(c.id);
+      logActivity("Started negotiation with driver on load " + nc.dataset.load);
+    } catch (err) { toast(err.message, true); }
+    return;
+  }
+  const chip = e.target.closest("[data-chip]");
+  if (chip) return trackDriver(matchChips[+chip.dataset.chip]);
+  const b = e.target.closest("[data-connect]");
+  if (!b || b.disabled) return;
+  b.disabled = true; b.textContent = "Connecting…";
+  try {
+    const r = await api("/loads/" + b.dataset.connect + "/connect", { method: "POST" });
+    const t = r.truck || {};
+    toast("Connected: " + (t.name || "driver") + " · " + (t.plate_no || "") + " (" + r.distance_mi + " mi away)");
+    logActivity("Load " + r.load_id + " connected to " + (t.plate_no || t.name || "driver"));
+    loadLoads(); loadDrivers();
+  } catch (err) {
+    toast("Connect failed: " + err.message, true);
+    b.disabled = false; b.textContent = "Connect nearest driver";
+  }
+};
+
+/* ---------- list your truck ---------- */
+function getLocalTrucks() { try { return JSON.parse(localStorage.getItem("waynok_local_trucks") || "[]"); } catch (e) { return []; } }
+function renderMyTrucks() {
+  const mine = getLocalTrucks();
+  $("ltMine").innerHTML = mine.length ? mine.map((t, i) => `
+    <div class="drv">
+      <span class="dot ${t.status === "on_trip" ? "trip" : "avail"}"></span>
+      <div class="info">
+        <div class="nm">${esc(t.name)} <span class="hint" style="font-weight:400;">· ${esc(t.truck)}</span></div>
+        <div class="meta">${t.status === "on_trip" ? "On trip" : "Available"} · ${esc(t.location)}</div>
+      </div>
+      <span class="plate">${esc(t.plate)}</span>
+      <button class="ghost" data-deltruck="${i}" style="padding:5px 12px;">Remove</button>
+    </div>`).join("") : `<p class="hint">You haven't listed any trucks yet.</p>`;
+  $("ltMine").querySelectorAll("[data-deltruck]").forEach(b => b.onclick = async () => {
+    const mine2 = getLocalTrucks(); const t = mine2.splice(+b.dataset.deltruck, 1)[0];
+    localStorage.setItem("waynok_local_trucks", JSON.stringify(mine2));
+    if (t.id && /^\d+$/.test(String(t.id))) { try { await api("/trucks/" + t.id, { method: "DELETE" }); } catch (e) {} }
+    renderMyTrucks(); loadDrivers(); toast("Truck removed from the board");
+  });
+}
+
+// optional GPS (falls back to city text)
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    () => { $("ltCoords").textContent = "GPS available — your precise position can be shared."; },
+    () => { $("ltCoords").textContent = "GPS unavailable — customers will see your city only."; },
+    { timeout: 4000 });
+}
+
+$("ltSubmit").onclick = async () => {
+  $("ltErr").textContent = "";
+  const name = $("ltName").value.trim(), plate = $("ltPlate").value.trim(), city = $("ltCity").value.trim();
+  if (!name || !plate || !city) return $("ltErr").textContent = "Name, plate and city are required.";
+  if (!$("ltCap").value) return $("ltErr").textContent = "Enter your truck capacity in kg.";
+  const c = geocodeCity(city);
+  if (!c) return $("ltErr").textContent = "Unknown city. Use: Accra, Kumasi, Tema, Takoradi, Tamale, Ho, Cape Coast, Sunyani.";
+  const EQUIP = { "Box truck": "box_truck", "Trailer": "flatbed", "Semi": "flatbed", "Delivery van": "dry_van", "Tanker": "tanker", "Flatbed": "flatbed" };
+  const localTruck = { id: null, name, truck: $("ltType").value, plate, status: "available", location: city, lat: c[0], lng: c[1] };
+  try {
+    const r = await api("/trucks", { method: "POST", body: JSON.stringify({
+      name, plate_no: plate,
+      equipment_type: EQUIP[$("ltType").value] || "dry_van",
+      capacity_kg: +$("ltCap").value,
+      origin_city: city, origin_lat: c[0], origin_lng: c[1],
+      available_until: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+    })});
+    localTruck.id = r.id;
+    const mine = getLocalTrucks();
+    if (!mine.some(t => t.plate === plate)) { mine.push(localTruck); localStorage.setItem("waynok_local_trucks", JSON.stringify(mine)); }
+    ["ltName", "ltPlate", "ltCity", "ltCap"].forEach(i => $(i).value = "");
+    renderMyTrucks(); loadDrivers();
+    logActivity("Listed truck " + plate + " in " + city);
+    toast("You're live — customers can see you now");
+    goTab("track");
+  } catch (e) {
+    $("ltErr").textContent = e.message + " — sign in as a Carrier to publish to the server board.";
+    toast("Not published to server: " + e.message, true);
+  }
+};
+
+/* ---------- track driver on the map ---------- */
+function trackDriver(d) {
+  if (!d || d.lat == null) return toast("No position available for this driver", true);
+  goTab("map");
+  if (!map) return toast("Map is not enabled — add a Maps key in index.html to see live positions.", true);
+  if (trackedMarker) { trackedMarker.setMap(null); clearInterval(trackTimer); }
+  trackedMarker = new google.maps.Marker({
+    position: { lat: d.lat, lng: d.lng }, map,
+    label: { text: (d.name || "D").split(" ")[0], color: "#161006", fontWeight: "700" },
+  });
+  map.panTo({ lat: d.lat, lng: d.lng }); map.setZoom(9);
+  toast("Tracking " + d.name + " · " + d.plate);
+  logActivity("Started tracking " + d.name);
+  trackTimer = setInterval(() => {
+    if (!trackedMarker) return;
+    const p = trackedMarker.getPosition();
+    trackedMarker.setPosition({ lat: p.lat() + (Math.random() - .5) * .01, lng: p.lng() + (Math.random() - .5) * .01 });
+  }, 2000);
+}
+
+/* ---------- consent banner ---------- */
+(function consent() {
+  const c = $("consent");
+  if (!localStorage.getItem("waynok_consent")) c.classList.remove("hidden");
+  $("consentOk").onclick = () => { localStorage.setItem("waynok_consent", "all"); c.classList.add("hidden"); toast("Preferences saved"); };
+  $("consentNo").onclick = () => { localStorage.setItem("waynok_consent", "essential"); c.classList.add("hidden"); };
+})();
+
+/* ---------- messaging & negotiation ---------- */
+let myUid = null, myRole = null;
+let convCache = [], curConv = null;
+let badgeTimer = null, threadTimer = null;
+
+async function loadMe() {
+  if (!token) { myUid = null; myRole = null; myIsAdmin = false; $("adminMenuItem").classList.add("hidden"); return; }
+  try {
+    const me = await api("/me");
+    myUid = me.id; myRole = me.role; myIsAdmin = !!me.is_admin;
+    if (me.company_name) localStorage.setItem("waynok_name", me.company_name);
+  } catch (e) { myUid = null; myRole = null; myIsAdmin = false; }
+  $("adminMenuItem").classList.toggle("hidden", !myIsAdmin);
+  loadLoads(); // re-render role-dependent buttons now that role is known
+}
+
+/* ---- conversation list + unread badge ---- */
+function startBadgePolling() {
+  stopBadgePolling();
+  if (!token) return;
+  refreshConversations();
+  badgeTimer = setInterval(refreshConversations, 15000);
+}
+function stopBadgePolling() { if (badgeTimer) { clearInterval(badgeTimer); badgeTimer = null; } }
+
+async function refreshConversations() {
+  if (!token) return;
+  try {
+    convCache = await api("/conversations");
+    const n = convCache.reduce((s, c) => s + (c.unread || 0), 0);
+    const b = $("msgBadge");
+    if (n > 0) { b.textContent = n; b.classList.remove("hidden"); }
+    else b.classList.add("hidden");
+    if (!$("msgs").classList.contains("hidden")) renderConvList(convCache);
+  } catch (e) { /* offline — keep last state */ }
+}
+
+function renderConvList(convs) {
+  if (!token) {
+    $("convList").innerHTML = `<p class="hint">Sign in to view your negotiations.</p>`;
+    return;
+  }
+  $("convList").innerHTML = convs.length ? convs.map(c => `
+    <div class="drv" data-open="${c.id}" style="cursor:pointer;">
+      <span class="dot ${c.unread ? "trip" : "avail"}" style="${c.unread ? "" : "background:var(--line);box-shadow:none;"}"></span>
+      <div class="info">
+        <div class="nm">${esc(c.other_name)} <span class="badge ${c.load_status || "open"}" style="margin-left:6px;">${esc(c.load_status || "")}</span></div>
+        <div class="meta">${esc(c.load_route || "Load " + c.load_id)} · ${esc((c.last_text || "").slice(0, 60))}</div>
+      </div>
+      <span class="hint" style="flex:none;font-size:11px;">${c.last_at ? new Date(c.last_at).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : ""}</span>
+      ${c.unread ? `<span style="flex:none;background:var(--bad);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;">${c.unread}</span>` : ""}
+    </div>`).join("") : `<p class="hint">No negotiations yet — open one from a load on the board (carrier view) or from a matched driver (Track tab).</p>`;
+}
+
+$("convList").onclick = e => {
+  const row = e.target.closest("[data-open]");
+  if (row) openConversation(+row.dataset.open);
+};
+
+/* ---- chat thread ---- */
+function openConversation(cid) {
+  curConv = convCache.find(c => c.id === cid) || { id: cid, other_name: "Negotiation", load_route: "", load_status: "" };
+  $("chatTitle").textContent = curConv.other_name || "Negotiation";
+  $("chatLoadInfo").textContent = curConv.load_route
+    ? `Load ${curConv.load_id}: ${curConv.load_route} · ${curConv.load_status || ""}`
+    : "";
+  goTab("chat");
+  loadThread();
+  startThreadPoll();
+  refreshConversations();
+}
+
+async function loadThread() {
+  if (!curConv) return;
+  try {
+    const msgs = await api(`/conversations/${curConv.id}/messages`);
+    $("chatThread").innerHTML = msgs.length ? msgs.map(msgHtml).join("")
+      : `<p class="hint">Say hello — negotiate price, pickup time and location here.</p>`;
+    $("chatThread").scrollTop = 1e9;
+  } catch (e) {
+    $("chatThread").innerHTML = `<p class="err">${esc(e.message)}</p>`;
+  }
+}
+
+function msgHtml(m) {
+  const mine = m.sender_id === myUid;
+  const who = mine ? "YOU" : (curConv.other_name || "PARTNER").toUpperCase();
+  let card = "";
+  if (m.price_ghs != null || m.pickup_time || m.location) {
+    const bits = [];
+    if (m.price_ghs != null) bits.push("₵" + Number(m.price_ghs).toLocaleString());
+    if (m.pickup_time) bits.push("Pickup: " + new Date(m.pickup_time).toLocaleString());
+    if (m.location) bits.push("Location: " + m.location);
+    let actions = "";
+    if (m.proposal_status === "pending" && !mine) {
+      actions = `<div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="btn" data-accept="${m.id}" style="padding:6px 16px;font-size:12px;">Accept</button>
+        <button class="ghost" data-decline="${m.id}" style="padding:6px 16px;font-size:12px;">Decline</button></div>`;
+    }
+    const status = m.proposal_status
+      ? `<div class="hint" style="margin-top:6px;">${m.proposal_status === "accepted" ? "✅ Accepted — load updated" : m.proposal_status === "declined" ? "Declined" : "Awaiting response…"}</div>`
+      : "";
+    card = `<div style="margin-top:8px;border:1px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:13px;background:rgba(255,176,32,.05);">📋 <b>Terms proposal</b> — ${bits.map(esc).join(" · ")}${actions}${status}</div>`;
+  }
+  return `<div class="msg ${mine ? "user" : "bot"}"><span class="who">${esc(who)}</span>${m.text ? esc(m.text) : ""}${card}</div>`;
+}
+
+function startThreadPoll() { stopThreadPoll(); threadTimer = setInterval(loadThread, 4000); }
+function stopThreadPoll() { if (threadTimer) { clearInterval(threadTimer); threadTimer = null; } }
+
+$("chatThread").onclick = async e => {
+  const a = e.target.closest("[data-accept],[data-decline]");
+  if (!a || !curConv) return;
+  const id = a.dataset.accept || a.dataset.decline;
+  const action = a.dataset.accept ? "accept" : "decline";
+  try {
+    await api(`/messages/${id}/respond?action=${action}`, { method: "POST" });
+    toast(action === "accept" ? "Terms accepted — load updated" : "Proposal declined");
+    logActivity((action === "accept" ? "Accepted terms in negotiation " : "Declined proposal in negotiation ") + curConv.id);
+    loadThread(); refreshConversations(); loadLoads();
+  } catch (err) { toast(err.message, true); }
+};
+
+async function sendMessage(text, proposal) {
+  if (!curConv) return;
+  let body;
+  if (proposal) {
+    body = {
+      text: "",
+      price_ghs: $("ppPrice").value !== "" ? +$("ppPrice").value : null,
+      pickup_time: $("ppTime").value ? new Date($("ppTime").value).toISOString() : null,
+      location: $("ppLoc").value.trim() || null,
+    };
+    if (body.price_ghs == null && !body.pickup_time && !body.location) return toast("Fill at least one term", true);
+  } else {
+    if (!text.trim()) return;
+    body = { text };
+  }
+  try {
+    await api(`/conversations/${curConv.id}/messages`, { method: "POST", body: JSON.stringify(body) });
+    $("msgInput").value = "";
+    if (proposal) { $("ppPrice").value = ""; $("ppTime").value = ""; $("ppLoc").value = ""; $("propPanel").classList.add("hidden"); }
+    loadThread(); refreshConversations();
+  } catch (e) { toast(e.message, true); }
+}
+$("msgSend").onclick = () => sendMessage($("msgInput").value, false);
+$("msgInput").onkeydown = e => { if (e.key === "Enter") sendMessage($("msgInput").value, false); };
+$("ppSend").onclick = () => sendMessage("", true);
+$("propToggle").onclick = () => $("propPanel").classList.toggle("hidden");
+$("chatBack").onclick = () => { stopThreadPoll(); goTab("msgs"); };
+
+/* ---- entry points ---- */
+function negBtnHtml(l) {
+  if (!token || l.status !== "open") return "";
+  if (myRole === "carrier")
+    return ` <button class="ghost" data-neg="${l.id}" style="padding:3px 10px;font-size:11px;margin-left:6px;">Negotiate</button>`;
+  if (myUid && l.shipper_id === myUid)
+    return ` <span class="hint" style="font-size:11px;">· yours</span>`;
+  return "";
+}
+
+$("loadRows").onclick = async e => {
+  const t = e.target;
+  if (t.closest("[data-neg]")) {
+    const id = t.closest("[data-neg]").dataset.neg;
+    try {
+      const c = await api(`/loads/${id}/conversations`, { method: "POST", body: "{}" });
+      openConversation(c.id);
+      logActivity("Started negotiation on load " + id);
+    } catch (err) { toast(err.message, true); }
+    return;
+  }
+  if (t.closest("[data-wa]")) return shareWhatsApp(cachedLoads.find(x => x.id == t.closest("[data-wa]").dataset.wa));
+  if (t.closest("[data-pay]")) return payLoad(+t.closest("[data-pay]").dataset.pay);
+  if (t.closest("[data-pickup]")) return doLoadAction(+t.closest("[data-pickup]").dataset.pickup, "pickup", "Picked up — load is in transit");
+  if (t.closest("[data-deliver]")) { pendingDeliverId = +t.closest("[data-deliver]").dataset.deliver; $("proofFile").click(); return; }
+  if (t.closest("[data-confirm]")) return doLoadAction(+t.closest("[data-confirm]").dataset.confirm, "confirm", "Delivery confirmed — payment released");
+  if (t.closest("[data-proof]")) return showProof(+t.closest("[data-proof]").dataset.proof);
+  if (t.closest("[data-live]")) return showLiveDriver(+t.closest("[data-live]").dataset.live);
+  if (t.closest("[data-rate]")) return openRateModal(+t.closest("[data-rate]").dataset.rate);
+};
+
+/* ---------- stat count-up ---------- */
+function countUp(el, target, prefix = "") {
+  if (!el) return;
+  const dur = 700, t0 = performance.now();
+  (function step(t) {
+    const p = Math.min(1, (t - t0) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = prefix + Math.round(target * eased).toLocaleString();
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+/* ================= marketplace features ================= */
+let myIsAdmin = false;
+let pendingDeliverId = null;
+
+/* ---- modal helpers ---- */
+function openModal(title, bodyHtml) {
+  $("modalTitle").textContent = title;
+  $("modalBody").innerHTML = bodyHtml;
+  $("modalOverlay").classList.remove("hidden");
+}
+function closeModal() { $("modalOverlay").classList.add("hidden"); $("modalBody").innerHTML = ""; }
+$("modalClose").onclick = closeModal;
+$("modalOverlay").onclick = e => { if (e.target === $("modalOverlay")) closeModal(); };
+
+/* ---- load board filters ---- */
+function renderBoard() {
+  const q = ($("fltCity").value || "").toLowerCase();
+  const eq = $("fltEquip").value;
+  const list = cachedLoads.filter(l =>
+    (!q || (l.pickup + " " + l.dropoff).toLowerCase().includes(q)) &&
+    (!eq || l.equip === eq));
+  $("loadRows").innerHTML = list.length ? list.map(loadRowHtml).join("")
+    : `<tr><td colspan="6" class="hint">${cachedLoads.length ? "No loads match these filters." : "No loads yet — post the first one above."}</td></tr>`;
+}
+$("fltCity").oninput = renderBoard;
+$("fltEquip").onchange = renderBoard;
+
+/* ---- row action buttons ---- */
+function loadActions(l) {
+  if (!token) return "";
+  const b = (attrs, label, cls) => ` <button class="${cls || "ghost"}" ${attrs} style="padding:3px 10px;font-size:11px;margin-left:6px;">${label}</button>`;
+  let h = "";
+  if (l.status === "open") h += b(`data-wa="${l.id}"`, "Share");
+  const mine = myUid && l.shipper_id === myUid;
+  if (myRole === "shipper" && mine) {
+    if (["open", "assigned", "in_transit"].includes(l.status) && l.payment_status === "unpaid")
+      h += b(`data-pay="${l.id}"`, "Pay", "btn");
+    if (l.status === "delivered" && !l.shipper_confirmed)
+      h += b(`data-confirm="${l.id}"`, "Confirm ✓", "btn");
+    if (["assigned", "in_transit"].includes(l.status)) h += b(`data-live="${l.id}"`, "Live", "btn");
+    if (l.proof_image) h += b(`data-proof="${l.id}"`, "POD");
+    if (l.status === "delivered" && l.shipper_confirmed) h += b(`data-rate="${l.id}"`, "★ Rate", "btn");
+  }
+  if (myRole === "carrier" && l.status === "assigned") h += b(`data-pickup="${l.id}"`, "Picked up", "btn");
+  if (myRole === "carrier" && l.status === "in_transit") h += b(`data-deliver="${l.id}"`, "Deliver", "btn");
+  return h;
+}
+
+async function doLoadAction(id, action, okMsg) {
+  try {
+    await api(`/loads/${id}/${action}`, { method: "POST" });
+    toast(okMsg); logActivity(okMsg + " (load " + id + ")");
+    loadLoads();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function payLoad(id) {
+  try {
+    const d = await api(`/loads/${id}/pay`, { method: "POST" });
+    toast("Redirecting to Paystack (mobile money / card)…");
+    window.location.href = d.authorization_url;
+  } catch (e) { toast(e.message, true); }
+}
+
+function shareWhatsApp(l) {
+  if (!l) return;
+  const text = `Load on Waynok: ${l.pickup} → ${l.dropoff}, ${l.weight_kg ? l.weight_kg.toLocaleString() + " kg" : ""}${l.price ? ", ₵" + l.price.toLocaleString() : ""}. See it on ${location.origin}`;
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+}
+
+/* ---- proof of delivery ---- */
+const proofInput = document.createElement("input");
+proofInput.type = "file"; proofInput.id = "proofFile"; proofInput.accept = "image/*"; proofInput.style.display = "none";
+document.body.appendChild(proofInput);
+proofInput.onchange = async () => {
+  if (!pendingDeliverId || !proofInput.files.length) return;
+  const fd = new FormData();
+  fd.append("file", proofInput.files[0]);
+  try {
+    const r = await fetch(`${API_BASE}/loads/${pendingDeliverId}/deliver`, {
+      method: "POST",
+      headers: token ? { "Authorization": "Bearer " + token } : {},
+      body: fd,
+    });
+    if (!r.ok) {
+      let m = "HTTP " + r.status;
+      try { const j = await r.json(); if (j.detail) m = typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail); } catch (e) {}
+      throw new Error(m);
+    }
+    toast("Delivered — proof of delivery uploaded");
+    logActivity("Delivered load " + pendingDeliverId + " with POD");
+    loadLoads();
+  } catch (e) { toast(e.message, true); }
+  proofInput.value = ""; pendingDeliverId = null;
+};
+function showProof(id) {
+  openModal("Proof of delivery", `<img src="/loads/${id}/proof?token=${encodeURIComponent(token)}" style="width:100%;border-radius:12px;border:1px solid var(--line);" alt="Proof of delivery">`);
+}
+
+/* ---- rating ---- */
+function openRateModal(loadId) {
+  openModal("Rate your carrier", `
+    <div id="rateStars" style="font-size:32px;letter-spacing:8px;cursor:pointer;margin-bottom:14px;text-align:center;">
+      ${[1, 2, 3, 4, 5].map(i => `<span data-star="${i}" style="color:var(--dim);">★</span>`).join("")}
+    </div>
+    <input id="rateComment" placeholder="How was the haul? (optional)" aria-label="Rating comment">
+    <button class="btn" id="rateSubmit" style="width:100%;">Submit rating</button>`);
+  let stars = 0;
+  $("rateStars").onclick = e => {
+    const s = e.target.closest("[data-star]"); if (!s) return;
+    stars = +s.dataset.star;
+    document.querySelectorAll("#rateStars [data-star]").forEach(x =>
+      x.style.color = +x.dataset.star <= stars ? "var(--acc)" : "var(--dim)");
+  };
+  $("rateSubmit").onclick = async () => {
+    if (!stars) return toast("Pick a star rating first", true);
+    try {
+      await api("/ratings", { method: "POST", body: JSON.stringify({ load_id: loadId, stars, comment: $("rateComment").value.trim() }) });
+      closeModal(); toast("Thanks — rating submitted"); logActivity("Rated load " + loadId + ": " + stars + "★");
+      loadLoads();
+    } catch (e) { toast(e.message, true); }
+  };
+}
+
+/* ---- password reset ---- */
+$("forgotLink").onclick = e => {
+  e.preventDefault();
+  $("rsStep1").classList.remove("hidden"); $("rsStep2").classList.add("hidden");
+  $("rsMsg").textContent = ""; $("rsHint").textContent = "";
+  $("resetOverlay").classList.remove("hidden");
+};
+$("resetClose").onclick = () => $("resetOverlay").classList.add("hidden");
+$("resetOverlay").onclick = e => { if (e.target === $("resetOverlay")) $("resetOverlay").classList.add("hidden"); };
+$("rsSend").onclick = async () => {
+  $("rsMsg").textContent = "";
+  const email = $("rsEmail").value.trim();
+  if (!email) return $("rsMsg").textContent = "Enter your account email.";
+  try {
+    await api("/auth/forgot", { method: "POST", body: JSON.stringify({ email, password: "x" }) });
+    $("rsStep1").classList.add("hidden"); $("rsStep2").classList.remove("hidden");
+    $("rsHint").textContent = "If that email is registered, a reset link is on its way (check the server logs if SMTP isn't configured). Paste the token below.";
+  } catch (e) { $("rsMsg").textContent = e.message; }
+};
+$("npSend").onclick = async () => {
+  $("rsMsg").textContent = "";
+  try {
+    await api("/auth/reset", { method: "POST", body: JSON.stringify({ token: $("npToken").value.trim(), password: $("npPass").value }) });
+    $("resetOverlay").classList.add("hidden");
+    toast("Password updated — sign in with your new password");
+  } catch (e) { $("rsMsg").textContent = e.message; }
+};
+function openResetWithToken(token) {
+  $("rsStep1").classList.add("hidden"); $("rsStep2").classList.remove("hidden");
+  $("npToken").value = token;
+  $("rsHint").textContent = "Enter your new password below.";
+  $("resetOverlay").classList.remove("hidden");
+}
+
+/* ---- legacy role picker (old Firebase accounts only) ---- */
+async function pickRole(role) {
+  try {
+    const me = await api("/me", { method: "PATCH", body: JSON.stringify({ role }) });
+    myRole = me.role;
+    $("roleOverlay").classList.add("hidden");
+    enterApp();
+    logActivity("Chose role: " + role);
+    toast("You're set up as a " + role);
+  } catch (e) { toast(e.message, true); }
+}
+$("roleShipper").onclick = () => pickRole("shipper");
+$("roleCarrier").onclick = () => pickRole("carrier");
+
+/* ---- admin panel ---- */
+function renderAdChart(daily) {
+  const W = 720, H = 190, padX = 26, base = H - 24;
+  const max = Math.max(1, ...daily.map(d => Math.max(d.signups, d.loads)));
+  const bw = (W - padX * 2) / daily.length;
+  let bars = "", labels = "", grid = "";
+  for (let g = 1; g <= 3; g++) {
+    const y = base - (base - 20) * g / 3;
+    grid += `<line x1="${padX}" y1="${y}" x2="${W - padX}" y2="${y}" stroke="#232c42" stroke-width="1"/>` +
+            `<text x="4" y="${y + 3}" font-size="9" fill="#5a6480">${Math.round(max * g / 3)}</text>`;
+  }
+  daily.forEach((d, i) => {
+    const x = padX + i * bw;
+    const h1 = (d.signups / max) * (base - 20), h2 = (d.loads / max) * (base - 20);
+    if (d.signups) bars += `<rect x="${(x + bw * 0.12).toFixed(1)}" y="${(base - h1).toFixed(1)}" width="${(bw * 0.34).toFixed(1)}" height="${h1.toFixed(1)}" rx="2" fill="#ffb020"><title>${d.date}: ${d.signups} signups</title></rect>`;
+    if (d.loads) bars += `<rect x="${(x + bw * 0.54).toFixed(1)}" y="${(base - h2).toFixed(1)}" width="${(bw * 0.34).toFixed(1)}" height="${h2.toFixed(1)}" rx="2" fill="#5b9dff"><title>${d.date}: ${d.loads} loads</title></rect>`;
+    if (i % 2 === 0) labels += `<text x="${(x + bw / 2).toFixed(1)}" y="${H - 8}" font-size="9" fill="#8f98b3" text-anchor="middle">${d.date.slice(5)}</text>`;
+  });
+  $("adChart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;">${grid}${bars}${labels}</svg>`;
+}
+
+async function loadAdmin() {
+  if (!myIsAdmin) { goTab("home"); return toast("Admin access required", true); }
+  try {
+    const [users, loads, stats] = await Promise.all([api("/admin/users"), api("/admin/loads"), api("/admin/stats")]);
+    countUp($("adStatUsers"), stats.total_users);
+    countUp($("adStatShippers"), stats.shippers);
+    countUp($("adStatCarriers"), stats.carriers);
+    countUp($("adStatLoads"), stats.loads);
+    countUp($("adStatOpen"), stats.open_loads);
+    countUp($("adStatGHS"), Math.round(stats.paid_ghs), "₵");
+    countUp($("adStatConvos"), stats.conversations);
+    $("adStatRating").textContent = stats.avg_rating ? "\u2605 " + Number(stats.avg_rating).toFixed(1) : "\u2014";
+    renderAdChart(stats.daily || []);
+    $("admUsersCount").textContent = "\u00b7 " + users.length;
+    $("admUsers").innerHTML = users.length ? users.map(u => `
+      <tr><td>${u.id}</td><td>${esc(u.email)}</td><td>${esc(u.role)}</td>
+      <td>${u.disabled ? '<span class="badge cancelled">disabled</span>' : '<span class="badge delivered">active</span>'}</td>
+      <td class="hint" style="font-size:12px;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : "\u2014"}</td>
+      <td><button class="ghost" data-admdis="${u.id}" style="padding:3px 10px;font-size:11px;">${u.disabled ? "Enable" : "Disable"}</button></td></tr>`).join("")
+      : `<tr><td colspan="6" class="hint">No users.</td></tr>`;
+    $("admLoads").innerHTML = loads.length ? loads.map(l => `
+      <tr><td>${l.id}</td><td>${esc(l.origin_city)} → ${esc(l.dest_city)}</td>
+      <td><span class="badge ${l.status}">${esc(l.status)}</span></td><td>${esc(l.payment_status)}</td>
+      <td>${["delivered", "cancelled", "expired"].includes(l.status) ? "" : `<button class="ghost" data-admcan="${l.id}" style="padding:3px 10px;font-size:11px;">Cancel</button>`}</td></tr>`).join("")
+      : `<tr><td colspan="5" class="hint">No loads.</td></tr>`;
+  } catch (e) {
+    $("admUsers").innerHTML = $("admLoads").innerHTML = `<tr><td colspan="5" class="err">${esc(e.message)}</td></tr>`;
+  }
+}
+$("admUsers").onclick = async e => {
+  const b = e.target.closest("[data-admdis]"); if (!b) return;
+  try {
+    const r = await api(`/admin/users/${b.dataset.admdis}/toggle-disable`, { method: "POST" });
+    toast("User " + (r.disabled ? "disabled" : "enabled")); loadAdmin();
+  } catch (err) { toast(err.message, true); }
+};
+$("admLoads").onclick = async e => {
+  const b = e.target.closest("[data-admcan]"); if (!b) return;
+  try {
+    await api(`/admin/loads/${b.dataset.admcan}/cancel`, { method: "POST" });
+    toast("Load cancelled"); loadAdmin(); loadLoads();
+  } catch (err) { toast(err.message, true); }
+};
+
+/* ---- PWA ---- */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+
+/* ---------- boot: deep links ---------- */
+(function boot() {
+  const h = location.hash;
+  if (h.startsWith("#ref=")) {
+    const code = h.slice(5).toUpperCase().trim();
+    if (code) { localStorage.setItem("waynok_ref", code); const rc = $("refCode"); if (rc) rc.value = code; }
+  }
+  if (h.startsWith("#reset?")) {
+    const t = new URLSearchParams(h.slice(7)).get("token");
+    if (t) openResetWithToken(t);
+  }
+  const paid = new URLSearchParams(location.search).get("paid");
+  if (paid === "1") setTimeout(() => toast("Payment received — load marked PAID"), 600);
+  if (paid === "0") setTimeout(() => toast("Payment was not completed", true), 600);
+  if (paid) history.replaceState(null, "", "/#loads");
+})();
+
+/* ================= referrals & driver dashboard ================= */
+
+async function loadReferrals() {
+  if (!token) {
+    $("rfCodeBig").textContent = "········";
+    $("rfList").innerHTML = `<p class="hint">Sign in to see your referral code and earnings.</p>`;
+    return;
+  }
+  try {
+    const [ref, bal, wds] = await Promise.all([api("/me/referral"), api("/me/balance"), api("/me/withdrawals")]);
+    $("rfCodeBig").textContent = ref.code || "········";
+    $("rfLink").value = ref.link || "";
+    countUp($("rfAvail"), Math.round(ref.available_ghs), "₵");
+    countUp($("rfPending"), Math.round(ref.pending_ghs), "₵");
+    countUp($("rfCount"), (ref.referred || []).length);
+    $("rfList").innerHTML = (ref.referred || []).length ? ref.referred.map(r => `
+      <div class="act-item">
+        <span class="at">${r.joined_at ? new Date(r.joined_at).toLocaleDateString() : ""}</span>
+        <span style="flex:1;">${esc(r.name || r.email)}</span>
+        ${r.rewarded ? '<span class="badge delivered">GHS 20 earned</span>' : '<span class="badge open">awaiting first order</span>'}
+      </div>`).join("") : `<p class="hint">No referrals yet — share your link above.</p>`;
+    $("wdList").innerHTML = wds.length ? wds.map(w => `
+      <div class="act-item">
+        <span class="at">${new Date(w.created_at).toLocaleDateString()}</span>
+        <span style="flex:1;">GHS ${Number(w.amount_ghs).toLocaleString()}</span>
+        <span class="badge ${w.status === "paid" ? "delivered" : w.status === "rejected" ? "cancelled" : "assigned"}">${esc(w.status)}</span>
+      </div>`).join("") : `<p class="hint">No withdrawals yet.</p>`;
+    $("wdMsg").textContent = "";
+  } catch (e) { $("rfList").innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+}
+$("rfCopy").onclick = async () => {
+  const link = $("rfLink").value;
+  try { await navigator.clipboard.writeText(link); toast("Referral link copied"); }
+  catch (e) { $("rfLink").select(); document.execCommand("copy"); toast("Referral link copied"); }
+  logActivity("Copied referral link");
+};
+/* ---- payout details (MoMo / bank) ---- */
+async function loadPayout() {
+  if (!token) return;
+  try {
+    const p = await api("/me/payout");
+    if (p.momo_provider) $("pdMomoProvider").value = p.momo_provider;
+    if (p.momo_number) $("pdMomoNumber").value = p.momo_number;
+    if (p.bank_name) $("pdBankName").value = p.bank_name;
+    if (p.bank_account_name) $("pdAcctName").value = p.bank_account_name;
+    if (p.bank_account_number) $("pdAcctNumber").value = p.bank_account_number;
+    $("pdMsg").textContent = p.has_payout ? "" : "No payout method saved yet — add one to receive withdrawals.";
+  } catch (e) {}
+}
+loadPayout();
+$("pdSave").onclick = async () => {
+  $("pdMsg").textContent = "";
+  const body = {
+    momo_provider: $("pdMomoProvider").value || null,
+    momo_number: $("pdMomoNumber").value.trim() || null,
+    bank_name: $("pdBankName").value.trim() || null,
+    bank_account_name: $("pdAcctName").value.trim() || null,
+    bank_account_number: $("pdAcctNumber").value.trim() || null,
+  };
+  try {
+    const p = await api("/me/payout", { method: "PUT", body: JSON.stringify(body) });
+    toast("Payout details saved"); logActivity("Updated payout details");
+    if (!p.has_payout) $("pdMsg").textContent = "Provide complete MoMo or complete bank details.";
+  } catch (e) { $("pdMsg").textContent = e.message; toast(e.message, true); }
+};
+
+$("wdBtn").onclick = async () => {
+  $("wdMsg").textContent = "";
+  const amt = +$("wdAmt").value;
+  if (!amt) return $("wdMsg").textContent = "Enter an amount.";
+  try {
+    await api("/me/withdraw", { method: "POST", body: JSON.stringify({ amount: amt }) });
+    $("wdAmt").value = "";
+    toast("Withdrawal requested — paid to mobile money within 48h");
+    logActivity("Requested withdrawal of GHS " + amt);
+    loadReferrals();
+  } catch (e) { $("wdMsg").textContent = e.message; }
+};
+
+/* ---- driver dashboard: balance, online status, offers ---- */
+let watchId = null, lastPingAt = 0, offerTimer = null, online = false;
+
+async function loadDashboard() {
+  if (!token) { goTab("home"); return toast("Sign in to open the dashboard", true); }
+  if (myRole && myRole !== "carrier") {
+    // shippers see balance readout but not the driver tools
+    $("dOnline").classList.add("hidden");
+    $("dStatus").textContent = "Driver tools are for carrier accounts. Your balance is shown above.";
+  }
+  try {
+    const bal = await api("/me/balance");
+    countUp($("dAvail"), Math.round(bal.available_ghs), "₵");
+    countUp($("dCurrent"), Math.round(bal.current_ghs), "₵");
+    countUp($("dPending"), Math.round(bal.pending_ghs), "₵");
+  } catch (e) {}
+  refreshOffers();
+}
+async function refreshOffers() {
+  if (!token || myRole !== "carrier") return;
+  try {
+    const offers = await api("/drivers/offers");
+    $("dOffers").innerHTML = offers.length ? offers.map(o => {
+      const l = o.load;
+      return `<div class="match">
+        <div class="route">${esc(l.origin_city)}<span class="arrow">→</span>${esc(l.dest_city)}
+          <span class="badge open" style="margin-left:8px;">${o.distance_km != null ? o.distance_km + " km away" : "near you"}</span></div>
+        <div class="ldmeta">${l.weight_kg.toLocaleString()} kg · ${esc(l.equipment_type)}${l.budget_ghs ? " · ₵" + l.budget_ghs.toLocaleString() : ""}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="btn" data-accoffer="${o.offer_id}" style="padding:7px 18px;font-size:13px;">Accept load</button>
+          <button class="ghost" data-decoffer="${o.offer_id}" style="padding:7px 14px;font-size:13px;">Decline</button>
+        </div></div>`;
+    }).join("") : `<p class="hint">No offers right now — go online and we'll send nearby loads your way.</p>`;
+    const near = await api("/drivers/nearby-loads");
+    $("dNearby").innerHTML = near.length ? near.map(n => {
+      const l = n.load;
+      return `<div class="act-item"><span class="at">${n.distance_km} km</span>
+        <span style="flex:1;">${esc(l.origin_city)} → ${esc(l.dest_city)} · ${l.weight_kg.toLocaleString()} kg${l.budget_ghs ? " · ₵" + l.budget_ghs.toLocaleString() : ""}</span>
+        <span class="badge ${l.status}">${esc(l.status)}</span></div>`;
+    }).join("") : `<p class="hint">No open loads within 60 km of your position.</p>`;
+  } catch (e) { /* offline */ }
+}
+$("dOffers").onclick = async e => {
+  const acc = e.target.closest("[data-accoffer]");
+  const dec = e.target.closest("[data-decoffer]");
+  try {
+    if (acc) {
+      await api(`/offers/${acc.dataset.accoffer}/accept`, { method: "POST" });
+      toast("Load accepted — check the board for pickup"); logActivity("Accepted a nearby load offer");
+      refreshOffers(); loadLoads();
+    } else if (dec) {
+      await api(`/offers/${dec.dataset.decoffer}/decline`, { method: "POST" });
+      refreshOffers();
+    }
+  } catch (err) { toast(err.message, true); refreshOffers(); }
+};
+
+function setOnline(on) {
+  online = on;
+  $("dOnline").textContent = on ? "Go offline" : "Go online — share my location";
+  if (on) {
+    if (!navigator.geolocation) { toast("Geolocation not supported on this device", true); online = false; return; }
+    const ping = pos => {
+      const now = Date.now();
+      if (now - lastPingAt < 45000) return;  // ~1 ping/minute max
+      lastPingAt = now;
+      api("/drivers/location", { method: "POST", body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }) })
+        .then(r => { if (r.new_offers > 0) toast(r.new_offers + " new load offer(s) near you!"); refreshOffers(); })
+        .catch(() => {});
+      $("dStatus").textContent = "You're online at " + pos.coords.latitude.toFixed(4) + ", " + pos.coords.longitude.toFixed(4) + " — offers arriving as loads post nearby.";
+    };
+    watchId = navigator.geolocation.watchPosition(ping, err => {
+      $("dStatus").textContent = "Location error: " + err.message + " — enable location permission and try again.";
+    }, { enableHighAccuracy: false, maximumAge: 30000, timeout: 20000 });
+    offerTimer = setInterval(refreshOffers, 20000);
+    $("dStatus").textContent = "Waiting for GPS…";
+  } else {
+    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+    if (offerTimer) { clearInterval(offerTimer); offerTimer = null; }
+    $("dStatus").textContent = "You're offline — customers can't see your position and loads won't be offered to you.";
+  }
+}
+$("dOnline").onclick = () => setOnline(!online);
+
+/* ---- live map on Track page (customer view of online drivers) ---- */
+let trackMap = null, trackMarkers = [];
+function initTrackMap() {
+  if (trackMap || MAPS_KEY.includes("YOUR_")) return;
+  const s = document.createElement("script");
+  s.src = "https://maps.googleapis.com/maps/api/js?key=" + MAPS_KEY + "&callback=bootTrackMap&libraries=maps,marker&v=beta";
+  s.async = true; document.head.appendChild(s);
+}
+window.bootTrackMap = () => {
+  trackMap = new google.maps.Map($("trackMap"), { mapId: MAP_ID, center: { lat: 7.9, lng: -1.0 }, zoom: 7, styles: [
+    { elementType: "geometry", stylers: [{ color: "#10151f" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#8f98b3" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#232c42" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0d1526" }] },
+    { featureType: "poi", stylers: [{ visibility: "off" }] }
+  ]});
+  $("trackMapHint").textContent = "Orange markers are online drivers — tap Track on any driver for a live view.";
+  plotLiveDrivers();
+};
+async function plotLiveDrivers() {
+  if (!trackMap) return;
+  try {
+    const locs = await api("/drivers/locations");
+    trackMarkers.forEach(m => m.setMap(null));
+    trackMarkers = [];
+    locs.filter(l => l.live).forEach(l => {
+      const m = new google.maps.Marker({
+        position: { lat: l.lat, lng: l.lng }, map: trackMap,
+        label: { text: (l.name || "D").split(" ")[0], color: "#161006", fontWeight: "700" },
+        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: "#ffb020", fillOpacity: 1, strokeColor: "#ff7a1a", strokeWeight: 2 },
+      });
+      trackMarkers.push(m);
+    });
+    if (trackMarkers.length) {
+      const b = new google.maps.LatLngBounds();
+      trackMarkers.forEach(m => b.extend(m.getPosition()));
+      trackMap.fitBounds(b);
+    }
+  } catch (e) {}
+}
+setInterval(() => { if (trackMap && !$("track").classList.contains("hidden")) plotLiveDrivers(); }, 30000);
+
+/* ---- merge live positions into the driver list on Track ---- */
+const _origLoadDrivers = loadDrivers;
+loadDrivers = async function () {
+  await _origLoadDrivers();
+  try {
+    const locs = await api("/drivers/locations");
+    const byCarrier = {};
+    locs.forEach(l => { byCarrier[l.carrier_id] = l; });
+    drivers = drivers.map(d => {
+      const live = d.cid != null ? byCarrier[d.cid] : null;
+      if (live && live.live) return { ...d, lat: live.lat, lng: live.lng, live: true };
+      return d;
+    });
+    renderDrivers();
+  } catch (e) {}
+};
+// reassign delegation reference (renderDrivers bound via closure already)
+
+/* ---- per-load live driver position ---- */
+async function showLiveDriver(loadId) {
+  try {
+    const d = await api(`/loads/${loadId}/driver-location`);
+    trackDriver({ name: d.truck.name || "Driver", plate: d.truck.plate_no, lat: d.lat, lng: d.lng, live: true });
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ---------- session restore ---------- */
+if (token) enterApp();
+</script>
+</body>
+</html>
