@@ -1,0 +1,4 @@
+grep -n 'id="privacy"' src/static/index.html
+grep -n '#terms' src/static/index.html
+grep -n 'Read our Privacy' src/static/index.html
+grep -n 'terms\|privacy\|refund' src/static/index.html | grep -i 'nav\|footer'
