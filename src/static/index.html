@@ -2481,7 +2481,7 @@ async function acceptOffer(btn, id, endpoint) {
     // 3) open the in-app chat between driver and client
     setTimeout(() => openNegotiation(r.load_id), 400);
     toast("Load accepted — chat opened with the client");
-    logActivity("Accepted load offer " + offerId + " (load " + r.load_id + ")");
+    logActivity("Accepted load " + r.load_id);
     refreshOffers(); loadLoads();
   } catch (err) {
     toast(err.message, true);
