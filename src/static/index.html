@@ -239,6 +239,33 @@
   .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:4px}
 
+  /* ===== one-menu mobile navigation ===== */
+  #menuBtn{display:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--txt);font-size:18px;cursor:pointer;
+    align-items:center;justify-content:center;flex:none}
+  #menuBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;display:none}
+  #menuDrawer{position:fixed;top:0;left:0;height:100vh;width:272px;max-width:84vw;z-index:91;
+    background:#0f1524;border-right:1px solid var(--line);transform:translateX(-105%);
+    transition:transform .22s ease;padding:16px 12px;overflow-y:auto;display:flex;flex-direction:column}
+  #menuDrawer.open{transform:translateX(0)}
+  #menuDrawer .menu-head{display:flex;justify-content:space-between;align-items:center;
+    padding:4px 8px 12px;font-size:16px}
+  #menuDrawer #menuClose{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:0 6px}
+  #menuDrawer #menuClose:hover{color:var(--acc)}
+  #menuDrawer a{display:flex;gap:11px;align-items:center;padding:12px;border-radius:10px;
+    color:var(--txt);text-decoration:none;font-size:15px;margin-bottom:2px}
+  #menuDrawer a:hover{background:rgba(255,176,32,.1)}
+  #menuDrawer .sep{margin:14px 8px 6px;font:600 10px "IBM Plex Mono";letter-spacing:2px;
+    color:var(--dim);text-transform:uppercase}
+  @media (max-width:900px){
+    nav.main{display:none}
+    #menuBtn{display:flex}
+  }
+  @media (max-width:480px){
+    #navAuth .btn.ghost{display:none}
+    .top-in{gap:10px}
+  }
+
   /* ===== Uber-style post-a-load ===== */
   .uber-field{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:4px 10px 4px 16px;margin-bottom:12px;}
   .u-dot{width:10px;height:10px;border-radius:50%;flex:none;}
@@ -269,6 +296,7 @@
 <body>
 <header class="top">
   <div class="wrap top-in">
+    <button id="menuBtn" aria-label="Open menu">&#9776;</button>
     <a class="logo" href="#home"><span class="mark">🚚</span>WAYNOK</a>
     <nav class="main" id="mainNav">
       <a href="#home" data-nav="home">Home</a>
@@ -282,6 +310,30 @@
   </div>
 </header>
 <div class="notif-panel hidden" id="notifPanel"></div>
+<div id="menuBackdrop"></div>
+<nav id="menuDrawer" aria-label="Menu">
+  <div class="menu-head"><b>Waynok</b><button id="menuClose" aria-label="Close menu">&times;</button></div>
+  <a href="#home" onclick="closeMenu()">🏠 Home</a>
+  <a href="#post" onclick="closeMenu()">📦 Post a load</a>
+  <a href="#loads" onclick="closeMenu()">📋 Load board</a>
+  <a href="#track" onclick="closeMenu()">🗺️ Track drivers</a>
+  <a href="#agent" onclick="closeMenu()">🤖 AI dispatcher</a>
+  <a href="#msgs" onclick="closeMenu()">💬 Messages</a>
+  <div class="sep">Drivers</div>
+  <a href="#dash" onclick="closeMenu()">🚛 Driver dashboard</a>
+  <a href="#trucks" onclick="closeMenu()">🚚 My trucks</a>
+  <a href="#truck-new" onclick="closeMenu()">➕ List a truck</a>
+  <a href="#earn" onclick="closeMenu()">💰 Earnings calculator</a>
+  <div class="sep">Account</div>
+  <a href="#profile" onclick="closeMenu()">👤 Profile &amp; wallet</a>
+  <a href="#settings" onclick="closeMenu()">⚙️ Settings</a>
+  <a href="#support" onclick="closeMenu()">🆘 Support</a>
+  <div class="sep">Legal</div>
+  <a href="#terms" onclick="closeMenu()">📜 Terms</a>
+  <a href="#privacy" onclick="closeMenu()">🔒 Privacy</a>
+  <a href="#refund" onclick="closeMenu()">💵 Refund policy</a>
+  <a href="#admin" onclick="closeMenu()" style="color:var(--dim)">🛡 Admin</a>
+</nav>
 
 <main class="wrap" style="padding-top:24px;padding-bottom:40px;">
   <div class="offline-banner" id="offlineBanner">You're offline. Reconnect to keep working.</div>
@@ -1541,6 +1593,14 @@ async function doReset() {
     $("rsMsg").textContent = "Password updated — sign in with your new password.";
   } catch (e) { $("rsErr").textContent = e.message; }
 }
+
+/* ---------------- mobile menu ---------------- */
+function openMenu() { $("menuDrawer").classList.add("open"); $("menuBackdrop").style.display = "block"; }
+function closeMenu() { $("menuDrawer").classList.remove("open"); $("menuBackdrop").style.display = "none"; }
+$("menuBtn").onclick = openMenu;
+$("menuClose").onclick = closeMenu;
+$("menuBackdrop").onclick = closeMenu;
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
 
 /* ---------------- misc ---------------- */
 if ("serviceWorker" in navigator) {
