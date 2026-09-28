@@ -1080,8 +1080,7 @@ function collectPostBody(allowPartial) {
     weight_kg: parseFloat($("poWeight").value),
     pickup_time: $("poPickup").value ? new Date($("poPickup").value).toISOString() : undefined,
   };
-  const valid = o.origin_city && isFinite(o.origin_lat) && isFinite(o.origin_lng) &&
-    o.dest_city && isFinite(o.dest_lat) && isFinite(o.dest_lng) && o.weight_kg > 0;
+  const valid = o.origin_city && o.dest_city && o.weight_kg > 0;
   return (valid || allowPartial) ? o : null;
 }
 function quoteDebounce() { clearTimeout(quoteTimer); quoteTimer = setTimeout(fetchQuotes, 500); }
@@ -1101,7 +1100,7 @@ async function fetchQuotes() {
 async function postLoad() {
   $("poErr").textContent = ""; $("poOk").textContent = "";
   const body = collectPostBody(false);
-  if (!body) { $("poErr").textContent = "Fill in Where from, Where to, and weight (kg) — tap \uD83D\uDCCD to auto-fill coordinates."; return; }
+  if (!body) { $("poErr").textContent = "Fill in Where from, Where to, and weight (kg)."; return; }
   $("poBtn").disabled = true;
   try {
     const d = await api("/loads", { method: "POST", body: JSON.stringify(body) });
