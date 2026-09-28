@@ -261,6 +261,7 @@
   #modalOverlay:not(.hidden), #roleOverlay:not(.hidden), #resetOverlay:not(.hidden) { animation:fadeUp .25s ease; }
   :focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 4px; }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -520,7 +521,7 @@
     <div class="panel" id="trackMapPanel">
       <h2>Live map <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· drivers online now</span></h2>
       <div id="trackMap" style="height:380px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);"></div>
-      <p class="hint" id="trackMapHint" style="margin-top:8px;">Add a Maps key in index.html to see live driver positions.</p>
+      <p class="hint" id="trackMapHint" style="margin-top:8px;">Map display is optional (set MAPS_KEY in index.html). Live positions and road distances work via the server without it.</p>
     </div>
     <div class="panel">
       <h2>Loads matched to drivers <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· within 50 mi of pickup</span></h2>
@@ -921,7 +922,7 @@
 <script>
 /* ================= CONFIG ================= */
 const API_BASE = "";   // same origin — always talks to the backend that served this page
-const MAPS_KEY = "AIzaSyA5Oo54DZ8HmM3WFKSi_nxRlDHMK2uXFiE";  // Google Maps JS key (referrer-restricted)
+const MAPS_KEY = "";  // optional browser key for the map DISPLAY only — distances & pricing use the server-side GOOGLE_MAPS_API_KEY
 const MAP_ID = "6817d9f8bc77499c68ff1242";  // cloud map style (Google Cloud -> Map Management)
 
 // Sign-in: email/password or phone number + password (SMS verification coming soon).
@@ -1185,13 +1186,26 @@ function mktPrice(km, origin, equip) {          // MARKET price (what the haul i
 const PRICE_MARKUP = 0.50;
 const customerPrice = m => Math.round(m * (1 + PRICE_MARKUP));   // market + 15% price increase
 const driverNet = m => Math.round(customerPrice(m) * (1 - PLATFORM_FEE));  // driver pays 15% commission on the increased price
+let autoPriceTimer = null;
+function renderAutoPrice(km, origin, distLabel) {
+  const market = mktPrice(km, origin, $("ldEquip").value);
+  const road = MKT_GOOD_ROADS.includes((origin||"").split(",")[0].trim().toLowerCase()) ? "good road" : "bad road +15%";
+  $("ldAutoPrice").innerHTML = "&#8373;" + customerPrice(market).toLocaleString() +
+    " <span style='opacity:.7'>· " + Math.round(km) + " km " + distLabel + " · " + road + " · market + 50% · min &#8373;300</span>";
+}
 function updAutoPrice() {
   const a = geocodeCity($("ldPickup").value), b = geocodeCity($("ldDropoff").value);
   if (!a || !b) { $("ldAutoPrice").textContent = "Market price appears here"; return; }
-  const km = havKm(a[0], a[1], b[0], b[1]);
-  const market = mktPrice(km, $("ldPickup").value, $("ldEquip").value);
-  const road = MKT_GOOD_ROADS.includes(($("ldPickup").value||"").split(",")[0].trim().toLowerCase()) ? "good road" : "bad road +15%";
-  $("ldAutoPrice").innerHTML = "&#8373;" + customerPrice(market).toLocaleString() + " <span style='opacity:.7'>· " + Math.round(km) + " km · " + road + " · market + 50% · min &#8373;300</span>";
+  const o = $("ldPickup").value.trim(), d = $("ldDropoff").value.trim();
+  renderAutoPrice(havKm(a[0], a[1], b[0], b[1]), o, "straight-line");
+  clearTimeout(autoPriceTimer);
+  autoPriceTimer = setTimeout(async () => {
+    try {
+      const r = await api("/maps/directions?origin=" + encodeURIComponent(o) + "&destination=" + encodeURIComponent(d));
+      const km = parseFloat((r.legs && r.legs[0] && r.legs[0].distance && r.legs[0].distance.text) || "") || 0;
+      if (r.provider === "google" && km > 0) renderAutoPrice(km, o, "road");
+    } catch (e) { /* keep straight-line estimate */ }
+  }, 500);
 }
 ["ldPickup", "ldDropoff", "ldEquip", "ldWeight"].forEach(i => $(i).addEventListener("input", updAutoPrice));
 
