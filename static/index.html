@@ -254,6 +254,10 @@
     .drv { flex-wrap: wrap; }
   }
   .expired { background:rgba(143,152,179,.1); color:var(--dim); border:1px solid var(--line); }
+  button.live-btn { position:relative; }
+  button.live-btn::after { content:""; position:absolute; inset:-4px; border-radius:14px;
+      border:2px solid var(--acc); animation:livepulse 1.6s ease-out infinite; pointer-events:none; }
+  @keyframes livepulse { 0% { opacity:.9; transform:scale(1); } 100% { opacity:0; transform:scale(1.15); } }
   .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
   @media (max-width:1100px){ .grid4{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:820px){ .grid4{grid-template-columns:1fr;} }
@@ -2247,7 +2251,7 @@ async function refreshOffers() {
         <div class="ldmeta">${l.weight_kg.toLocaleString()} kg · ${esc(l.equipment_type)}${l.budget_ghs ? " · ₵" + l.budget_ghs.toLocaleString() + "" : ""}</div>
         ${l.budget_ghs ? `<div class="ldmeta" style="color:var(--ok);">You take ₵${Math.round(l.budget_ghs * (1 - PLATFORM_FEE)).toLocaleString()} after 15% commission (₵${l.budget_ghs.toLocaleString()} − ₵${Math.round(l.budget_ghs * PLATFORM_FEE).toLocaleString()})</div>` : ""}
         <div style="margin-top:10px;display:flex;gap:8px;">
-          <button class="btn" data-accoffer="${o.offer_id}" style="padding:7px 18px;font-size:13px;">Accept load</button>
+          <button class="btn live-btn" data-accoffer="${o.offer_id}" style="padding:7px 18px;font-size:13px;">Accept load</button>
           <button class="ghost" data-negoffer="${l.id}" style="padding:7px 14px;font-size:13px;">Negotiate</button>
           <button class="ghost" data-decoffer="${o.offer_id}" style="padding:7px 14px;font-size:13px;">Decline</button>
         </div></div>`;
@@ -2262,6 +2266,36 @@ async function refreshOffers() {
     }).join("") : `<p class="hint">No open loads within 60 km of your position.</p>`;
   } catch (e) { /* offline */ }
 }
+/* ---- accept flow: track + chat + live button ---- */
+async function acceptOffer(btn, offerId) {
+  btn.disabled = true;
+  btn.textContent = "Accepting…";
+  try {
+    const r = await api(`/offers/${offerId}/accept`, { method: "POST" });
+    // 1) live button state
+    btn.textContent = "✓ Accepted — live";
+    btn.classList.remove("live-btn");
+    btn.style.background = "linear-gradient(90deg,#34d399,#2ecc71)";
+    // 2) start tracking the driver's movement right away
+    if (!online) setOnline(true);
+    if (navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => {
+      api("/drivers/location", { method: "POST",
+        body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }) })
+        .then(() => toast("Live tracking started — the client can see you"))
+        .catch(() => {});
+    });
+    // 3) open the in-app chat between driver and client
+    setTimeout(() => openNegotiation(r.load_id), 400);
+    toast("Load accepted — chat opened with the client");
+    logActivity("Accepted load offer " + offerId + " (load " + r.load_id + ")");
+    refreshOffers(); loadLoads();
+  } catch (err) {
+    toast(err.message, true);
+    btn.disabled = false;
+    btn.textContent = "Accept load";
+  }
+}
+
 $("dOffers").onclick = async e => {
   const neg = e.target.closest("[data-negoffer]");
   if (neg) return openNegotiation(+neg.dataset.negoffer);
@@ -2269,9 +2303,7 @@ $("dOffers").onclick = async e => {
   const dec = e.target.closest("[data-decoffer]");
   try {
     if (acc) {
-      await api(`/offers/${acc.dataset.accoffer}/accept`, { method: "POST" });
-      toast("Load accepted — check the board for pickup"); logActivity("Accepted a nearby load offer");
-      refreshOffers(); loadLoads();
+      return acceptOffer(acc, acc.dataset.accoffer);
     } else if (dec) {
       await api(`/offers/${dec.dataset.decoffer}/decline`, { method: "POST" });
       refreshOffers();
