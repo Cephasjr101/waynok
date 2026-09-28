@@ -283,7 +283,7 @@
         <h1>Move freight across Ghana.<br><em>Matched in seconds.</em></h1>
         <p>Post a load, get matched with a verified driver, track delivery live, and pay securely on delivery — all from your phone.</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="btn primary" onclick="goTab('loads')">Post a load</button>
+          <button class="btn primary" onclick="goTab('post')">Post a load</button>
           <button class="btn ghost" onclick="goTab('trucks')">I'm a driver</button>
         </div>
       </div>
@@ -296,7 +296,7 @@
     </div>
 
     <div class="grid3" style="margin-bottom:24px;">
-      <div class="qa" onclick="goTab('loads')">
+      <div class="qa" onclick="goTab('post')">
         <div class="ic">📦</div>
         <h3>Post a load</h3>
         <p>Origin, destination, weight. Matched with available trucks instantly.</p>
@@ -393,7 +393,8 @@
   <section id="loads" class="tabpage">
     <div class="panel">
       <h2>Load board <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· open loads across Ghana</span>
-        <button class="ghost btn sm" style="margin-left:auto;" onclick="refreshLoads(true)">Refresh</button></h2>
+        <button class="btn primary sm" style="margin-left:auto;" onclick="goTab('post')">+ Post a load</button>
+        <button class="ghost btn sm" onclick="refreshLoads(true)">Refresh</button></h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="loadFilters">
         <button class="fchip active" data-f="all">All</button>
         <button class="fchip" data-f="flatbed">Flatbed</button>
@@ -925,7 +926,7 @@ async function doRegister() {
     closeAuth(); enterApp();
     toast("Account created — welcome to Waynok");
     if (d.user && d.user.role === "carrier") { goTab("dash"); setTimeout(() => setOnline(true), 400); }
-    else if (d.user && d.user.role === "shipper") { goTab("loads"); }
+    else if (d.user && d.user.role === "shipper") { goTab("post"); }
   } catch (e) { $("regErr").textContent = e.message; }
   $("regBtn").disabled = false;
 }
