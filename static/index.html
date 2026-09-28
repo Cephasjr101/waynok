@@ -2206,6 +2206,17 @@ $("wdBtn").onclick = async () => {
   } catch (e) { $("wdMsg").textContent = e.message; }
 };
 
+/* ---- negotiation entry point (carrier side) ---- */
+async function openNegotiation(loadId) {
+  if (!token) { toast("Sign in to negotiate with the shipper", true); return; }
+  try {
+    const c = await api(`/loads/${loadId}/conversations`, { method: "POST", body: "{}" });
+    await refreshConversations();
+    openConversation(c.id);
+    logActivity("Started negotiation on load " + loadId);
+  } catch (e) { toast(e.message, true); }
+}
+
 /* ---- driver dashboard: balance, online status, offers ---- */
 let watchId = null, lastPingAt = 0, offerTimer = null, online = false;
 
@@ -2237,6 +2248,7 @@ async function refreshOffers() {
         ${l.budget_ghs ? `<div class="ldmeta" style="color:var(--ok);">You take ₵${Math.round(l.budget_ghs * (1 - PLATFORM_FEE)).toLocaleString()} after 15% commission (₵${l.budget_ghs.toLocaleString()} − ₵${Math.round(l.budget_ghs * PLATFORM_FEE).toLocaleString()})</div>` : ""}
         <div style="margin-top:10px;display:flex;gap:8px;">
           <button class="btn" data-accoffer="${o.offer_id}" style="padding:7px 18px;font-size:13px;">Accept load</button>
+          <button class="ghost" data-negoffer="${l.id}" style="padding:7px 14px;font-size:13px;">Negotiate</button>
           <button class="ghost" data-decoffer="${o.offer_id}" style="padding:7px 14px;font-size:13px;">Decline</button>
         </div></div>`;
     }).join("") : `<p class="hint">No offers right now — go online and we'll send nearby loads your way.</p>`;
@@ -2245,11 +2257,14 @@ async function refreshOffers() {
       const l = n.load;
       return `<div class="act-item"><span class="at">${n.distance_km} km</span>
         <span style="flex:1;">${esc(l.origin_city)} → ${esc(l.dest_city)} · ${l.weight_kg.toLocaleString()} kg${l.budget_ghs ? " · ₵" + l.budget_ghs.toLocaleString() : ""}</span>
-        <span class="badge ${l.status}">${esc(l.status)}</span></div>`;
+        <span class="badge ${l.status}">${esc(l.status)}</span>
+        <button class="ghost" data-negnear="${l.id}" style="padding:4px 10px;font-size:11px;">Negotiate</button></div>`;
     }).join("") : `<p class="hint">No open loads within 60 km of your position.</p>`;
   } catch (e) { /* offline */ }
 }
 $("dOffers").onclick = async e => {
+  const neg = e.target.closest("[data-negoffer]");
+  if (neg) return openNegotiation(+neg.dataset.negoffer);
   const acc = e.target.closest("[data-accoffer]");
   const dec = e.target.closest("[data-decoffer]");
   try {
@@ -2262,6 +2277,11 @@ $("dOffers").onclick = async e => {
       refreshOffers();
     }
   } catch (err) { toast(err.message, true); refreshOffers(); }
+};
+
+$("dNearby").onclick = e => {
+  const neg = e.target.closest("[data-negnear]");
+  if (neg) return openNegotiation(+neg.dataset.negnear);
 };
 
 function setOnline(on) {
