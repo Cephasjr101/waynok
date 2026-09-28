@@ -242,15 +242,27 @@ def update_me(body: schemas.UserUpdate, db: Session = Depends(get_db), user=Depe
         user.email_notifications = 1 if body.email_notifications else 0
     if body.role is not None and body.role != user.role:
         # legacy Firebase-provisioned rows (role_source "google") get one role choice
-        if user.role_source != "google":
+     if user.role_source != "google":
             raise HTTPException(status_code=400, detail="Role cannot be changed on this account")
-        if body.role not in ("shipper", "carrier"):
+     if body.role not in ("shipper", "carrier"):
             raise HTTPException(status_code=400, detail="Role must be 'shipper' or 'carrier'")
         user.role = body.role
         user.role_source = "self"
     db.commit()
     db.refresh(user)
-    return _user_out(user)
+     if load.status == "open":
+        trucks = (db.query(models.Truck)
+         .filter(models.Truck.carrier_id == conv.carrier_id,
+         models.Truck.status == "available").all())
+      pick = next((t for t in trucks
+         if t.equipment_type.lower() == load.equipment_type.lower()
+                             and (not t.capacity_kg or t.capacity_kg >= load.weight_kg)), None)
+     if pick is None and trucks:
+                    pick = trucks[0]
+    if pick is not None:
+             load.assigned_truck_id = pick.id
+             load.status = "assigned"
+             pick.status = "on_trip"
 
 
 def _send_verify_email(user) -> None:
