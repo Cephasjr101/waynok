@@ -1292,13 +1292,17 @@ function pingLocation(first) {
 
 async function refreshOffers() {
   if (myRole && myRole !== "carrier") return;
-  try {
-    const offers = await api("/drivers/offers");
-    const near = await api("/drivers/nearby-loads");
-    renderOfferList($("dOffers"), offers.map(o => o.load), true, offers);
-    renderOfferList($("dNearby"), near.map(n => n.load), false, near);
-  } catch (e) {
-    $("dOffers").innerHTML = '<div class="empty">' + esc(e.message) + "</div>";
+  let offers = [], near = [], nearOk = true;
+  try { offers = await api("/drivers/offers"); } catch (e) {}
+  try { near = await api("/drivers/nearby-loads"); } catch (e) {
+    nearOk = false;
+    $("dNearby").innerHTML = '<div class="empty">Could not reach the loads endpoint (' + esc(e.message) +
+      '). The latest <b>main.py</b> and <b>driver_routes.py</b> must be uploaded to the server.</div>';
+  }
+  renderOfferList($("dOffers"), offers.map(o => o.load), true, offers);
+  if (nearOk) renderOfferList($("dNearby"), near.map(n => n.load), false, near);
+  else if (!offers.length) {
+    $("dOffers").innerHTML = '<div class="empty">Offers unavailable — check that the latest backend files are deployed.</div>';
   }
 }
 function renderOfferList(el, loads, isOffers, raw) {
