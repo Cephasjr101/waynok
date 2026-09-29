@@ -296,7 +296,7 @@
 <body>
 <header class="top">
   <div class="wrap top-in">
-    <button id="menuBtn" aria-label="Open menu">&#9776;</button>
+    <button id="menuBtn" aria-label="Open menu" style="display:flex">&#9776;</button>
     <a class="logo" href="#home"><span class="mark">W</span>WAYNOK</a>
     <nav class="main" id="mainNav">
       <a href="#home" data-nav="home">Home</a>
@@ -1098,18 +1098,18 @@ function loadActions(l) {
   return h;
 }
 const EQUIP = [
-  { t: "flatbed", n: "Flatbed", i: "<b class='mono'>FB</b>", h: "steel, machinery, containers" },
-  { t: "box",     n: "Box truck", i: "\uD83D\uDE9A", h: "pallets, packaged goods" },
-  { t: "tanker",  n: "Tanker",    i: "\uD83D\uDEE2", h: "fuel, water, liquids" },
-  { t: "tipper",  n: "Tipper",    i: "\u26CF\uFE0F", h: "sand, gravel, aggregates" },
-  { t: "reefer",  n: "Reefer",    i: "\u2744\uFE0F", h: "cold chain, perishables" },
+  { t: "flatbed", n: "Flatbed",   c: "FB", h: "steel, machinery, containers" },
+  { t: "box",     n: "Box truck", c: "BX", h: "pallets, packaged goods" },
+  { t: "tanker",  n: "Tanker",    c: "TK", h: "fuel, water, liquids" },
+  { t: "tipper",  n: "Tipper",    c: "TP", h: "sand, gravel, aggregates" },
+  { t: "reefer",  n: "Reefer",    c: "RF", h: "cold chain, perishables" },
 ];
 let selEquip = "flatbed", quoteCache = {}, quoteTimer = null;
 
 function renderEquipRows() {
   $("equipRows").innerHTML = EQUIP.map(e =>
     '<div class="equip-row' + (e.t === selEquip ? " sel" : "") + '" data-t="' + e.t + '" onclick="selectEquip(\'' + e.t + '\')">' +
-    '<div class="ei">' + e.i + '</div>' +
+    '<div class="ei"><b class="mono" style="font-size:13px">' + e.c + '</b></div>' +
     '<div style="flex:1;"><div class="en">' + e.n + '</div><div class="eh">' + e.h + '</div></div>' +
     '<div class="ep" id="ep-' + e.t + '">' + (quoteCache[e.t] != null ? fmtGHS(quoteCache[e.t]) : "—") + "</div></div>"
   ).join("");
