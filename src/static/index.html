@@ -241,6 +241,11 @@
  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
  :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:4px}
 
+ /* role-filtered menus: each role only sees its own tools */
+ body.role-carrier .m-ship{display:none !important}
+ body.role-shipper .m-carr{display:none !important}
+ body:not(.role-admin) .m-admin{display:none !important}
+
  /* ===== one-menu mobile navigation ===== */
  #menuBtn{display:flex;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
   background:var(--panel2);color:var(--txt);font-size:18px;cursor:pointer;
@@ -352,10 +357,10 @@
  <a href="#agent" onclick="closeMenu()">AI dispatcher</a>
  <a href="#msgs" onclick="closeMenu()">Messages</a>
  <div class="sep">Drivers</div>
- <a href="#dash" onclick="closeMenu()">Driver dashboard</a>
- <a href="#trucks" onclick="closeMenu()">My trucks</a>
- <a href="#truck-new" onclick="closeMenu()">List a truck</a>
- <a href="#earn" onclick="closeMenu()">Earnings calculator</a>
+ <a href="#dash" class="m-carr" onclick="closeMenu()">Driver dashboard</a>
+ <a href="#trucks" class="m-carr" onclick="closeMenu()">My trucks</a>
+ <a href="#truck-new" class="m-carr" onclick="closeMenu()">List a truck</a>
+ <a href="#earn" class="m-carr" onclick="closeMenu()">Earnings calculator</a>
  <div class="sep">Account</div>
  <a href="#profile" onclick="closeMenu()">Profile &amp; wallet</a>
  <a href="#settings" onclick="closeMenu()">Settings</a>
@@ -364,7 +369,7 @@
  <a href="#terms" onclick="closeMenu()">Terms</a>
  <a href="#privacy" onclick="closeMenu()">Privacy</a>
  <a href="#refund" onclick="closeMenu()">Refund policy</a>
- <a href="#admin" onclick="closeMenu()" style="color:var(--dim)">Admin</a>
+ <a href="#admin" class="m-admin" onclick="closeMenu()" style="color:var(--dim)">Admin</a>
 </nav>
 
 <main class="wrap" style="padding-top:24px;padding-bottom:40px;">
@@ -474,6 +479,8 @@
     </div>
     <label class="hint">Password</label>
     <input class="input" id="regPass" type="password" placeholder="Minimum 8 characters" style="margin:6px 0 14px;">
+    <label class="hint">Phone number (for SMS order status and driver arrival alerts)</label>
+    <input class="input" id="regPhoneMain" placeholder="+233 244 000 000" style="margin:6px 0 14px;">
     <label class="hint">Referral code <span style="opacity:.6">(optional)</span></label>
     <input class="input" id="regRef" placeholder="e.g. AB12CD34" style="margin:6px 0 14px;">
     <div id="regErr" class="error"></div>
@@ -523,6 +530,14 @@
      <input class="input" id="poWeight" type="number" min="1" placeholder="Weight (kg) — e.g. 5000" style="flex:1;" oninput="quoteDebounce()">
      <input class="input" id="poPickup" type="datetime-local" style="flex:1;">
     </div>
+    <div class="hint" style="margin-bottom:8px;font:600 11px 'IBM Plex Mono';letter-spacing:1.5px;">PAYMENT METHOD</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="payMethods">
+     <button class="fchip active" data-pm="momo">MoMo</button>
+     <button class="fchip" data-pm="card">Card</button>
+     <button class="fchip" data-pm="cash">Cash on delivery</button>
+     <button class="fchip" data-pm="balance">Waynok balance</button>
+    </div>
+    <div class="hint" id="pmNote" style="margin:-6px 0 12px;font-size:12px;">Pay now with mobile money via Paystack.</div>
     <div class="hint" style="margin-bottom:8px;font:600 11px 'IBM Plex Mono';letter-spacing:1.5px;">CHOOSE YOUR TRUCK</div>
     <div id="equipRows"></div>
     <div id="poErr" class="error"></div>
@@ -546,6 +561,7 @@
    <div id="mapShell" class="map-shell" style="height:460px;"></div>
    <p class="hint" style="margin-top:10px;">Drivers appear here when they go online. Select one of your loads to follow its truck.</p>
    <div id="trackLoads" style="margin-top:14px;"></div>
+   <div id="trackEta" class="hint" style="margin-top:12px;font-size:13px;"></div>
   </div>
  </section>
 
@@ -787,7 +803,16 @@
    <details class="faq"><summary>How do I post a load?</summary><p>Open the Load board and tap "Post a load". Fill in origin, destination, weight and pickup time — you'll be matched with drivers instantly.</p></details>
    <details class="faq"><summary>When does the driver get paid?</summary><p>When you confirm delivery, the payment is released to the driver's withdrawable balance. Drivers withdraw to MoMo or bank.</p></details>
    <details class="faq"><summary>How do driver earnings work?</summary><p>Drivers keep 85% of the quoted price. The remaining 15% covers platform operations and payment processing.</p></details>
-   <details class="faq"><summary>Contact us</summary><p>Email support@waynok.net and we'll reply within one business day.</p></details>
+   <details class="faq"><summary>Contact us</summary><p>Email support@waynok.net and we will reply within one business day.</p></details>
+   <div class="panel" style="margin-top:18px;max-width:560px;">
+    <h3 style="margin-bottom:6px;">File an insurance claim</h3>
+    <p class="hint" style="margin-bottom:12px;">Accident or cargo loss? Both parties submit evidence and Waynok compensates up to GHS 1,000,000. Reviewed within 72 hours (3 business days).</p>
+    <input class="input" id="clLoad" placeholder="Load ID" style="margin-bottom:10px;">
+    <textarea class="input" id="clDesc" placeholder="What happened?" style="margin-bottom:10px;min-height:80px;"></textarea>
+    <input class="input" id="clEvid" placeholder="Evidence summary (photos, police report ref, etc.)" style="margin-bottom:12px;">
+    <button class="btn primary" onclick="fileClaim()">Submit claim</button>
+    <div id="clMsg" class="ok" style="margin-top:10px;"></div>
+   </div>
   </div>
  </section>
 
@@ -803,7 +828,9 @@
    <p>Quoted prices are system-generated from distance, weight and equipment. Shippers pay on delivery confirmation. Drivers receive 85% of the quoted price.</p>
    <h3>4. Conduct</h3>
    <p>No fraudulent loads, no off-platform payment solicitation, no abuse of other users. Violations lead to suspension.</p>
-   <h3>5. Liability</h3>
+   <h3>5. Insurance &amp; compensation</h3>
+   <p>Waynok provides accident compensation coverage of up to <b>GHS 1,000,000</b> per incident when both the shipper and the carrier provide sufficient evidence (photos, police report where applicable, and delivery documentation). Claims are reviewed within <b>72 hours (3 business days)</b> and approved payouts are paid within the same window.</p>
+   <h3>6. Liability</h3>
    <p>Waynok facilitates matching and payment but is not liable for loss or damage to cargo. Drivers are responsible for the goods in their custody.</p>
   </div>
  </section>
@@ -828,7 +855,7 @@
   <div class="panel prose" style="max-width:720px;margin:0 auto;">
    <h2>Refund policy</h2>
    <h3>Shippers</h3>
-   <p>If a load is cancelled before pickup, your payment is refunded in full within 5 business days. If delivery fails after pickup, contact support with your load ID for a full review.</p>
+   <p>If a load is cancelled before pickup, your payment is refunded in full within <b>72 hours (3 business days)</b>. If delivery fails after pickup, contact support with your load ID for a full review.</p>
    <h3>Drivers</h3>
    <p>Earnings already released to your balance are yours. Withdrawals are processed within 48 hours to your saved MoMo or bank account.</p>
    <h3>Disputes</h3>
@@ -846,6 +873,10 @@
     <div class="stat"><div class="num" id="adOpen">0</div><div class="lbl">OPEN</div></div>
     <div class="stat"><div class="num" id="adRevenue">₵0</div><div class="lbl">REVENUE</div></div>
    </div>
+   <h3 style="margin:14px 0 8px;">Messages monitor</h3>
+   <p class="hint" style="margin-bottom:8px;">Every shipper-driver conversation. Click one to read it.</p>
+   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Load</th><th>Route</th><th>Shipper</th><th>Driver</th><th>Msgs</th></tr></thead><tbody id="adConvsBody"></tbody></table></div>
+   <div id="adConvMsgs" style="margin:14px 0;display:none;"></div>
    <h3 style="margin:14px 0 8px;">Users</h3>
    <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody id="adUsersBody"></tbody></table></div>
    <h3 style="margin:18px 0 8px;">Recent loads</h3>
@@ -924,6 +955,13 @@ function goTab(name) {
  location.hash = name === "home" ? "#home" : "#" + name;
  document.querySelectorAll("#bottomBar [data-bnav]").forEach(a =>
   a.classList.toggle("active", a.dataset.bnav === name));
+ if (name === "post" && !$("poOriginLat").value && navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(p => {
+   $("poOriginLat").value = p.coords.latitude.toFixed(6);
+   $("poOriginLng").value = p.coords.longitude.toFixed(6);
+   quoteDebounce();
+  });
+ }
  if (name === "loads") refreshLoads();
  if (name === "track") initMap();
  if (name === "msgs") { refreshConversations(); }
@@ -980,7 +1018,14 @@ function boot() {
 }
 function enterApp() {
  goTab(myRole === "carrier" ? "dash" : "home");
- loadMe();
+ loadMe().then(async () => {
+  if (myRole === "carrier") {
+   try {
+    const mine = await api("/trucks/mine");
+    if (!mine.length) { goTab("truck-new"); toast("List your truck to start receiving orders"); }
+   } catch (e) {}
+  }
+ });
 }
 
 /* ---------------- auth ---------------- */
@@ -1007,6 +1052,8 @@ async function doLogin() {
   token = d.access_token; localStorage.setItem("waynok_token", token);
   closeAuth(); enterApp();
   toast("Welcome back" + (d.user ? ", " + (d.user.company_name || "") : ""));
+  setTimeout(checkPhoneVerification, 800);
+  if (navigator.geolocation) navigator.geolocation.getCurrentPosition(() => {});
   if ("Notification" in window && Notification.permission === "default") {
    Notification.requestPermission().then(p => { if (p === "granted") enablePush(); });
   } else if ("Notification" in window && Notification.permission === "granted") {
@@ -1022,11 +1069,14 @@ async function doRegister() {
   const d = await api("/auth/register", { method: "POST", body: JSON.stringify({
    email: $("regEmail").value.trim(), password: $("regPass").value,
    name: $("regName").value.trim(), role: regRoleSel,
+   phone: $("regPhoneMain").value.trim() || null,
    referral_code: $("regRef").value.trim() || null }) });
   token = d.access_token; localStorage.setItem("waynok_token", token);
   if (d.user && d.user.company_name) localStorage.setItem("waynok_name", d.user.company_name);
   closeAuth(); enterApp();
   toast("Account created — welcome to Waynok");
+  setTimeout(checkPhoneVerification, 800);
+  if (navigator.geolocation) navigator.geolocation.getCurrentPosition(() => {});
   if (d.user && d.user.role === "carrier") { goTab("dash"); setTimeout(() => setOnline(true), 400); }
   else if (d.user && d.user.role === "shipper") { goTab("post"); }
  } catch (e) { $("regErr").textContent = e.message; }
@@ -1052,6 +1102,9 @@ async function loadMe() {
   const u = await api("/me");
   me = u; myUid = u.id; myRole = u.role;
   localStorage.setItem("waynok_name", u.company_name || u.email);
+  document.body.classList.toggle("role-carrier", myRole === "carrier");
+  document.body.classList.toggle("role-shipper", myRole === "shipper");
+  document.body.classList.toggle("role-admin", !!u.is_admin);
   renderNav();
   if (myRole === "carrier") { loadDashboard(); refreshOffers(); }
  } catch (e) { /* guest or expired */ }
@@ -1178,6 +1231,19 @@ function renderEquipRows() {
  ).join("");
  updateQuoteBar();
 }
+let selectedPayment = "momo";
+const PM_NOTES = { momo: "Pay now with mobile money via Paystack.", card: "Pay now with debit/credit card via Paystack.", cash: "Pay the driver in person at delivery. The driver's 15% commission is collected from their Waynok balance.", balance: "Pay instantly from your Waynok balance (available earnings)." };
+$("payMethods").addEventListener("click", async e => {
+ const b = e.target.closest(".fchip"); if (!b) return;
+ document.querySelectorAll("#payMethods .fchip").forEach(c => c.classList.remove("active"));
+ b.classList.add("active");
+ selectedPayment = b.dataset.pm;
+ let note = PM_NOTES[selectedPayment];
+ if (selectedPayment === "balance" && token) {
+  try { const bal = await api("/me/balance"); note += " You have " + fmtGHS(bal.available_ghs || 0) + " available."; } catch (err) {}
+ }
+ $("pmNote").textContent = note;
+});
 function selectEquip(t) { selEquip = t; renderEquipRows(); }
 function updateQuoteBar() {
  const q = quoteCache[selEquip];
@@ -1192,6 +1258,7 @@ function collectPostBody(allowPartial) {
   dest_lat: parseFloat($("poDestLat").value),
   dest_lng: parseFloat($("poDestLng").value),
   equipment_type: selEquip,
+  payment_method: selectedPayment,
   weight_kg: parseFloat($("poWeight").value),
   pickup_time: $("poPickup").value ? new Date($("poPickup").value).toISOString() : undefined,
  };
@@ -1214,6 +1281,11 @@ async function fetchQuotes() {
 }
 async function postLoad() {
  $("poErr").textContent = ""; $("poOk").textContent = "";
+ try {
+  const mine = await api("/loads/mine");
+  const act = (mine || []).find(l => ["open", "assigned", "in_transit"].includes(l.status));
+  if (act) { $("poErr").textContent = "You already have an active load (" + act.id + "). Complete or cancel it first."; return; }
+ } catch (e) {}
  const body = collectPostBody(false);
  if (!body) { $("poErr").textContent = "Fill in Where from, Where to, and weight (kg)."; return; }
  $("poBtn").disabled = true;
@@ -1222,6 +1294,7 @@ async function postLoad() {
   $("poOk").textContent = "Load " + d.id + " requested at " + fmtGHS(d.budget_ghs) + " — drivers see it now.";
   toast("Driver request sent — " + fmtGHS(d.budget_ghs));
   refreshLoads();
+  goTab("track"); trackFocus = d.id; initMap(); refreshDriverLocations();
  } catch (e) { $("poErr").textContent = e.message; }
  $("poBtn").disabled = false;
 }
@@ -1249,6 +1322,14 @@ async function confirmDelivery(id) {
  catch (e) { toast(e.message, true); }
 }
 function trackLoad(id) { goTab("track"); trackFocus = id; refreshDriverLocations(); }
+function renderEta(eta) {
+ const el = $("trackEta");
+ if (!el) return;
+ if (!eta.assigned) { el.textContent = "Waiting for a driver to accept your load..."; return; }
+ if (!eta.tracking) { el.textContent = "Driver assigned - live GPS starts when the driver goes online."; return; }
+ el.innerHTML = '<span class="live-dot" style="margin-right:8px"></span>Driver is <b>' + eta.distance_km +
+  ' km</b> away - arriving in about <b>' + eta.eta_minutes + ' min</b>';
+}
 let trackFocus = null;
 async function negotiateFromBoard(loadId) { openNegotiation(loadId); }
 
@@ -1285,6 +1366,19 @@ async function deleteTruck(id) {
 /* ---------------- driver dashboard ---------------- */
 async function loadDashboard() {
  if (!token) { goTab("home"); return toast("Sign in to open the driver dashboard", true); }
+ try {
+  const debt = await api("/me/debt");
+  if (debt.owed_ghs > 0) {
+   const old = document.getElementById("debtBanner"); if (old) old.remove();
+   const dv = document.createElement("div"); dv.id = "debtBanner";
+   dv.className = "panel"; dv.style.borderColor = "rgba(255,93,93,.5)"; dv.style.background = "rgba(255,93,93,.07)";
+   dv.innerHTML = '<b style="color:#ffb3b3">Commission due: ' + fmtGHS(debt.owed_ghs) + '</b>' +
+    '<p class="hint" style="margin:6px 0 10px;">A load was paid in cash. Pay your 15% from your balance.' +
+    (debt.warnings > 0 ? ' Warning ' + debt.warnings + '/3 - account suspends on the 3rd failed attempt.' : '') + '</p>' +
+    '<button class="btn primary sm" onclick="payDebt()">Pay from balance</button>';
+   $("myOrders").insertAdjacentElement("beforebegin", dv);
+  }
+ } catch (e) {}
  if (myRole && myRole !== "carrier") { $("dash").classList.add("hidden"); return; }
  $("dash").classList.remove("hidden");
  loadMyOrders(); refreshOffers();
@@ -1334,6 +1428,7 @@ function setOnline(on) {
  if (on) {
   $("dStatus").textContent = "You're online — finding loads near you…";
   pingLocation(true);
+  if (!window._pingTimer) window._pingTimer = setInterval(() => { if (online) pingLocation(false); }, 60000);
   if (!curChatPoll) refreshOffers();
  } else {
   $("dStatus").textContent = "You're offline. Tap GO to receive loads.";
@@ -1369,6 +1464,11 @@ async function refreshOffers() {
  }
 }
 function renderOfferList(el, loads, isOffers, raw) {
+ if (window.activeOrder) {
+  el.innerHTML = '<p class="hint">One order at a time - finish order ' + window.activeOrder.load.id +
+   ' first, then new offers appear here.</p>';
+  return;
+ }
  if (!loads.length) {
   el.innerHTML = isOffers
    ? '<p class="hint">No offers right now. List a truck and go online — offers arrive instantly when a matching load is posted.</p>'
@@ -1412,6 +1512,7 @@ async function loadMyOrders() {
  const box = $("myOrders");
  try {
   const orders = await api("/drivers/my-loads");
+  window.activeOrder = (orders || []).find(o => o.load && ["assigned", "in_transit"].includes(o.load.status)) || null;
   if (!orders.length) { box.innerHTML = '<p class="hint">No orders yet. Accept a load from the offers or nearby loads above.</p>'; return; }
   box.innerHTML = orders.map(o => orderCardHtml(o)).join("");
  } catch (e) { box.innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; }
@@ -1420,8 +1521,11 @@ function orderCardHtml(o) {
  const l = o.load || {};
  const st = l.status;
  let actions = "";
- if (st === "assigned") actions = '<button class="btn primary sm" onclick="driverPickup(' + l.id + ')">Confirm pickup</button>';
- if (st === "in_transit") actions = '<button class="btn primary sm" onclick="driverDeliver(' + l.id + ')">Deliver + proof</button><button class="btn ghost sm" onclick="trackLoad(' + l.id + ')">Track</button>';
+ if (st === "assigned") actions = '<button class="btn primary sm" onclick="driverPickup(' + l.id + ')">Confirm pickup</button>' +
+  '<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + l.origin_lat + ',' + l.origin_lng + '">' + svgIcon('pin', 13) + ' Navigate to pickup</a>';
+ if (st === "in_transit") actions = '<button class="btn primary sm" onclick="driverDeliver(' + l.id + ')">Deliver + proof</button>' +
+  '<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + l.dest_lat + ',' + l.dest_lng + '">' + svgIcon('pin', 13) + ' Navigate to delivery</a>' +
+  '<button class="btn ghost sm" onclick="trackLoad(' + l.id + ')">Track</button>';
  if (st === "delivered") actions = '<span class="tag delivered">delivered — awaiting client confirm</span>';
  return '<div class="match">' +
   '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
@@ -1433,6 +1537,14 @@ function orderCardHtml(o) {
   (o.conversation_id ? '<button class="btn ghost sm" onclick="openConversation(' + o.conversation_id + ')">' + svgIcon('chat', 14) + ' Client chat</button>' : "") +
   "</div></div>";
 }
+async function payDebt() {
+ try {
+  const d = await api("/me/debt/pay", { method: "POST" });
+  toast("Commission settled - thank you");
+  loadDashboard();
+ } catch (e) { toast(e.message, true); if (/suspended/i.test(e.message)) setTimeout(() => logout(), 2500); }
+}
+
 async function driverPickup(loadId) {
  try { await api("/loads/" + loadId + "/pickup", { method: "POST" }); toast("Pickup confirmed — safe trip!"); loadMyOrders(); }
  catch (e) { toast(e.message, true); }
@@ -1587,6 +1699,7 @@ async function refreshDriverLocations() {
     else mapMarkers["focus"].setLatLng([loc.lat, loc.lng]);
     map.setView([loc.lat, loc.lng], 12);
    } catch (e) {}
+   try { renderEta(await api("/loads/" + trackFocus + "/eta")); } catch (e) {}
   }
  } catch (e) {}
 }
@@ -1641,15 +1754,44 @@ async function loadAdmin() {
    "<tr><td class=\"mono\">" + u.id + "</td><td>" + esc(u.email) + '</td><td><span class="badge ' + esc(u.role) + '">' + esc(u.role) + "</span></td>" +
    "<td>" + (u.disabled ? "disabled" : "active") + '</td><td><button class="btn ghost sm" onclick="toggleDisable(' + u.id + ')">' + (u.disabled ? "Enable" : "Disable") + "</button></td></tr>"
   ).join("");
+  try {
+   const convs = await api("/admin/conversations");
+   $("adConvsBody").innerHTML = convs.map(c =>
+    "<tr style=\"cursor:pointer\" onclick=\"adminViewConv(" + c.id + ")\"><td class=\"mono\">" + c.id + "</td><td class=\"mono\">" + c.load_id + "</td><td>" + esc(c.route) + "</td><td>" + esc(c.shipper) + "</td><td>" + esc(c.carrier) + "</td><td>" + c.messages + "</td></tr>"
+   ).join("") || '<tr><td colspan="6" class="hint">No conversations yet</td></tr>';
+  } catch (e) { $("adConvsBody").innerHTML = '<tr><td colspan="6" class="hint">' + esc(e.message) + "</td></tr>"; }
   const loads = await api("/admin/loads");
   $("adLoadsBody").innerHTML = loads.slice(0, 30).map(l =>
    "<tr><td class=\"mono\">" + l.id + "</td><td>" + esc(l.origin_city) + " " + esc(l.dest_city) + '</td><td><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></td><td>" + fmtGHS(l.budget_ghs) + "</td></tr>"
   ).join("");
  } catch (e) { toast(e.message, true); }
 }
+async function adminViewConv(cid) {
+ try {
+  const msgs = await api("/admin/conversations/" + cid + "/messages");
+  $("adConvMsgs").style.display = "block";
+  $("adConvMsgs").innerHTML = "<h4 style=\"margin-bottom:10px\">Conversation " + cid + "</h4>" +
+   msgs.map(m => '<div class="msg ' + (m.proposal_status ? "other" : "user") + '" style="max-width:100%;margin-bottom:6px">' +
+    esc(m.text || "") +
+    (m.price_ghs != null ? ' <span class="hint">[GHS ' + m.price_ghs + "]</span>" : "") +
+    '<span class="t">from user ' + m.sender_id + " - " + fmtDT(m.created_at) + "</span></div>"
+   ).join("") || '<p class="hint">No messages</p>';
+ } catch (e) { toast(e.message, true); }
+}
+
 async function toggleDisable(uid) {
  try { await api("/admin/users/" + uid + "/toggle-disable", { method: "POST" }); loadAdmin(); }
  catch (e) { toast(e.message, true); }
+}
+
+async function fileClaim() {
+ const msg = $("clMsg");
+ try {
+  const d = await api("/claims", { method: "POST", body: JSON.stringify({
+   load_id: parseInt($("clLoad").value), description: $("clDesc").value, evidence: $("clEvid").value }) });
+  msg.className = "ok"; msg.textContent = d.message;
+  $("clLoad").value = ""; $("clDesc").value = ""; $("clEvid").value = "";
+ } catch (e) { msg.className = "error"; msg.textContent = e.message; }
 }
 
 /* ---------------- forgot / reset ---------------- */
@@ -1723,6 +1865,61 @@ async function enablePush() {
   }
   await api("/push/subscribe", { method: "POST", body: JSON.stringify(sub.toJSON()) });
  } catch (e) { /* permission denied or unsupported — feed still works */ }
+}
+
+/* ---------------- newsletter ---------------- */
+(function () {
+ const wrap = document.querySelector(".foot .wrap");
+ if (!wrap) return;
+ const f = document.createElement("form");
+ f.id = "nlForm";
+ f.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap";
+ f.innerHTML = '<span class="hint" style="font-size:12px">Fare deals and new routes, weekly:</span>' +
+  '<input class="input" id="nlEmail" placeholder="your@email.com" style="max-width:220px;padding:8px 12px;font-size:13px;">' +
+  '<button class="btn ghost sm" type="submit">Subscribe</button><span class="hint" id="nlMsg" style="font-size:12px"></span>';
+ wrap.appendChild(f);
+ f.onsubmit = async ev => {
+  ev.preventDefault();
+  try {
+   await api("/newsletter", { method: "POST", body: JSON.stringify({ email: $("nlEmail").value.trim() }) });
+   $("nlMsg").textContent = "Subscribed!";
+   $("nlEmail").value = "";
+  } catch (e) { $("nlMsg").textContent = e.message; }
+ };
+})();
+
+/* ---------------- phone verification ---------------- */
+function ensureVerifyModal() {
+ if ($("verifyModal")) return;
+ const m = document.createElement("div");
+ m.className = "modal"; m.id = "verifyModal";
+ m.innerHTML = '<div class="box"><h2 style="margin-bottom:6px;">Verify your number</h2>' +
+  '<p class="hint" style="margin-bottom:14px;">We sent a 6-digit code by SMS. Enter it to activate posting and accepting.</p>' +
+  '<input class="input" id="vPhone" placeholder="Phone number" style="margin-bottom:10px;">' +
+  '<input class="input" id="vCode" placeholder="6-digit code" maxlength="6" style="margin-bottom:10px;">' +
+  '<button class="btn primary block" id="vGo">Verify</button>' +
+  '<p class="hint" style="margin-top:10px;text-align:center;"><a href="javascript:void(0)" id="vResend">Resend code</a></p>' +
+  '<div id="vMsg" class="error"></div></div>';
+ document.body.appendChild(m);
+ $("vGo").onclick = async () => {
+  try {
+   const d = await api("/auth/verify-phone", { method: "POST", body: JSON.stringify({ phone: $("vPhone").value.trim(), code: $("vCode").value.trim() }) });
+   if (d.access_token) { token = d.access_token; localStorage.setItem("waynok_token", token); }
+   m.classList.remove("open"); toast("Number verified - you are fully active"); loadMe();
+  } catch (e) { $("vMsg").textContent = e.message; }
+ };
+ $("vResend").onclick = async () => {
+  try { await api("/auth/resend-code", { method: "POST", body: JSON.stringify({ phone: $("vPhone").value.trim() }) }); $("vMsg").className = "ok"; $("vMsg").textContent = "New code sent."; }
+  catch (e) { $("vMsg").textContent = e.message; }
+ };
+}
+async function checkPhoneVerification() {
+ if (!token || !me) return;
+ if (me.phone && !me.phone_verified) {
+  ensureVerifyModal();
+  $("vPhone").value = me.phone;
+  $("verifyModal").classList.add("open");
+ }
 }
 
 /* ---------------- misc ---------------- */
