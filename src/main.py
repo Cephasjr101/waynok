@@ -54,9 +54,10 @@ def _startup_init_db():
 def _notify(user, title: str, body: str) -> None:
     """Notification delivery must never crash a request."""
     try:
-        _notify(user, title, body)
+    def _notify(user, title, body)
     except Exception:
-        log.warning("notify delivery failed", exc_info=True)
+    try:
+        _notify(user, title, body) 
 
 
 def _user_out(user: models.User) -> schemas.UserOut:
