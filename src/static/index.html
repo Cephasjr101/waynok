@@ -240,7 +240,7 @@
   :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:4px}
 
   /* ===== one-menu mobile navigation ===== */
-  #menuBtn{display:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+  #menuBtn{display:flex;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
     background:var(--panel2);color:var(--txt);font-size:18px;cursor:pointer;
     align-items:center;justify-content:center;flex:none}
   #menuBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;display:none}
@@ -1452,8 +1452,15 @@ async function sendChat() {
   try {
     await api("/conversations/" + curConv + "/messages", { method: "POST", body: JSON.stringify(body) });
     $("chatInput").value = ""; $("chatPrice").value = ""; $("chatTime").value = ""; $("chatLoc").value = "";
+    if (myUid) {
+      $("chatThread").innerHTML += msgHtml({ sender_id: myUid, text: text, price_ghs: body.price_ghs,
+        pickup_time: body.pickup_time, location: body.location, proposal_status: null,
+        created_at: new Date().toISOString() });
+      const b = $("chatThread"); b.scrollTop = b.scrollHeight;
+    }
     loadThread();
-  } catch (e) { toast(e.message, true); }
+    refreshConversations();
+  } catch (e) { toast("Message failed: " + e.message, true); }
 }
 async function respondProposal(mid, action) {
   try {
