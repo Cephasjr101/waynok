@@ -257,6 +257,25 @@
   #menuDrawer a:hover{background:rgba(255,176,32,.1)}
   #menuDrawer .sep{margin:14px 8px 6px;font:600 10px "IBM Plex Mono";letter-spacing:2px;
     color:var(--dim);text-transform:uppercase}
+  /* ===== mobile bottom tab bar ===== */
+  #bottomBar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:80;
+    background:#0f1524;border-top:1px solid var(--line);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+    grid-template-columns:1fr 1fr 64px 1fr 1fr;align-items:end}
+  #bottomBar a,#bottomBar>button{display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:8px 2px;color:var(--dim);text-decoration:none;font:600 11px "Sora";
+    border:none;background:none;cursor:pointer;border-radius:10px}
+  #bottomBar a.active{color:var(--acc)}
+  #bottomBar .post-tab{width:54px;height:54px;border-radius:50%;margin:-30px auto 2px;
+    background:linear-gradient(135deg,var(--acc),var(--acc2));color:#161006;
+    font:800 30px/1 "Sora";display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px rgba(255,140,20,.45);border:5px solid var(--bg);padding:0}
+  @media (max-width:900px){
+    #bottomBar{display:grid}
+    main{padding-bottom:86px}
+    .foot{padding-bottom:100px}
+  }
+
   @media (max-width:900px){
     nav.main{display:none}
     #menuBtn{display:flex}
@@ -828,6 +847,13 @@
   </div>
 </main>
 
+<nav id="bottomBar" aria-label="Mobile navigation">
+  <a href="#home" data-bnav="home">Home</a>
+  <a href="#loads" data-bnav="loads">Loads</a>
+  <button class="post-tab" onclick="goTab('post')" aria-label="Post a load">+</button>
+  <a href="#track" data-bnav="track">Track</a>
+  <button onclick="openMenu()" aria-label="More">More</button>
+</nav>
 <div class="toast" id="toast"></div>
 <button id="gpsFab" title="Go online"></button>
 
@@ -880,6 +906,8 @@ function goTab(name) {
   document.querySelectorAll("nav.main a").forEach(a =>
     a.classList.toggle("active", a.dataset.nav === name));
   location.hash = name === "home" ? "#home" : "#" + name;
+  document.querySelectorAll("#bottomBar [data-bnav]").forEach(a =>
+    a.classList.toggle("active", a.dataset.bnav === name));
   if (name === "loads") refreshLoads();
   if (name === "track") initMap();
   if (name === "msgs") { refreshConversations(); }
