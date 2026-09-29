@@ -297,7 +297,7 @@
 <header class="top">
   <div class="wrap top-in">
     <button id="menuBtn" aria-label="Open menu">&#9776;</button>
-    <a class="logo" href="#home"><span class="mark">🚚</span>WAYNOK</a>
+    <a class="logo" href="#home"><span class="mark">W</span>WAYNOK</a>
     <nav class="main" id="mainNav">
       <a href="#home" data-nav="home">Home</a>
       <a href="#loads" data-nav="loads">Load board</a>
@@ -313,26 +313,26 @@
 <div id="menuBackdrop"></div>
 <nav id="menuDrawer" aria-label="Menu">
   <div class="menu-head"><b>Waynok</b><button id="menuClose" aria-label="Close menu">&times;</button></div>
-  <a href="#home" onclick="closeMenu()">🏠 Home</a>
-  <a href="#post" onclick="closeMenu()">📦 Post a load</a>
-  <a href="#loads" onclick="closeMenu()">📋 Load board</a>
-  <a href="#track" onclick="closeMenu()">🗺️ Track drivers</a>
-  <a href="#agent" onclick="closeMenu()">🤖 AI dispatcher</a>
-  <a href="#msgs" onclick="closeMenu()">💬 Messages</a>
+  <a href="#home" onclick="closeMenu()">Home</a>
+  <a href="#post" onclick="closeMenu()">Post a load</a>
+  <a href="#loads" onclick="closeMenu()">Load board</a>
+  <a href="#track" onclick="closeMenu()">Track drivers</a>
+  <a href="#agent" onclick="closeMenu()">AI dispatcher</a>
+  <a href="#msgs" onclick="closeMenu()">Messages</a>
   <div class="sep">Drivers</div>
-  <a href="#dash" onclick="closeMenu()">🚛 Driver dashboard</a>
-  <a href="#trucks" onclick="closeMenu()">🚚 My trucks</a>
-  <a href="#truck-new" onclick="closeMenu()">➕ List a truck</a>
-  <a href="#earn" onclick="closeMenu()">💰 Earnings calculator</a>
+  <a href="#dash" onclick="closeMenu()">Driver dashboard</a>
+  <a href="#trucks" onclick="closeMenu()">My trucks</a>
+  <a href="#truck-new" onclick="closeMenu()">List a truck</a>
+  <a href="#earn" onclick="closeMenu()">Earnings calculator</a>
   <div class="sep">Account</div>
-  <a href="#profile" onclick="closeMenu()">👤 Profile &amp; wallet</a>
-  <a href="#settings" onclick="closeMenu()">⚙️ Settings</a>
-  <a href="#support" onclick="closeMenu()">🆘 Support</a>
+  <a href="#profile" onclick="closeMenu()">Profile &amp; wallet</a>
+  <a href="#settings" onclick="closeMenu()">Settings</a>
+  <a href="#support" onclick="closeMenu()">Support</a>
   <div class="sep">Legal</div>
-  <a href="#terms" onclick="closeMenu()">📜 Terms</a>
-  <a href="#privacy" onclick="closeMenu()">🔒 Privacy</a>
-  <a href="#refund" onclick="closeMenu()">💵 Refund policy</a>
-  <a href="#admin" onclick="closeMenu()" style="color:var(--dim)">🛡 Admin</a>
+  <a href="#terms" onclick="closeMenu()">Terms</a>
+  <a href="#privacy" onclick="closeMenu()">Privacy</a>
+  <a href="#refund" onclick="closeMenu()">Refund policy</a>
+  <a href="#admin" onclick="closeMenu()" style="color:var(--dim)">Admin</a>
 </nav>
 
 <main class="wrap" style="padding-top:24px;padding-bottom:40px;">
@@ -361,17 +361,17 @@
 
     <div class="grid3" style="margin-bottom:24px;">
       <div class="qa" onclick="goTab('post')">
-        <div class="ic">📦</div>
+        <div class="ic"><span class="mono" style="font-weight:700">01</span></div>
         <h3>Post a load</h3>
         <p>Origin, destination, weight. Matched with available trucks instantly.</p>
       </div>
       <div class="qa" onclick="goTab('track')">
-        <div class="ic">🗺️</div>
+        <div class="ic"><span class="mono" style="font-weight:700">02</span></div>
         <h3>Track live</h3>
         <p>Watch your delivery move across the map in real time.</p>
       </div>
       <div class="qa" onclick="goTab('messages')">
-        <div class="ic">💬</div>
+        <div class="ic"><span class="mono" style="font-weight:700">03</span></div>
         <h3>Negotiate & pay</h3>
         <p>Chat with your driver, agree terms, pay securely on delivery.</p>
       </div>
@@ -400,7 +400,7 @@
     <div class="box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 id="authTitle" style="margin:0;">Sign in</h2>
-        <button class="btn ghost sm" onclick="closeAuth()">✕</button>
+        <button class="btn ghost sm" onclick="closeAuth()"></button>
       </div>
       <div class="seg">
         <button id="segLogin" class="active" onclick="authMode('login')">Sign in</button>
@@ -424,8 +424,8 @@
       <div id="authRegister" class="hidden">
         <label class="hint">I am a…</label>
         <div class="seg" style="margin:6px 0 14px;">
-          <button id="segShipper" class="active" onclick="regRole('shipper')">📦 Shipper</button>
-          <button id="segCarrier" onclick="regRole('carrier')">🚛 Driver</button>
+          <button id="segShipper" class="active" onclick="regRole('shipper')">Shipper</button>
+          <button id="segCarrier" onclick="regRole('carrier')">Driver</button>
         </div>
         <div id="regNameWrap">
           <label class="hint">Full name or company</label>
@@ -474,12 +474,12 @@
   <!-- ============ POST A LOAD (Uber-style) ============ -->
   <section id="post" class="tabpage">
     <div class="panel" style="max-width:560px;margin:0 auto;padding:0;overflow:hidden;">
-      <div id="postMap" style="height:190px;background:#0d1420;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px;text-align:center;padding:0 30px;">🗺️ Your load, matched like a ride — fill Where from / Where to and prices appear instantly</div>
+      <div id="postMap" style="height:190px;background:#0d1420;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px;text-align:center;padding:0 30px;">Your load, matched like a ride — fill Where from / Where to and prices appear instantly</div>
       <div style="padding:20px 22px 14px;">
         <div class="uber-field">
           <span class="u-dot" style="background:var(--ok)"></span>
           <input class="input u-in" id="poOrigin" placeholder="Where from?" oninput="quoteDebounce()">
-          <button class="btn ghost sm" title="Use my location" onclick="useMyLocation('poOrigin');quoteDebounce();">📍</button>
+          <button class="btn ghost sm" title="Use my location" onclick="useMyLocation('poOrigin');quoteDebounce();">PIN</button>
         </div>
         <div class="uber-field">
           <span class="u-dot" style="background:var(--bad)"></span>
@@ -520,13 +520,13 @@
   <!-- ============ AI DISPATCHER ============ -->
   <section id="agent" class="tabpage">
     <div class="panel" style="max-width:680px;margin:0 auto;">
-      <h2>🤖 AI dispatcher</h2>
+      <h2>AI dispatcher</h2>
       <p class="hint" style="margin-bottom:14px;">Ask anything about moving freight — pricing, routes, documents, regulations.</p>
       <div id="agentThread" style="min-height:220px;max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
         <div class="msg other">Hi — I'm your Waynok dispatcher. Ask me about prices, routes, or how the platform works.</div>
       </div>
       <div style="display:flex;gap:10px;">
-        <input class="input" id="agentInput" placeholder="How much to move 5t Accra → Kumasi?" onkeydown="if(event.key==='Enter')askAgent()">
+        <input class="input" id="agentInput" placeholder="How much to move 5t Accra  Kumasi?" onkeydown="if(event.key==='Enter')askAgent()">
         <button class="btn primary" onclick="askAgent()">Send</button>
       </div>
     </div>
@@ -549,7 +549,7 @@
   <section id="chat" class="tabpage">
     <div class="panel">
       <div class="chat-head" style="padding:0 0 14px;">
-        <button class="btn ghost sm" onclick="goTab('msgs')">← Back</button>
+        <button class="btn ghost sm" onclick="goTab('msgs')"> Back</button>
         <div><b id="chatTitle">Chat</b><div class="hint" id="chatLoadInfo" style="margin:-6px 0 14px;"></div></div>
       </div>
       <div class="chat-shell" style="height:520px;">
@@ -580,7 +580,7 @@
         <div class="kv"><span class="hint">Wallet balance</span><b id="pfWallet">₵0.00</b></div>
         <div class="kv"><span class="hint">Member since</span><b id="pfSince">—</b></div>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
-          <button class="btn ghost sm" onclick="goTab('settings')">⚙️ Settings</button>
+          <button class="btn ghost sm" onclick="goTab('settings')">Settings</button>
           <button class="btn ghost sm" onclick="logout()">Log out</button>
         </div>
       </div>
@@ -635,7 +635,7 @@
         <input class="input" id="ltLat" placeholder="Lat" type="number" step="any">
         <input class="input" id="ltLng" placeholder="Lng" type="number" step="any">
       </div>
-      <button class="btn ghost sm" onclick="useMyLocation('lt')" style="margin-bottom:14px;">📍 Use my location</button>
+      <button class="btn ghost sm" onclick="useMyLocation('lt')" style="margin-bottom:14px;">Use my location (GPS)</button>
       <div id="ltErr" class="error"></div>
       <button class="btn primary block" onclick="listTruck()" id="ltBtn">Go live on the board</button>
       <p class="hint" style="margin-top:10px;">Going live shares your position with nearby shippers and matches you with open loads instantly.</p>
@@ -829,7 +829,7 @@
 </main>
 
 <div class="toast" id="toast"></div>
-<button id="gpsFab" title="Go online">📡</button>
+<button id="gpsFab" title="Go online"></button>
 
 <script>
 /* ================= Waynok SPA ================= */
@@ -919,7 +919,7 @@ window.addEventListener("DOMContentLoaded", () => {
   if (h.startsWith("#verify")) {
     const tk = new URLSearchParams(h.split("?")[1] || "").get("token");
     if (tk) api("/auth/verify-email?token=" + encodeURIComponent(tk)).then(() => {
-      toast("Email verified ✓"); location.hash = "#profile"; boot();
+      toast("Email verified "); location.hash = "#profile"; boot();
     }).catch(e => toast(e.message, true));
     return;
   }
@@ -1030,7 +1030,7 @@ async function loadProfile() {
     $("pfAvatar").textContent = (u.company_name || u.email || "?")[0].toUpperCase();
     $("pfName").textContent = u.company_name || "Your account";
     $("pfBadges").innerHTML = '<span class="badge ' + u.role + '">' + u.role + '</span>' +
-      (u.verified ? '<span class="badge" style="color:var(--ok);border-color:#1f5c3a;">verified ✓</span>' : "");
+      (u.verified ? '<span class="badge" style="color:var(--ok);border-color:#1f5c3a;">verified </span>' : "");
     $("pfEmail").textContent = u.email;
     $("pfSince").textContent = new Date(u.created_at).toLocaleDateString(undefined, { month: "short", year: "numeric" });
     const bal = await api("/me/balance");
@@ -1079,7 +1079,7 @@ function renderLoads() {
   $("loadList").innerHTML = list.map(l => {
     const mine = myUid && l.shipper_id === myUid;
     return '<div class="load-card">' +
-      '<div class="route"><div class="cities">' + esc(l.origin_city) + " → " + esc(l.dest_city) + '</div>' +
+      '<div class="route"><div class="cities">' + esc(l.origin_city) + "  " + esc(l.dest_city) + '</div>' +
       '<div class="meta mono">' + esc(l.equipment_type) + " · " + Number(l.weight_kg).toLocaleString() + " kg · pickup " + fmtDT(l.pickup_time) + "</div></div>" +
       '<div style="text-align:right;"><div class="price">' + fmtGHS(l.budget_ghs) + '</div><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></div>" +
       (mine ? loadActions(l) : '<div class="row-actions"><button class="btn primary sm" onclick="negotiateFromBoard(' + l.id + ')">Negotiate</button></div>') +
@@ -1092,13 +1092,13 @@ function loadActions(l) {
     '<button class="btn ghost sm" onclick="connectDriver(' + l.id + ')">Connect nearest driver</button>';
   if (l.status === "assigned") h += '<span class="tag assigned">driver assigned</span><button class="btn ghost sm" onclick="trackLoad(' + l.id + ')">Track live</button>';
   if (l.status === "in_transit") h += '<span class="tag in_transit">on the way</span><button class="btn ghost sm" onclick="trackLoad(' + l.id + ')">Track live</button>';
-  if (l.status === "delivered") h += '<button class="btn primary sm" onclick="confirmDelivery(' + l.id + ')">Confirm delivery ✓</button>' +
+  if (l.status === "delivered") h += '<button class="btn primary sm" onclick="confirmDelivery(' + l.id + ')">Confirm delivery </button>' +
     (l.proof_image ? '<a class="btn ghost sm" target="_blank" href="/loads/' + l.id + '/proof?token=' + encodeURIComponent(String(l.proof_image).slice(0, 12)) + '">View proof</a>' : "");
   h += "</div>";
   return h;
 }
 const EQUIP = [
-  { t: "flatbed", n: "Flatbed",   i: "\uD83D\uDEFB", h: "steel, machinery, containers" },
+  { t: "flatbed", n: "Flatbed", i: "<b class='mono'>FB</b>", h: "steel, machinery, containers" },
   { t: "box",     n: "Box truck", i: "\uD83D\uDE9A", h: "pallets, packaged goods" },
   { t: "tanker",  n: "Tanker",    i: "\uD83D\uDEE2", h: "fuel, water, liquids" },
   { t: "tipper",  n: "Tipper",    i: "\u26CF\uFE0F", h: "sand, gravel, aggregates" },
@@ -1157,7 +1157,7 @@ async function postLoad() {
   try {
     const d = await api("/loads", { method: "POST", body: JSON.stringify(body) });
     $("poOk").textContent = "Load " + d.id + " requested at " + fmtGHS(d.budget_ghs) + " — drivers see it now.";
-    toast("Driver request sent ✓ — " + fmtGHS(d.budget_ghs));
+    toast("Driver request sent  — " + fmtGHS(d.budget_ghs));
     refreshLoads();
   } catch (e) { $("poErr").textContent = e.message; }
   $("poBtn").disabled = false;
@@ -1167,18 +1167,18 @@ function useMyLocation(prefix) {
   navigator.geolocation.getCurrentPosition(pos => {
     $(prefix + "Lat").value = pos.coords.latitude.toFixed(6);
     $(prefix + "Lng").value = pos.coords.longitude.toFixed(6);
-    toast("Location captured ✓");
+    toast("Location captured ");
   }, () => toast("Couldn't get your location", true), { timeout: 8000 });
 }
 async function payLoad(id) {
   try {
     const d = await api("/loads/" + id + "/pay", { method: "POST" });
     if (d.authorization_url) location.href = d.authorization_url;
-    else toast("Paid ✓");
+    else toast("Paid ");
   } catch (e) { toast(e.message, true); }
 }
 async function connectDriver(id) {
-  try { const d = await api("/loads/" + id + "/connect", { method: "POST" }); toast("Driver connected ✓ — chat is open"); refreshLoads(); }
+  try { const d = await api("/loads/" + id + "/connect", { method: "POST" }); toast("Driver connected  — chat is open"); refreshLoads(); }
   catch (e) { toast(e.message, true); }
 }
 async function confirmDelivery(id) {
@@ -1318,7 +1318,7 @@ function renderOfferList(el, loads, isOffers, raw) {
     const earning = l.budget_ghs ? Math.round(l.budget_ghs * 0.85) : null;
     return '<div class="match">' +
       '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
-      '<div class="route" style="font:700 15px Sora;">' + esc(l.origin_city) + " → " + esc(l.dest_city) + "</div>" +
+      '<div class="route" style="font:700 15px Sora;">' + esc(l.origin_city) + "  " + esc(l.dest_city) + "</div>" +
       '<div class="price" style="font:800 17px Sora;color:var(--ok);">' + (earning != null ? "you earn " + fmtGHS(earning) : "") + "</div></div>" +
       '<div class="meta mono" style="margin:6px 0;">' + esc(l.equipment_type) + " · " + Number(l.weight_kg).toLocaleString() + " kg · " + dk + " · pickup " + fmtDT(l.pickup_time) + "</div>" +
       '<div class="row-actions">' +
@@ -1334,7 +1334,7 @@ async function acceptOffer(btn, id, endpoint) {
   btn.disabled = true;
   try {
     const r = await api(endpoint, { method: "POST" });
-    toast("Load accepted ✓ — chat with the client is open");
+    toast("Load accepted  — chat with the client is open");
     openNegotiation(r.load_id);
     refreshOffers(); loadMyOrders(); refreshLoads();
   } catch (e) { toast(e.message, true); }
@@ -1362,12 +1362,12 @@ function orderCardHtml(o) {
   if (st === "delivered") actions = '<span class="tag delivered">delivered — awaiting client confirm</span>';
   return '<div class="match">' +
     '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
-    '<div class="route" style="font:700 15px Sora;">' + esc(l.origin_city) + " → " + esc(l.dest_city) + "</div>" +
+    '<div class="route" style="font:700 15px Sora;">' + esc(l.origin_city) + "  " + esc(l.dest_city) + "</div>" +
     '<div style="text-align:right;"><div class="price" style="font:800 16px Sora;color:var(--ok);">' + (o.earning_ghs != null ? fmtGHS(o.earning_ghs) : "—") + '</div>' +
     '<div class="hint">' + esc(st) + "</div></div></div>" +
     '<div class="meta mono" style="margin:6px 0;">Client: ' + esc(o.client_name || "Shipper") + " · pickup " + fmtDT(l.pickup_time) + "</div>" +
     '<div class="row-actions">' + actions +
-    (o.conversation_id ? '<button class="btn ghost sm" onclick="openConversation(' + o.conversation_id + ')">💬 Client chat</button>' : "") +
+    (o.conversation_id ? '<button class="btn ghost sm" onclick="openConversation(' + o.conversation_id + ')">Client chat</button>' : "") +
     "</div></div>";
 }
 async function driverPickup(loadId) {
@@ -1385,7 +1385,7 @@ function driverDeliver(loadId) {
     else if (guestId) headers["X-Guest-Id"] = guestId;
     const res = await fetch("/loads/" + loadId + "/deliver", { method: "POST", headers, body: fd });
     const data = await res.json().catch(() => null);
-    if (res.ok) { toast("Delivered ✓ — client notified to confirm"); loadMyOrders(); }
+    if (res.ok) { toast("Delivered  — client notified to confirm"); loadMyOrders(); }
     else toast((data && data.detail) || "Upload failed", true);
   };
   inp.click();
@@ -1432,9 +1432,9 @@ function msgHtml(m) {
   let terms = "";
   if (m.price_ghs != null || m.pickup_time || m.location) {
     terms = '<div class="terms">' +
-      (m.price_ghs != null ? "💰 " + fmtGHS(m.price_ghs) + " · " : "") +
-      (m.pickup_time ? "🕐 " + fmtDT(m.pickup_time) + " · " : "") +
-      (m.location ? "📍 " + esc(m.location) : "") +
+      (m.price_ghs != null ? "Price " + fmtGHS(m.price_ghs) + " · " : "") +
+      (m.pickup_time ? "Time " + fmtDT(m.pickup_time) + " · " : "") +
+      (m.location ? "At " + esc(m.location) : "") +
       (m.proposal_status === "pending" && !mine ?
         '<div class="row-actions" style="margin-top:8px;">' +
         '<button class="btn primary sm" onclick="respondProposal(' + m.id + ',\'accept\')">Accept</button>' +
@@ -1469,7 +1469,7 @@ async function sendChat() {
 async function respondProposal(mid, action) {
   try {
     const r = await api("/messages/" + mid + "/respond?action=" + action, { method: "POST" });
-    toast(action === "accept" ? "Terms accepted — load assigned to the driver ✓" : "Proposal declined");
+    toast(action === "accept" ? "Terms accepted — load assigned to the driver " : "Proposal declined");
     loadThread();
   } catch (e) { toast(e.message, true); }
 }
@@ -1530,7 +1530,7 @@ async function refreshDriverLocations() {
 let _truckIcon;
 function truckIcon(color) {
   if (!_truckIcon) {
-    _truckIcon = L.divIcon({ className: "", html: '<div style="background:#ffb020;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.5);">🚚</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
+    _truckIcon = L.divIcon({ className: "", html: '<div style="background:#ffb020;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 12px Sora;color:#161006;box-shadow:0 2px 10px rgba(0,0,0,.5);">W</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
   }
   return _truckIcon;
 }
@@ -1580,7 +1580,7 @@ async function loadAdmin() {
     ).join("");
     const loads = await api("/admin/loads");
     $("adLoadsBody").innerHTML = loads.slice(0, 30).map(l =>
-      "<tr><td class=\"mono\">" + l.id + "</td><td>" + esc(l.origin_city) + " → " + esc(l.dest_city) + '</td><td><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></td><td>" + fmtGHS(l.budget_ghs) + "</td></tr>"
+      "<tr><td class=\"mono\">" + l.id + "</td><td>" + esc(l.origin_city) + "  " + esc(l.dest_city) + '</td><td><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></td><td>" + fmtGHS(l.budget_ghs) + "</td></tr>"
     ).join("");
   } catch (e) { toast(e.message, true); }
 }
