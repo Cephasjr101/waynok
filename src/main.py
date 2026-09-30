@@ -1478,6 +1478,9 @@ def admin_stats(user=Depends(get_current_user), db: Session = Depends(get_db)):
         "paid_ghs": db.query(func.coalesce(func.sum(models.Payment.amount_ghs), 0))
                         .filter(models.Payment.status.in_(["paid", "released"])).scalar(),
         "conversations": db.query(models.Conversation).count(),
+        "revenue_ghs": db.query(func.coalesce(func.sum(models.Payment.commission_ghs), 0)).scalar(),
+        "drivers_balance_ghs": db.query(func.coalesce(func.sum(models.User.referral_credit_ghs), 0)).scalar(),
+        "users_pending_ghs": db.query(func.coalesce(func.sum(models.User.referral_pending_ghs), 0)).scalar(),
         "orders_total": db.query(models.Load).count(),
         "orders_completed": db.query(models.Load).filter(models.Load.status == "delivered").count(),
         "orders_pending": db.query(models.Load)
