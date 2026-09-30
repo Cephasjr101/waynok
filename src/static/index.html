@@ -243,6 +243,7 @@
 
  /* role-filtered menus: each role only sees its own tools */
  body.logged-in .guest-only{display:none !important}
+ body.role-admin .m-ship,body.role-admin .m-carr{display:none !important}
  body.role-carrier .m-ship{display:none !important}
  body.role-shipper .m-carr{display:none !important}
  body:not(.role-admin) .m-admin{display:none !important}
@@ -874,20 +875,32 @@
  <section id="admin" class="tabpage hidden">
   <div class="panel">
    <h2>Admin</h2>
-   <div class="grid4" style="margin-bottom:16px;">
-    <div class="stat"><div class="num" id="adUsers">0</div><div class="lbl">USERS</div></div>
-    <div class="stat"><div class="num" id="adLoads">0</div><div class="lbl">LOADS</div></div>
-    <div class="stat"><div class="num" id="adOpen">0</div><div class="lbl">OPEN</div></div>
-    <div class="stat"><div class="num" id="adRevenue">₵0</div><div class="lbl">REVENUE</div></div>
-   </div>
+  <div class="grid4" style="margin-bottom:16px;">
+   <div class="stat"><div class="num" id="adTotal">0</div><div class="lbl">TOTAL ORDERS</div></div>
+   <div class="stat"><div class="num" id="adDone" style="color:var(--ok)">0</div><div class="lbl">TASK COMPLETE</div></div>
+   <div class="stat"><div class="num" id="adPending" style="color:var(--warn)">0</div><div class="lbl">TASK PENDING</div></div>
+   <div class="stat"><div class="num" id="adCancelled" style="color:var(--bad)">0</div><div class="lbl">TASK CANCELED</div></div>
+  </div>
+  <div class="panel">
+   <h2>Orders <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· every load on the platform</span>
+    <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;" id="adFilters">
+     <button class="fchip active" data-af="all">All</button>
+     <button class="fchip" data-af="pending">Pending</button>
+     <button class="fchip" data-af="completed">Complete</button>
+     <button class="fchip" data-af="cancelled">Canceled</button>
+    </span></h2>
+   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Route</th><th>Status</th><th>Payment</th><th>Price</th><th></th></tr></thead><tbody id="adOrdersBody"></tbody></table></div>
+  </div>
+  <div class="panel">
+   <h2>Live activity <span class="pill"><span class="live-dot"></span> streaming</span></h2>
+   <div id="adActivity" style="max-height:320px;overflow-y:auto;"><p class="hint">Loading activity…</p></div>
+  </div>
    <h3 style="margin:14px 0 8px;">Messages monitor</h3>
    <p class="hint" style="margin-bottom:8px;">Every shipper-driver conversation. Click one to read it.</p>
    <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Load</th><th>Route</th><th>Shipper</th><th>Driver</th><th>Msgs</th></tr></thead><tbody id="adConvsBody"></tbody></table></div>
    <div id="adConvMsgs" style="margin:14px 0;display:none;"></div>
    <h3 style="margin:14px 0 8px;">Users</h3>
    <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody id="adUsersBody"></tbody></table></div>
-   <h3 style="margin:18px 0 8px;">Recent loads</h3>
-   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Route</th><th>Status</th><th>Price</th></tr></thead><tbody id="adLoadsBody"></tbody></table></div>
   </div>
  </section>
 
@@ -1787,29 +1800,67 @@ function calcEarn() {
 /* ---------------- admin ---------------- */
 async function loadAdmin() {
  if (!me || !me.is_admin) { goTab("home"); return toast("Admin only", true); }
+ if (!window._adFilt) {
+  window._adFilt = 1;
+  $("adFilters").addEventListener("click", e => {
+   const b = e.target.closest(".fchip"); if (!b) return;
+   document.querySelectorAll("#adFilters .fchip").forEach(c => c.classList.remove("active"));
+   b.classList.add("active");
+   renderAdOrders(b.dataset.af);
+  });
+ }
  try {
   const s = await api("/admin/stats");
-  $("adUsers").textContent = (s.users || 0).toLocaleString();
-  $("adLoads").textContent = (s.loads || 0).toLocaleString();
-  $("adOpen").textContent = s.open_loads || 0;
-  $("adRevenue").textContent = "₵" + Number(s.revenue_ghs || 0).toLocaleString();
+  $("adTotal").textContent = (s.orders_total != null ? s.orders_total : s.loads || 0).toLocaleString();
+  $("adDone").textContent = (s.orders_completed != null ? s.orders_completed : s.delivered || 0).toLocaleString();
+  $("adPending").textContent = (s.orders_pending != null ? s.orders_pending : s.open_loads || 0).toLocaleString();
+  $("adCancelled").textContent = (s.orders_cancelled || 0).toLocaleString();
+  window._adOrders = await api("/admin/loads");
+  renderAdOrders((document.querySelector("#adFilters .fchip.active") || {}).dataset ? document.querySelector("#adFilters .fchip.active").dataset.af : "all");
+  try {
+   const acts = await api("/admin/activity");
+   $("adActivity").innerHTML = (acts || []).map(a =>
+    '<div class="act-line"><span><b>' + esc(a.title) + '</b> \u2014 ' + esc((a.body || "").slice(0, 80)) +
+    ' <span class="hint">(' + esc(a.user) + ')</span></span><span class="when">' + fmtDT(a.at) + '</span></div>'
+   ).join("") || '<p class="hint">No activity yet.</p>';
+  } catch (e) { $("adActivity").innerHTML = '<p class="hint">Activity feed unavailable</p>'; }
+  const convs = await api("/admin/conversations");
+  $("adConvsBody").innerHTML = convs.map(c =>
+   "<tr style=\"cursor:pointer\" onclick=\"adminViewConv(" + c.id + ")\"><td class=\"mono\">" + c.id + "</td><td class=\"mono\">" + c.load_id + "</td><td>" + esc(c.route) + "</td><td>" + esc(c.shipper) + "</td><td>" + esc(c.carrier) + "</td><td>" + c.messages + "</td></tr>"
+  ).join("") || '<tr><td colspan="6" class="hint">No conversations yet</td></tr>';
   const users = await api("/admin/users");
   $("adUsersBody").innerHTML = users.map(u =>
    "<tr><td class=\"mono\">" + u.id + "</td><td>" + esc(u.email) + '</td><td><span class="badge ' + esc(u.role) + '">' + esc(u.role) + "</span></td>" +
    "<td>" + (u.disabled ? "disabled" : "active") + '</td><td><button class="btn ghost sm" onclick="toggleDisable(' + u.id + ')">' + (u.disabled ? "Enable" : "Disable") + "</button></td></tr>"
   ).join("");
-  try {
-   const convs = await api("/admin/conversations");
-   $("adConvsBody").innerHTML = convs.map(c =>
-    "<tr style=\"cursor:pointer\" onclick=\"adminViewConv(" + c.id + ")\"><td class=\"mono\">" + c.id + "</td><td class=\"mono\">" + c.load_id + "</td><td>" + esc(c.route) + "</td><td>" + esc(c.shipper) + "</td><td>" + esc(c.carrier) + "</td><td>" + c.messages + "</td></tr>"
-   ).join("") || '<tr><td colspan="6" class="hint">No conversations yet</td></tr>';
-  } catch (e) { $("adConvsBody").innerHTML = '<tr><td colspan="6" class="hint">' + esc(e.message) + "</td></tr>"; }
-  const loads = await api("/admin/loads");
-  $("adLoadsBody").innerHTML = loads.slice(0, 30).map(l =>
-   "<tr><td class=\"mono\">" + l.id + "</td><td>" + esc(l.origin_city) + " " + esc(l.dest_city) + '</td><td><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></td><td>" + fmtGHS(l.budget_ghs) + "</td></tr>"
-  ).join("");
  } catch (e) { toast(e.message, true); }
 }
+function renderAdOrders(filter) {
+ const rows = (window._adOrders || []).filter(l => {
+  if (filter === "pending") return ["open", "assigned", "in_transit"].includes(l.status);
+  if (filter === "completed") return l.status === "delivered";
+  if (filter === "cancelled") return l.status === "cancelled";
+  return true;
+ }).slice(0, 100);
+ $("adOrdersBody").innerHTML = rows.map(l => {
+  const canCancel = ["open", "assigned"].includes(l.status);
+  return "<tr><td class=\"mono\">" + l.id + "</td>" +
+   "<td>" + esc(l.origin_city) + " \u2192 " + esc(l.dest_city) + "</td>" +
+   '<td><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></td>" +
+   "<td>" + esc(l.payment_status || "") + "</td>" +
+   "<td>" + fmtGHS(l.budget_ghs) + "</td>" +
+   "<td>" + (canCancel ? '<button class="btn danger sm" onclick="adminCancelOrder(' + l.id + ')">Cancel</button>' : "") + "</td></tr>";
+ }).join("") || '<tr><td colspan="6" class="hint">No orders in this view</td></tr>';
+}
+async function adminCancelOrder(id) {
+ if (!confirm("Cancel order " + id + "?")) return;
+ try {
+  await api("/admin/loads/" + id + "/cancel", { method: "POST" });
+  toast("Order " + id + " canceled");
+  loadAdmin();
+ } catch (e) { toast(e.message, true); }
+}
+
 async function adminViewConv(cid) {
  try {
   const msgs = await api("/admin/conversations/" + cid + "/messages");
