@@ -19,8 +19,8 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
  :root{
-  --bg:#0b0e14; --panel:#121828; --panel2:#1a2333; --line:#1e2a45;
-  --txt:#eef1f8; --dim:#8f98b3; --acc:#ffb020; --acc2:#ff7a1a;
+  --bg:#f6f1e7; --panel:#fffdf6; --panel2:#f0e9d8; --line:#ddd3bd;
+  --txt:#232a38; --dim:#7a7f8c; --acc:#ffb020; --acc2:#ff7a1a;
   --ok:#2ecc71; --warn:#ffd166; --bad:#ff5d5d;
  }
  *{margin:0;padding:0;box-sizing:border-box}
@@ -55,14 +55,14 @@
  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
- .stat{background:#141a28;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+ .stat{background:#fffdf6;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
  .stat .num{font:700 24px/1.2 "Sora";color:var(--txt)}
  .stat .lbl{color:var(--dim);font:600 11px "IBM Plex Mono",monospace;margin-top:6px;letter-spacing:1.2px}
- .panel{background:#121828;border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px;
+ .panel{background:#fffdf6;border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px;
      box-shadow:0 8px 24px rgba(0,0,0,.25)}
  .panel h2{font-size:18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;text-transform:none;letter-spacing:0}
  header.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
-       background:rgba(11,14,20,.82);border-bottom:1px solid var(--line)}
+       background:rgba(246,241,231,.88);border-bottom:1px solid var(--line)}
  .top-in{display:flex;align-items:center;gap:18px;height:62px}
  .logo{display:flex;align-items:center;gap:9px;font:800 19px "Sora";letter-spacing:.02em;color:var(--txt);text-decoration:none}
  .logo .mark{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
@@ -77,14 +77,14 @@
  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));
      color:#161006;display:flex;align-items:center;justify-content:center;font:700 14px "Sora"}
  .home-hero{position:relative;border-radius:16px;border:1px solid var(--line);margin-bottom:20px;
-  background:#131b30;min-height:240px;display:flex;align-items:center;
+  background:#fdf6e3;min-height:240px;display:flex;align-items:center;
   box-shadow:0 10px 30px rgba(0,0,0,.25)}
  .home-hero .in{padding:40px;max-width:640px}
  .home-hero h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin-bottom:14px}
  .home-hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--acc),var(--acc2));
           -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
  .home-hero p{color:var(--dim);font-size:16px;margin-bottom:22px}
- .qa{background:#141a28;border:1px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;transition:.2s;position:relative}
+ .qa{background:#fffdf6;border:1px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;transition:.2s;position:relative}
  .qa:hover{border-color:var(--acc);transform:translateY(-2px)}
  .qa h3{font-size:16px;margin-bottom:6px}
  .qa p{color:var(--dim);font-size:13px}
@@ -129,19 +129,19 @@
  .chat-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
  .chat-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
  .msg{max-width:72%;padding:10px 14px;border-radius:14px;font-size:14px}
- .msg.user{background:#22345a;margin-left:auto;border-bottom-right-radius:4px;border:1px solid #2c4470}
- .msg.other{background:var(--panel2);border-bottom-left-radius:4px;border:1px solid var(--line)}
+ .msg.user{background:#f7e7c2;margin-left:auto;border-bottom-right-radius:4px;border:1px solid #e8d3a4;color:#4a3410}
+ .msg.other{background:#ffffff;border-bottom-left-radius:4px;border:1px solid var(--line)}
  .msg .t{display:block;font:400 10px "IBM Plex Mono";color:var(--dim);margin-top:5px}
  .msg .terms{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,176,32,.08);
        border:1px solid rgba(255,176,32,.25);font-size:13px}
  .chat-foot{padding:14px;border-top:1px solid var(--line);display:flex;gap:10px}
- .map-shell{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0d1420}
+ .map-shell{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#efe7d5}
  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
      background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:12px 20px;
      border-radius:12px;font-size:14px;transition:.25s;z-index:100;pointer-events:none;max-width:90vw}
  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
  .toast.err{border-color:rgba(255,93,93,.5);color:#ffb3b3}
- .modal{position:fixed;inset:0;background:rgba(5,8,14,.7);backdrop-filter:blur(4px);z-index:60;
+ .modal{position:fixed;inset:0;background:rgba(35,42,56,.45);backdrop-filter:blur(4px);z-index:60;
      display:none;align-items:center;justify-content:center;padding:20px}
  .modal.open{display:flex}
  .modal .box{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;
@@ -252,7 +252,7 @@
   align-items:center;justify-content:center;flex:none}
  #menuBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;display:none}
  #menuDrawer{position:fixed;top:66px;left:8px;width:250px;max-width:82vw;z-index:91;
-  background:#0f1524;border:1px solid var(--line);border-radius:14px;
+  background:#f3ecdc;border:1px solid var(--line);border-radius:14px;
   display:none;flex-direction:column;padding:10px;overflow-y:auto;
   max-height:calc(100vh - 84px);box-shadow:0 18px 50px rgba(0,0,0,.5)}
  #menuDrawer.open{display:flex;animation:menuDrop .16s ease}
@@ -268,7 +268,7 @@
   color:var(--dim);text-transform:uppercase}
  /* ===== mobile bottom tab bar ===== */
  #bottomBar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:80;
-  background:#0f1524;border-top:1px solid var(--line);
+  background:#f3ecdc;border-top:1px solid var(--line);
   padding:6px 6px calc(6px + env(safe-area-inset-bottom));
   grid-template-columns:1fr 1fr 64px 1fr 1fr;align-items:end}
  #bottomBar a,#bottomBar>button{display:flex;flex-direction:column;align-items:center;gap:4px;
@@ -307,7 +307,7 @@
  .equip-row .ep{font:700 15px Sora;color:var(--ok);margin-left:auto;}
 
  /* available-balance hero card */
- .stat-hero{background:#141a28;border:1px solid rgba(255,176,32,.5);border-radius:16px;
+ .stat-hero{background:#fffdf6;border:1px solid rgba(255,176,32,.5);border-radius:16px;
  padding:24px 26px;margin-bottom:14px;position:relative;overflow:hidden;
  box-shadow:0 10px 30px rgba(0,0,0,.3)}
  .stat-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;
@@ -325,7 +325,7 @@
   box-shadow:0 0 0 8px rgba(52,211,153,.15), 0 10px 28px rgba(52,211,153,.3)}
  .dash-go:active{transform:scale(.94)}
  #dash .stat{padding:14px 16px}
- #dOffers .match,#dNearby .match{border-radius:16px;padding:18px;background:#101625}
+ #dOffers .match,#dNearby .match{border-radius:16px;padding:18px;background:#f3ecdc}
  #dOffers .match .route,#dNearby .match .route{font-size:16px}
 </style>
 <base target="_blank">
@@ -480,7 +480,10 @@
     <label class="hint">Password</label>
     <input class="input" id="regPass" type="password" placeholder="Minimum 8 characters" style="margin:6px 0 14px;">
     <label class="hint">Phone number (for SMS order status and driver arrival alerts)</label>
-    <input class="input" id="regPhoneMain" placeholder="+233 244 000 000" style="margin:6px 0 14px;">
+    <div style="display:flex;gap:8px;margin:6px 0 14px;">
+     <select class="input" id="regCC" style="max-width:170px;flex:none;"><option value="+233" selected>Ghana (+233)</option><option value="+234">Nigeria (+234)</option><option value="+254">Kenya (+254)</option><option value="+27">South Africa (+27)</option><option value="+20">Egypt (+20)</option><option value="+251">Ethiopia (+251)</option><option value="+255">Tanzania (+255)</option><option value="+256">Uganda (+256)</option><option value="+213">Algeria (+213)</option><option value="+212">Morocco (+212)</option><option value="+221">Senegal (+221)</option><option value="+225">Ivory Coast (+225)</option><option value="+237">Cameroon (+237)</option><option value="+250">Rwanda (+250)</option><option value="+260">Zambia (+260)</option><option value="+263">Zimbabwe (+263)</option><option value="+267">Botswana (+267)</option><option value="+264">Namibia (+264)</option><option value="+258">Mozambique (+258)</option><option value="+223">Mali (+223)</option><option value="+226">Burkina Faso (+226)</option><option value="+227">Niger (+227)</option><option value="+235">Chad (+235)</option><option value="+224">Guinea (+224)</option><option value="+229">Benin (+229)</option><option value="+228">Togo (+228)</option><option value="+241">Gabon (+241)</option><option value="+242">Congo (+242)</option><option value="+243">DR Congo (+243)</option><option value="+244">Angola (+244)</option><option value="+265">Malawi (+265)</option><option value="+266">Lesotho (+266)</option><option value="+268">Eswatini (+268)</option><option value="+252">Somalia (+252)</option><option value="+249">Sudan (+249)</option><option value="+211">South Sudan (+211)</option><option value="+218">Libya (+218)</option><option value="+216">Tunisia (+216)</option><option value="+230">Mauritius (+230)</option><option value="+261">Madagascar (+261)</option><option value="+257">Burundi (+257)</option><option value="+231">Liberia (+231)</option><option value="+232">Sierra Leone (+232)</option><option value="+220">Gambia (+220)</option><option value="+238">Cape Verde (+238)</option><option value="+245">Guinea-Bissau (+245)</option><option value="+240">Equatorial Guinea (+240)</option><option value="+239">Sao Tome & Principe (+239)</option><option value="+269">Comoros (+269)</option><option value="+253">Djibouti (+253)</option><option value="+291">Eritrea (+291)</option><option value="+248">Seychelles (+248)</option><option value="+236">CAR (+236)</option><option value="+222">Mauritania (+222)</option></select>
+     <input class="input" id="regPhoneMain" placeholder="244 000 000" inputmode="numeric">
+    </div>
     <label class="hint">Referral code <span style="opacity:.6">(optional)</span></label>
     <input class="input" id="regRef" placeholder="e.g. AB12CD34" style="margin:6px 0 14px;">
     <div id="regErr" class="error"></div>
@@ -513,7 +516,7 @@
  <!-- ============ POST A LOAD (Uber-style) ============ -->
  <section id="post" class="tabpage">
   <div class="panel" style="max-width:560px;margin:0 auto;padding:0;overflow:hidden;">
-   <div id="postMap" style="height:190px;background:#0d1420;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px;text-align:center;padding:0 30px;">Your load, matched like a ride — fill Where from / Where to and prices appear instantly</div>
+   <div id="postMap" style="height:190px;background:#efe7d5;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px;text-align:center;padding:0 30px;">Your load, matched like a ride — fill Where from / Where to and prices appear instantly</div>
    <div style="padding:20px 22px 14px;">
     <div class="uber-field">
      <span class="u-dot" style="background:var(--ok)"></span>
@@ -543,7 +546,7 @@
     <div id="poErr" class="error"></div>
     <div id="poOk" class="ok"></div>
    </div>
-   <div style="padding:16px 22px;border-top:1px solid var(--line);background:#0f1524;display:flex;align-items:center;gap:16px;">
+   <div style="padding:16px 22px;border-top:1px solid var(--line);background:#f3ecdc;display:flex;align-items:center;gap:16px;">
     <div style="flex:1;">
      <div class="hint" style="font-size:10px;letter-spacing:1.5px;">TOTAL PRICE</div>
      <div id="poQuote" style="font:800 24px Sora;color:var(--acc);">—</div>
@@ -1072,7 +1075,10 @@ async function doRegister() {
   const d = await api("/auth/register", { method: "POST", body: JSON.stringify({
    email: $("regEmail").value.trim(), password: $("regPass").value,
    name: $("regName").value.trim(), role: regRoleSel,
-   phone: $("regPhoneMain").value.trim() || null,
+   phone: (function () {
+     var digits = $("regPhoneMain").value.replace(/\D/g, "");
+     return digits ? $("regCC").value + digits : null;
+    })(),
    referral_code: $("regRef").value.trim() || null }) });
   token = d.access_token; localStorage.setItem("waynok_token", token);
   if (d.user && d.user.company_name) localStorage.setItem("waynok_name", d.user.company_name);
