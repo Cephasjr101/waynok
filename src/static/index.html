@@ -242,6 +242,7 @@
  :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:4px}
 
  /* role-filtered menus: each role only sees its own tools */
+ body.logged-in .guest-only{display:none !important}
  body.role-carrier .m-ship{display:none !important}
  body.role-shipper .m-carr{display:none !important}
  body:not(.role-admin) .m-admin{display:none !important}
@@ -426,8 +427,8 @@
    <h2 style="justify-content:center;">Ready to move?</h2>
    <p class="hint" style="margin:8px 0 18px;">Join shippers and drivers across Ghana on Waynok.</p>
    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-    <button class="btn primary" onclick="openAuth('register')">Create free account</button>
-    <button class="btn ghost" onclick="openAuth('login')">Sign in</button>
+    <button class="btn primary guest-only" onclick="openAuth('register')">Create free account</button>
+    <button class="btn ghost guest-only" onclick="openAuth('login')">Sign in</button>
    </div>
   </div>
  </section>
@@ -574,7 +575,7 @@
    <h2>AI dispatcher</h2>
    <p class="hint" style="margin-bottom:14px;">Ask anything about moving freight — pricing, routes, documents, regulations.</p>
    <div id="agentThread" style="min-height:220px;max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
-    <div class="msg other">Hi — I'm your Waynok dispatcher. Ask me about prices, routes, or how the platform works.</div>
+    <div class="msg other">Hello how can I help today?</div>
    </div>
    <div style="display:flex;gap:10px;">
     <input class="input" id="agentInput" placeholder="How much to move 5t Accra Kumasi?" onkeydown="if(event.key==='Enter')askAgent()">
@@ -1023,14 +1024,11 @@ function boot() {
  if (token) enterApp(); else goTab("home");
 }
 function enterApp() {
- goTab(myRole === "carrier" ? "dash" : "home");
  loadMe().then(async () => {
-  if (myRole === "carrier") {
-   try {
-    const mine = await api("/trucks/mine");
-    if (!mine.length) { goTab("truck-new"); toast("List your truck to start receiving orders"); }
-   } catch (e) {}
-  }
+  if (!token || !myRole) { goTab("home"); return; }
+  if (me && me.is_admin) { goTab("admin"); return; }
+  goTab("dash");
+  if (navigator.geolocation) navigator.geolocation.getCurrentPosition(() => {}, () => {});
  });
 }
 
@@ -1119,6 +1117,7 @@ async function loadMe() {
  } catch (e) { /* guest or expired */ }
 }
 function renderNav() {
+ document.body.classList.toggle("logged-in", !!(token && me));
  const el = $("navAuth");
  if (token && me) {
   el.innerHTML = '<span class="role-chip ' + me.role + '">' + me.role + '</span>' +
@@ -1334,8 +1333,8 @@ function trackLoad(id) { goTab("track"); trackFocus = id; refreshDriverLocations
 function renderEta(eta) {
  const el = $("trackEta");
  if (!el) return;
- if (!eta.assigned) { el.textContent = "Waiting for a driver to accept your load..."; return; }
- if (!eta.tracking) { el.textContent = "Driver assigned - live GPS starts when the driver goes online."; return; }
+ if (!eta.assigned) { el.textContent = "Waiting for a carrier to pick up the order..."; return; }
+ if (!eta.tracking) { el.textContent = "Carrier assigned - live GPS starts when the carrier goes online."; return; }
  el.innerHTML = '<span class="live-dot" style="margin-right:8px"></span>Driver is <b>' + eta.distance_km +
   ' km</b> away - arriving in about <b>' + eta.eta_minutes + ' min</b>';
 }
@@ -1373,8 +1372,38 @@ async function deleteTruck(id) {
 }
 
 /* ---------------- driver dashboard ---------------- */
+function shipRow(l) {
+  return '<div class="load-card">' +
+   '<div class="route"><div class="cities">' + esc(l.origin_city) + " \u2192 " + esc(l.dest_city) + '</div>' +
+   '<div class="meta mono">' + esc(l.equipment_type) + " \u00b7 " + Number(l.weight_kg).toLocaleString() + " kg \u00b7 pickup " + fmtDT(l.pickup_time) + "</div></div>" +
+   '<div style="text-align:right;"><div class="price">' + fmtGHS(l.budget_ghs) + '</div><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></div>" +
+   loadActions(l) + "</div>";
+ }
+ async function renderShipperDash() {
+  $("dash").classList.remove("hidden");
+  document.querySelectorAll("#dash > *").forEach(el => el.style.display = "none");
+  let p = $("shipperPanel");
+  if (!p) {
+   p = document.createElement("div");
+   p.id = "shipperPanel"; p.className = "panel";
+   p.innerHTML = '<h2>My loads <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">\u00b7 live status \u2014 track, chat, pay</span>' +
+    '<button class="ghost btn sm" style="margin-left:auto;" onclick="loadDashboard()">Refresh</button></h2>' +
+    '<div id="shipLoads"><div class="skeleton"></div><div class="skeleton"></div></div>';
+   $("dash").appendChild(p);
+  }
+  p.style.display = "";
+  try {
+   const mine = await api("/loads/mine");
+   const active = (mine || []).filter(l => ["open", "assigned", "in_transit"].includes(l.status));
+   const done = (mine || []).filter(l => !["open", "assigned", "in_transit"].includes(l.status)).slice(0, 5);
+   $("shipLoads").innerHTML = active.map(shipRow).join("") + done.map(shipRow).join("") ||
+    '<p class="hint">No loads yet. Tap the <b>+</b> below to post your first load.</p>';
+  } catch (e) { $("shipLoads").innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; }
+ }
+
 async function loadDashboard() {
- if (!token) { goTab("home"); return toast("Sign in to open the driver dashboard", true); }
+ if (!token) { goTab("home"); return toast("Sign in to open your dashboard", true); }
+ if (myRole === "shipper") { await renderShipperDash(); return; }
  try {
   const debt = await api("/me/debt");
   if (debt.owed_ghs > 0) {
