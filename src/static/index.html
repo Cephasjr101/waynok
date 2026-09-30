@@ -941,6 +941,28 @@
 <button id="gpsFab" title="Go online"></button>
 
 <script>
+/* ---- on-screen error reporter: any JS error draws itself here ---- */
+window.addEventListener("error", function (e) {
+ var d = document.getElementById("errBox");
+ if (!d) {
+  d = document.createElement("div");
+  d.id = "errBox";
+  d.style.cssText = "position:fixed;bottom:8px;left:8px;right:8px;background:#ffe9e9;color:#8a0000;border:2px solid #c00;border-radius:8px;padding:10px 12px;font:12px/1.5 monospace;z-index:999999;white-space:pre-wrap;max-height:45vh;overflow:auto";
+  document.body.appendChild(d);
+ }
+ d.textContent += (e.message || (e.error && e.error.message) || "error") + "  @ " + String(e.filename || "").split("/").pop() + ":" + e.lineno + "\n";
+});
+window.addEventListener("unhandledrejection", function (e) {
+ var d = document.getElementById("errBox");
+ if (!d) {
+  d = document.createElement("div");
+  d.id = "errBox";
+  d.style.cssText = "position:fixed;bottom:8px;left:8px;right:8px;background:#ffe9e9;color:#8a0000;border:2px solid #c00;border-radius:8px;padding:10px 12px;font:12px/1.5 monospace;z-index:999999;white-space:pre-wrap;max-height:45vh;overflow:auto";
+  document.body.appendChild(d);
+ }
+ d.textContent += "Promise: " + (e.reason && e.reason.message ? e.reason.message : e.reason) + "\n";
+});
+
 /* ================= Waynok SPA ================= */
 const $ = id => document.getElementById(id);
 const API_BASE = "";           // same origin; served by the FastAPI app
