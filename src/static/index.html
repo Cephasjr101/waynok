@@ -881,6 +881,22 @@
    <div class="stat"><div class="num" id="adPending" style="color:var(--warn)">0</div><div class="lbl">TASK PENDING</div></div>
    <div class="stat"><div class="num" id="adCancelled" style="color:var(--bad)">0</div><div class="lbl">TASK CANCELED</div></div>
   </div>
+  <div class="panel" style="max-width:560px;">
+   <h2>System charge &amp; fare</h2>
+   <p class="hint" style="margin-bottom:12px;">These apply instantly to every new quote and payment.</p>
+   <div class="grid2">
+    <div>
+     <label class="hint">Fare markup (x base estimate)</label>
+     <input class="input" id="prMarkup" type="number" step="0.05" min="1" max="3" style="margin:6px 0 12px;">
+    </div>
+    <div>
+     <label class="hint">Platform commission (% of fare)</label>
+     <input class="input" id="prComm" type="number" step="0.5" min="5" max="40" style="margin:6px 0 12px;">
+    </div>
+   </div>
+   <div id="prMsg" class="ok"></div>
+   <button class="btn primary" onclick="savePricing()">Save pricing</button>
+  </div>
   <div class="panel">
    <h2>Orders <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· every load on the platform</span>
     <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;" id="adFilters">
@@ -889,7 +905,7 @@
      <button class="fchip" data-af="completed">Complete</button>
      <button class="fchip" data-af="cancelled">Canceled</button>
     </span></h2>
-   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Route</th><th>Status</th><th>Payment</th><th>Price</th><th></th></tr></thead><tbody id="adOrdersBody"></tbody></table></div>
+   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Route</th><th>Shipper</th><th>Status</th><th>Payment</th><th>Price</th><th></th></tr></thead><tbody id="adOrdersBody"></tbody></table></div>
   </div>
   <div class="panel">
    <h2>Live activity <span class="pill"><span class="live-dot"></span> streaming</span></h2>
@@ -1806,6 +1822,7 @@ async function loadAdmin() {
    const b = e.target.closest(".fchip"); if (!b) return;
    document.querySelectorAll("#adFilters .fchip").forEach(c => c.classList.remove("active"));
    b.classList.add("active");
+   if (b.dataset.af === "all") window._adUser = null;
    renderAdOrders(b.dataset.af);
   });
  }
@@ -1815,6 +1832,11 @@ async function loadAdmin() {
   $("adDone").textContent = (s.orders_completed != null ? s.orders_completed : s.delivered || 0).toLocaleString();
   $("adPending").textContent = (s.orders_pending != null ? s.orders_pending : s.open_loads || 0).toLocaleString();
   $("adCancelled").textContent = (s.orders_cancelled || 0).toLocaleString();
+  try {
+   const pr = await api("/admin/pricing");
+   $("prMarkup").value = pr.price_markup;
+   $("prComm").value = Math.round(pr.commission_pct * 1000) / 10;
+  } catch (e) {}
   window._adOrders = await api("/admin/loads");
   renderAdOrders((document.querySelector("#adFilters .fchip.active") || {}).dataset ? document.querySelector("#adFilters .fchip.active").dataset.af : "all");
   try {
@@ -1829,14 +1851,34 @@ async function loadAdmin() {
    "<tr style=\"cursor:pointer\" onclick=\"adminViewConv(" + c.id + ")\"><td class=\"mono\">" + c.id + "</td><td class=\"mono\">" + c.load_id + "</td><td>" + esc(c.route) + "</td><td>" + esc(c.shipper) + "</td><td>" + esc(c.carrier) + "</td><td>" + c.messages + "</td></tr>"
   ).join("") || '<tr><td colspan="6" class="hint">No conversations yet</td></tr>';
   const users = await api("/admin/users");
+  window._adUserMap = {};
+  users.forEach(u => window._adUserMap[u.id] = u.email);
   $("adUsersBody").innerHTML = users.map(u =>
    "<tr><td class=\"mono\">" + u.id + "</td><td>" + esc(u.email) + '</td><td><span class="badge ' + esc(u.role) + '">' + esc(u.role) + "</span></td>" +
-   "<td>" + (u.disabled ? "disabled" : "active") + '</td><td><button class="btn ghost sm" onclick="toggleDisable(' + u.id + ')">' + (u.disabled ? "Enable" : "Disable") + "</button></td></tr>"
+   "<td>" + (u.disabled ? "disabled" : "active") + '</td><td style="white-space:nowrap;">' +
+   '<button class="btn ghost sm" onclick="adUserOrders(' + u.id + ', \'' + esc(u.email) + '\')">Orders</button> ' +
+   '<button class="btn ghost sm" onclick="toggleDisable(' + u.id + ')">' + (u.disabled ? "Enable" : "Disable") + "</button></td></tr>"
   ).join("");
  } catch (e) { toast(e.message, true); }
 }
+async function savePricing() {
+ const msg = $("prMsg");
+ try {
+  const d = await api("/admin/pricing", { method: "PUT", body: JSON.stringify({
+   price_markup: parseFloat($("prMarkup").value),
+   commission_pct: parseFloat($("prComm").value) / 100 }) });
+  msg.className = "ok"; msg.textContent = "Saved - markup x" + d.price_markup + ", commission " + (d.commission_pct * 100).toFixed(1) + "%";
+ } catch (e) { msg.className = "error"; msg.textContent = e.message; }
+}
+
+function adUserOrders(uid, email) {
+ window._adUser = uid;
+ renderAdOrders((document.querySelector("#adFilters .fchip.active") || {}).dataset ? document.querySelector("#adFilters .fchip.active").dataset.af : "all");
+ toast("Showing orders for " + email + " - tap All to reset");
+}
 function renderAdOrders(filter) {
  const rows = (window._adOrders || []).filter(l => {
+  if (window._adUser && l.shipper_id !== window._adUser) return false;
   if (filter === "pending") return ["open", "assigned", "in_transit"].includes(l.status);
   if (filter === "completed") return l.status === "delivered";
   if (filter === "cancelled") return l.status === "cancelled";
@@ -1844,13 +1886,15 @@ function renderAdOrders(filter) {
  }).slice(0, 100);
  $("adOrdersBody").innerHTML = rows.map(l => {
   const canCancel = ["open", "assigned"].includes(l.status);
+  const ship = (window._adUserMap && window._adUserMap[l.shipper_id]) || ("#" + l.shipper_id);
   return "<tr><td class=\"mono\">" + l.id + "</td>" +
    "<td>" + esc(l.origin_city) + " \u2192 " + esc(l.dest_city) + "</td>" +
+   "<td class=\"hint\" style=\"font-size:12px;\">" + esc(ship) + "</td>" +
    '<td><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></td>" +
    "<td>" + esc(l.payment_status || "") + "</td>" +
    "<td>" + fmtGHS(l.budget_ghs) + "</td>" +
    "<td>" + (canCancel ? '<button class="btn danger sm" onclick="adminCancelOrder(' + l.id + ')">Cancel</button>' : "") + "</td></tr>";
- }).join("") || '<tr><td colspan="6" class="hint">No orders in this view</td></tr>';
+ }).join("") || '<tr><td colspan="7" class="hint">No orders in this view</td></tr>';
 }
 async function adminCancelOrder(id) {
  if (!confirm("Cancel order " + id + "?")) return;
