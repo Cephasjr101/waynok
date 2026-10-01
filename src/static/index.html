@@ -1,0 +1,2135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waynok — move freight across Ghana</title>
+<meta name="description" content="Waynok matches shippers with verified truck drivers across Ghana. Post a load, get matched in seconds, track delivery live, and pay securely on delivery.">
+<meta property="og:title" content="Waynok — Ghana freight, matched in seconds">
+<meta property="og:description" content="Post a load, get matched with a verified driver, track delivery live.">
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png" sizes="192x192">
+<link rel="icon" href="/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+ :root{
+  --bg:#f6f1e7; --panel:#fffdf6; --panel2:#f0e9d8; --line:#ddd3bd;
+  --txt:#232a38; --dim:#7a7f8c; --acc:#ffb020; --acc2:#ff7a1a;
+  --ok:#2ecc71; --warn:#ffd166; --bad:#ff5d5d;
+ }
+ *{margin:0;padding:0;box-sizing:border-box}
+ html,body{max-width:100vw;overflow-x:hidden}
+ img,svg{max-width:100%}
+ html{scroll-behavior:smooth}
+ body{background:var(--bg);color:var(--txt);
+    font:15px/1.55 "Sora",system-ui,sans-serif;min-height:100vh}
+ h1,h2,h3{line-height:1.2;letter-spacing:-.02em}
+ a{color:var(--acc)}
+ .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+ .mono{font-family:"IBM Plex Mono",monospace}
+ .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;
+    border:1px solid var(--line);background:var(--panel);font-size:12px;color:var(--dim)}
+ .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+ .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:12px;
+    border:1px solid transparent;font:600 15px "Sora";cursor:pointer;transition:.15s;text-decoration:none}
+ .btn.primary{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#161006}
+ .btn.primary:hover{filter:brightness(1.08)}
+ .btn.ghost{background:transparent;border-color:var(--line);color:var(--txt)}
+ .btn.ghost:hover{border-color:var(--dim)}
+ .btn.danger{background:rgba(255,93,93,.12);border-color:rgba(255,93,93,.4);color:#ff9d9d}
+ .btn.block{width:100%}
+ .btn.sm{padding:8px 14px;font-size:13px;border-radius:10px}
+ .btn:disabled{opacity:.5;cursor:default}
+ .input,select.input,textarea.input{width:100%;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);padding:11px 14px;border-radius:10px;font:15px "Sora";outline:none;transition:border-color .15s}
+ .input:focus{border-color:var(--acc)}
+ .hint{color:var(--dim);font-size:13px}
+ .error{color:var(--bad);font-size:13px;margin-top:6px}
+ .ok{color:var(--ok);font-size:13px;margin-top:6px}
+ .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+ .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+ .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+ .stat{background:#fffdf6;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+ .stat .num{font:700 24px/1.2 "Sora";color:var(--txt)}
+ .stat .lbl{color:var(--dim);font:600 11px "IBM Plex Mono",monospace;margin-top:6px;letter-spacing:1.2px}
+ .panel{background:#fffdf6;border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px;
+     box-shadow:0 8px 24px rgba(0,0,0,.25)}
+ .panel h2{font-size:18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;text-transform:none;letter-spacing:0}
+ header.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+       background:rgba(246,241,231,.88);border-bottom:1px solid var(--line)}
+ .top-in{display:flex;align-items:center;gap:18px;height:62px}
+ .logo{display:flex;align-items:center;gap:9px;font:800 19px "Sora";letter-spacing:.02em;color:var(--txt);text-decoration:none}
+ .logo .mark{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+       background:linear-gradient(135deg,var(--acc),var(--acc2));color:#161006;font-size:15px}
+ nav.main{display:flex;gap:4px;margin-left:auto}
+ nav.main a{padding:8px 13px;border-radius:10px;color:var(--dim);text-decoration:none;font-size:14px;transition:.15s}
+ nav.main a:hover{color:var(--txt);background:var(--panel2)}
+ nav.main a.active{color:var(--acc);background:rgba(255,176,32,.1)}
+ .role-chip{font:600 12px "IBM Plex Mono";padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+ .role-chip.shipper{color:#8ec5ff;border-color:#2a4a77}
+ .role-chip.carrier{color:#7ee2a8;border-color:#1f5c3a}
+ .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));
+     color:#161006;display:flex;align-items:center;justify-content:center;font:700 14px "Sora"}
+ .home-hero{position:relative;border-radius:16px;border:1px solid var(--line);margin-bottom:20px;
+  background:#fdf6e3;min-height:240px;display:flex;align-items:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.25)}
+ .home-hero .in{padding:40px;max-width:640px}
+ .home-hero h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin-bottom:14px}
+ .home-hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--acc),var(--acc2));
+          -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+ .home-hero p{color:var(--dim);font-size:16px;margin-bottom:22px}
+ .qa{background:#fffdf6;border:1px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;transition:.2s;position:relative}
+ .qa:hover{border-color:var(--acc);transform:translateY(-2px)}
+ .qa h3{font-size:16px;margin-bottom:6px}
+ .qa p{color:var(--dim);font-size:13px}
+ .qa .ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+     background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.25)}
+ .fchip{padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);
+     color:var(--dim);font:600 13px "Sora";cursor:pointer;transition:.15s;white-space:nowrap}
+ .fchip:hover{border-color:var(--dim);color:var(--txt)}
+ .fchip.active{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#161006;border-color:transparent}
+ .load-card{border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px;background:var(--panel);
+       display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;transition:.15s}
+ .load-card:hover{border-color:#32405f}
+ .load-card .route{flex:1;min-width:220px}
+ .load-card .route .cities{font:700 16px "Sora"}
+ .load-card .route .meta{color:var(--dim);font-size:13px;margin-top:4px}
+ .load-card .price{font:800 18px "Sora";color:var(--ok)}
+ .tag{display:inline-block;padding:3px 10px;border-radius:999px;font:600 11px "IBM Plex Mono";border:1px solid var(--line)}
+ .tag.open{color:#8ec5ff;border-color:#2a4a77}
+ .tag.assigned{color:var(--warn);border-color:#6b5518}
+ .tag.in_transit{color:#c9a1ff;border-color:#4a2a77}
+ .tag.delivered{color:var(--ok);border-color:#1f5c3a}
+ .tag.cancelled{color:var(--bad);border-color:#5c1f1f}
+ .tag.paid{color:var(--ok);border-color:#1f5c3a}
+ .tag.unpaid{color:var(--warn);border-color:#6b5518}
+ .row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+ table.tb{width:100%;border-collapse:collapse;font-size:14px}
+ .tb th{text-align:left;color:var(--dim);font:600 11px "IBM Plex Mono";letter-spacing:1px;
+     padding:10px 12px;border-bottom:1px solid var(--line)}
+ .tb td{padding:12px;border-bottom:1px solid var(--line)}
+ .tb tr:hover td{background:rgba(255,255,255,.02)}
+ .chat-shell{display:grid;grid-template-columns:300px 1fr;gap:0;border:1px solid var(--line);
+       border-radius:16px;overflow:hidden;height:520px;background:var(--panel)}
+ .chat-list{border-right:1px solid var(--line);overflow-y:auto}
+ .conv{padding:14px 16px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s}
+ .conv:hover{background:var(--panel2)}
+ .conv.active{background:rgba(255,176,32,.07);border-left:3px solid var(--acc)}
+ .conv .name{font-weight:600;font-size:14px}
+ .conv .prev{color:var(--dim);font-size:12px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .conv .unread{float:right;background:var(--acc);color:#161006;font:700 11px "Sora";
+        min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+ .chat-main{display:flex;flex-direction:column}
+ .chat-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+ .chat-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+ .msg{max-width:72%;padding:10px 14px;border-radius:14px;font-size:14px}
+ .msg.user{background:#f7e7c2;margin-left:auto;border-bottom-right-radius:4px;border:1px solid #e8d3a4;color:#4a3410}
+ .msg.other{background:#ffffff;border-bottom-left-radius:4px;border:1px solid var(--line)}
+ .msg .t{display:block;font:400 10px "IBM Plex Mono";color:var(--dim);margin-top:5px}
+ .msg .terms{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,176,32,.08);
+       border:1px solid rgba(255,176,32,.25);font-size:13px}
+ .chat-foot{padding:14px;border-top:1px solid var(--line);display:flex;gap:10px}
+ .map-shell{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#efe7d5}
+ .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+     background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:12px 20px;
+     border-radius:12px;font-size:14px;transition:.25s;z-index:100;pointer-events:none;max-width:90vw}
+ .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+ .toast.err{border-color:rgba(255,93,93,.5);color:#ffb3b3}
+ .modal{position:fixed;inset:0;background:rgba(35,42,56,.45);backdrop-filter:blur(4px);z-index:60;
+     display:none;align-items:center;justify-content:center;padding:20px}
+ .modal.open{display:flex}
+ .modal .box{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;
+       width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+ .seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:18px}
+ .seg button{flex:1;padding:10px;border:none;background:transparent;color:var(--dim);font:600 14px "Sora";
+       border-radius:9px;cursor:pointer;transition:.15s}
+ .seg button.active{background:var(--acc);color:#161006}
+ .kbd{font:600 11px "IBM Plex Mono";border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:2px 6px;color:var(--dim)}
+ .foot{border-top:1px solid var(--line);margin-top:40px;padding:26px 0;color:var(--dim);font-size:13px}
+ .tabpage{display:none}
+ .tabpage.active{display:block;animation:fadeIn .2s ease}
+ @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+ .notif-bell{position:relative}
+ .notif-count{position:absolute;top:-4px;right:-4px;background:var(--bad);color:#fff;font:700 10px "Sora";
+        min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+ .notif-panel{position:absolute;top:56px;right:12px;width:340px;max-height:420px;overflow-y:auto;
+        background:var(--panel);border:1px solid var(--line);border-radius:14px;z-index:70;
+        box-shadow:0 20px 60px rgba(0,0,0,.5)}
+ .notif-item{padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+ .notif-item:hover{background:var(--panel2)}
+ .notif-item .t{font-weight:600;font-size:13px}
+ .notif-item .b{color:var(--dim);font-size:12px;margin-top:2px}
+ .empty{color:var(--dim);text-align:center;padding:40px 20px;font-size:14px}
+ .skeleton{border-radius:12px;background:linear-gradient(90deg,var(--panel) 25%,var(--panel2) 50%,var(--panel) 75%);
+      background-size:200% 100%;animation:sh 1.4s infinite;height:84px;margin-bottom:12px}
+ @keyframes sh{to{background-position:-200% 0}}
+ .big-av{width:72px;height:72px;border-radius:50%;font-size:26px;margin:0 auto 14px}
+ .kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:14px}
+ .kv:last-child{border-bottom:none}
+ .kv b{font-weight:600}
+ .ref-code{font:800 30px "IBM Plex Mono";letter-spacing:6px;text-align:center;padding:18px;
+      background:var(--panel2);border:1px dashed var(--acc);border-radius:14px;color:var(--acc)}
+ .copy-btn{margin-top:10px;width:100%}
+ .match{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;background:var(--panel)}
+ .match .name{font-weight:700}
+ .match .meta{color:var(--dim);font-size:13px;margin:6px 0}
+ .bar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden;margin-top:8px}
+ .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+ .rate{display:flex;gap:6px;margin:10px 0}
+ .rate button{flex:1;padding:12px 0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+        color:var(--dim);font-size:18px;cursor:pointer;transition:.15s}
+ .rate button.on{background:rgba(255,176,32,.15);border-color:var(--acc);color:var(--acc)}
+ .badge{display:inline-flex;align-items:center;gap:6px;font:600 11px "IBM Plex Mono";padding:4px 10px;
+     border-radius:999px;border:1px solid}
+ .badge.guest{color:#c9a1ff;border-color:#4a2a77}
+ .badge.shipper{color:#8ec5ff;border-color:#2a4a77}
+ .badge.carrier{color:#7ee2a8;border-color:#1f5c3a}
+ .prose h3{font-size:17px;margin:22px 0 10px}
+ .prose p,.prose li{color:#c6cddf;font-size:14.5px}
+ .prose ul{padding-left:20px;margin:10px 0}
+ .prose li{margin:6px 0}
+ .upload-zone{border:2px dashed var(--line);border-radius:14px;padding:34px;text-align:center;
+        color:var(--dim);cursor:pointer;transition:.15s}
+ .upload-zone:hover{border-color:var(--acc);color:var(--txt)}
+ .upload-zone img{max-width:100%;max-height:200px;border-radius:10px;margin-top:12px}
+ .checkline{display:flex;gap:10px;align-items:flex-start;padding:9px 0;font-size:14px}
+ .checkline .ck{color:var(--ok);flex:none;margin-top:2px}
+ #gpsFab{position:fixed;right:18px;bottom:18px;z-index:40;width:52px;height:52px;border-radius:50%;
+     background:var(--panel2);border:1px solid var(--line);color:var(--txt);font-size:20px;cursor:pointer;
+     display:none;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+ .live-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;
+      animation:pulse 1.6s infinite}
+ @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,204,113,.5)}70%{box-shadow:0 0 0 8px rgba(46,204,113,0)}100%{box-shadow:0 0 0 0 rgba(46,204,113,0)}}
+ .offline-banner{background:rgba(255,93,93,.1);border:1px solid rgba(255,93,93,.35);color:#ffb3b3;
+         padding:10px 16px;border-radius:12px;font-size:13px;margin-bottom:16px;display:none}
+ .act-line{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:13.5px}
+ .act-line:last-child{border:none}
+ .act-line .when{color:var(--dim);font:400 11px "IBM Plex Mono";flex:none}
+ .pay-opt{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;
+      padding:14px;cursor:pointer;transition:.15s;margin-bottom:10px}
+ .pay-opt:hover{border-color:var(--dim)}
+ .pay-opt.sel{border-color:var(--acc);background:rgba(255,176,32,.06)}
+ .pay-opt .r{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none;position:relative}
+ .pay-opt.sel .r{border-color:var(--acc)}
+ .pay-opt.sel .r::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--acc)}
+ .truck-row{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;
+       padding:16px;margin-bottom:12px;background:var(--panel);flex-wrap:wrap}
+ .truck-row .info{flex:1;min-width:200px}
+ .truck-row .plate{font:700 12px "IBM Plex Mono";border:1px solid var(--line);padding:2px 8px;border-radius:6px;color:var(--dim)}
+ .swatch{width:14px;height:14px;border-radius:4px;display:inline-block;vertical-align:-2px;margin-right:6px}
+ details.faq{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:var(--panel)}
+ details.faq summary{cursor:pointer;font-weight:600;font-size:14.5px}
+ details.faq p{color:var(--dim);font-size:13.5px;margin-top:10px}
+ .inline-edit{background:transparent;border:none;border-bottom:1px dashed var(--dim);color:var(--txt);
+        font:600 14px "Sora";padding:2px 4px;cursor:pointer}
+ .inline-edit:hover{border-color:var(--acc);color:var(--acc)}
+ .section-title{font-size:13px;font:600 11px "IBM Plex Mono";letter-spacing:2px;color:var(--dim);
+         text-transform:uppercase;margin:26px 0 12px}
+ .how-step{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+ .how-step:last-child{border:none}
+ .how-step .n{width:36px;height:36px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);
+        display:flex;align-items:center;justify-content:center;font:700 14px "Sora";color:var(--acc);flex:none}
+ .how-step h4{font-size:15px;margin-bottom:4px}
+ .how-step p{color:var(--dim);font-size:13.5px}
+ .hidden{display:none !important}
+ .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+ :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:4px}
+
+ /* role-filtered menus: each role only sees its own tools */
+ body.logged-in .guest-only{display:none !important}
+ body.role-admin .m-ship,body.role-admin .m-carr{display:none !important}
+ body.role-carrier .m-ship{display:none !important}
+ body.role-shipper .m-carr{display:none !important}
+ body:not(.role-admin) .m-admin{display:none !important}
+
+ /* ===== one-menu mobile navigation ===== */
+ #menuBtn{display:flex;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--txt);font-size:18px;cursor:pointer;
+  align-items:center;justify-content:center;flex:none}
+ #menuBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;display:none}
+ #menuDrawer{position:fixed;top:66px;left:8px;width:250px;max-width:82vw;z-index:91;
+  background:#f3ecdc;border:1px solid var(--line);border-radius:14px;
+  display:none;flex-direction:column;padding:10px;overflow-y:auto;
+  max-height:calc(100vh - 84px);box-shadow:0 18px 50px rgba(0,0,0,.5)}
+ #menuDrawer.open{display:flex;animation:menuDrop .16s ease}
+ @keyframes menuDrop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+ #menuDrawer .menu-head{display:flex;justify-content:space-between;align-items:center;
+  padding:4px 8px 12px;font-size:16px}
+ #menuDrawer #menuClose{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:0 6px}
+ #menuDrawer #menuClose:hover{color:var(--acc)}
+ #menuDrawer a{display:flex;gap:11px;align-items:center;padding:12px;border-radius:10px;
+  color:var(--txt);text-decoration:none;font-size:15px;margin-bottom:2px}
+ #menuDrawer a:hover{background:rgba(255,176,32,.1)}
+ #menuDrawer .sep{margin:14px 8px 6px;font:600 10px "IBM Plex Mono";letter-spacing:2px;
+  color:var(--dim);text-transform:uppercase}
+ /* ===== mobile bottom tab bar ===== */
+ #bottomBar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:80;
+  background:#f3ecdc;border-top:1px solid var(--line);
+  padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+  grid-template-columns:1fr 1fr 64px 1fr 1fr;align-items:end}
+ #bottomBar a,#bottomBar>button{display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 2px;color:var(--dim);text-decoration:none;font:600 11px "Sora";
+  border:none;background:none;cursor:pointer;border-radius:10px}
+ #bottomBar a.active{color:var(--acc)}
+ #bottomBar .post-tab{width:54px;height:54px;border-radius:50%;margin:-30px auto 2px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));color:#161006;
+  font:800 30px/1 "Sora";display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 20px rgba(255,140,20,.45);border:5px solid var(--bg);padding:0}
+ @media (max-width:900px){
+  #bottomBar{display:grid}
+  main{padding-bottom:86px}
+  .foot{padding-bottom:100px}
+ }
+
+ @media (max-width:900px){
+  nav.main{display:none}
+  #menuBtn{display:flex}
+ }
+ @media (max-width:480px){
+  #navAuth .btn.ghost{display:none}
+  .top-in{gap:10px}
+ }
+
+ /* ===== Uber-style post-a-load ===== */
+ .uber-field{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:4px 10px 4px 16px;margin-bottom:12px;}
+ .u-dot{width:10px;height:10px;border-radius:50%;flex:none;}
+ .u-in{border:none !important;background:transparent !important;padding:13px 0 !important;font-size:16px;}
+ .equip-row{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;cursor:pointer;transition:.15s;}
+ .equip-row:hover{border-color:var(--dim);}
+ .equip-row.sel{border-color:var(--acc);background:rgba(255,176,32,.06);}
+ .equip-row .ei{width:42px;height:42px;border-radius:12px;background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.25);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none;}
+ .equip-row .en{font:600 15px Sora;}
+ .equip-row .eh{color:var(--dim);font-size:12px;}
+ .equip-row .ep{font:700 15px Sora;color:var(--ok);margin-left:auto;}
+
+ /* available-balance hero card */
+ .stat-hero{background:#fffdf6;border:1px solid rgba(255,176,32,.5);border-radius:16px;
+ padding:24px 26px;margin-bottom:14px;position:relative;overflow:hidden;
+ box-shadow:0 10px 30px rgba(0,0,0,.3)}
+ .stat-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;
+ background:linear-gradient(90deg,var(--acc),var(--acc2))}
+ .stat-hero .num{font:800 42px/1.05 "Sora";color:var(--acc)}
+ .stat-hero .lbl{margin-top:8px;font:600 11px "IBM Plex Mono",monospace;letter-spacing:1.2px}
+
+ /* ===== Uber-style driver dashboard ===== */
+ .dash-hero{display:flex;align-items:center;gap:18px;padding:20px 22px}
+ .dash-go{width:92px;height:92px;border-radius:50%;border:none;cursor:pointer;flex:none;
+  font:800 16px "Sora";letter-spacing:1px;color:#161006;transition:.2s;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  box-shadow:0 0 0 8px rgba(255,176,32,.12), 0 10px 28px rgba(255,140,20,.35)}
+ .dash-go.online{background:linear-gradient(135deg,#34d399,#2ecc71);color:#062a1d;
+  box-shadow:0 0 0 8px rgba(52,211,153,.15), 0 10px 28px rgba(52,211,153,.3)}
+ .dash-go:active{transform:scale(.94)}
+ #dash .stat{padding:14px 16px}
+ #dOffers .match,#dNearby .match{border-radius:16px;padding:18px;background:#f3ecdc}
+ #dOffers .match .route,#dNearby .match .route{font-size:16px}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="wrap top-in">
+  <button id="menuBtn" aria-label="Open menu" style="display:flex">&#9776;</button>
+  <a class="logo" href="#home"><span class="mark">W</span>WAYNOK</a>
+  <nav class="main" id="mainNav">
+   <a href="#home" data-nav="home">Home</a>
+   <a href="#loads" data-nav="loads">Load board</a>
+   <a href="#track" data-nav="track">Track</a>
+   <a href="#agent" data-nav="agent">AI dispatcher</a>
+   <a href="#messages" data-nav="msgs">Messages</a>
+   <a href="#profile" data-nav="profile">Profile</a>
+  </nav>
+  <div id="navAuth" style="margin-left:8px;display:flex;align-items:center;gap:10px;"></div>
+ </div>
+</header>
+<div class="notif-panel hidden" id="notifPanel"></div>
+<div id="menuBackdrop"></div>
+<nav id="menuDrawer" aria-label="Menu">
+ <div class="menu-head"><b>Waynok</b><button id="menuClose" aria-label="Close menu">&times;</button></div>
+ <a href="#home" onclick="closeMenu()">Home</a>
+ <a href="#post" class="m-ship" onclick="closeMenu()">Post a load</a>
+ <a href="#loads" id="menuBoard" onclick="closeMenu()">Load board</a>
+ <a href="#track" onclick="closeMenu()">Track drivers</a>
+ <a href="#agent" onclick="closeMenu()">AI dispatcher</a>
+ <a href="#msgs" onclick="closeMenu()">Messages</a>
+ <div class="sep">Drivers</div>
+ <a href="#dash" class="m-carr" onclick="closeMenu()">Driver dashboard</a>
+ <a href="#trucks" class="m-carr" onclick="closeMenu()">My trucks</a>
+ <a href="#truck-new" class="m-carr" onclick="closeMenu()">List a truck</a>
+ <a href="#earn" class="m-carr" onclick="closeMenu()">Earnings calculator</a>
+ <div class="sep">Account</div>
+ <a href="#profile" onclick="closeMenu()">Profile &amp; wallet</a>
+ <a href="#settings" onclick="closeMenu()">Settings</a>
+ <a href="#support" onclick="closeMenu()">Support</a>
+ <div class="sep">Legal</div>
+ <a href="#terms" onclick="closeMenu()">Terms</a>
+ <a href="#privacy" onclick="closeMenu()">Privacy</a>
+ <a href="#refund" onclick="closeMenu()">Refund policy</a>
+ <a href="#admin" class="m-admin" onclick="closeMenu()" style="color:var(--dim)">Admin</a>
+</nav>
+
+<main class="wrap" style="padding-top:24px;padding-bottom:40px;">
+ <div class="offline-banner" id="offlineBanner">You're offline. Reconnect to keep working.</div>
+ <div id="app"></div>
+
+ <!-- ============ LANDING / HOME ============ -->
+ <section id="home" class="tabpage active">
+  <div class="home-hero">
+   <div class="in">
+    <span class="pill"><span class="dot"></span> Live across Ghana</span>
+    <h1>Move freight across Ghana.<br><em>Matched in seconds.</em></h1>
+    <p>Post a load, get matched with a verified driver, track delivery live, and pay securely on delivery — all from your phone.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+     <button class="btn primary" onclick="goTab('post')">Post a load</button>
+     <button class="btn ghost" onclick="goTab('trucks')">I'm a driver</button>
+    </div>
+   </div>
+  </div>
+
+  <div class="grid3" style="margin-bottom:20px;">
+   <div class="stat"><div class="num" id="statLoads">2,000+</div><div class="lbl">LOADS MOVED</div></div>
+   <div class="stat"><div class="num" id="statDrivers">850+</div><div class="lbl">VERIFIED DRIVERS</div></div>
+   <div class="stat"><div class="num" id="statCities">120+</div><div class="lbl">CITIES & TOWNS</div></div>
+  </div>
+
+  <div class="grid3" style="margin-bottom:24px;">
+   <div class="qa" onclick="goTab('post')">
+    <div class="ic"><span class="mono" style="font-weight:700">01</span></div>
+    <h3>Post a load</h3>
+    <p>Origin, destination, weight. Matched with available trucks instantly.</p>
+   </div>
+   <div class="qa" onclick="goTab('track')">
+    <div class="ic"><span class="mono" style="font-weight:700">02</span></div>
+    <h3>Track live</h3>
+    <p>Watch your delivery move across the map in real time.</p>
+   </div>
+   <div class="qa" onclick="goTab('messages')">
+    <div class="ic"><span class="mono" style="font-weight:700">03</span></div>
+    <h3>Negotiate & pay</h3>
+    <p>Chat with your driver, agree terms, pay securely on delivery.</p>
+   </div>
+  </div>
+
+  <div class="panel">
+   <div class="section-title">How it works</div>
+   <div class="how-step"><div class="n">1</div><div><h4>Post your load</h4><p>Tell us what, from where, to where. Takes under a minute.</p></div></div>
+   <div class="how-step"><div class="n">2</div><div><h4>Get matched</h4><p>Nearby verified drivers are notified instantly. Pick one or let us assign the best match.</p></div></div>
+   <div class="how-step"><div class="n">3</div><div><h4>Track & chat</h4><p>Follow the truck live and message the driver throughout the trip.</p></div></div>
+   <div class="how-step"><div class="n">4</div><div><h4>Pay on delivery</h4><p>Confirm receipt and release payment. Everyone's protected.</p></div></div>
+  </div>
+
+  <div class="panel" style="text-align:center;padding:36px;">
+   <h2 style="justify-content:center;">Ready to move?</h2>
+   <p class="hint" style="margin:8px 0 18px;">Join shippers and drivers across Ghana on Waynok.</p>
+   <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <button class="btn primary guest-only" onclick="openAuth('register')">Create free account</button>
+    <button class="btn ghost guest-only" onclick="openAuth('login')">Sign in</button>
+   </div>
+  </div>
+ </section>
+
+ <!-- ============ AUTH MODAL ============ -->
+ <div class="modal" id="authModal">
+  <div class="box">
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 id="authTitle" style="margin:0;">Sign in</h2>
+    <button class="btn ghost sm" onclick="closeAuth()"></button>
+   </div>
+   <div class="seg">
+    <button id="segLogin" class="active" onclick="authMode('login')">Sign in</button>
+    <button id="segRegister" onclick="authMode('register')">Create account</button>
+   </div>
+
+   <div id="authLogin">
+    <label class="hint">Email or phone number</label>
+    <input class="input" id="liEmail" placeholder="you@company.com or 0244…" style="margin:6px 0 14px;">
+    <label class="hint">Password</label>
+    <input class="input" id="liPass" type="password" placeholder="••••••••" style="margin:6px 0 14px;">
+    <div id="liErr" class="error"></div>
+    <button class="btn primary block" onclick="doLogin()" id="liBtn">Sign in</button>
+    <p class="hint" style="margin-top:12px;text-align:center;">
+     <a href="#ref" onclick="closeAuth();goTab('ref');return false;">Forgot password?</a>
+    </p>
+    <button class="btn ghost block" style="margin-top:10px;" onclick="guestIn('shipper')">Try as guest shipper</button>
+    <button class="btn ghost block" style="margin-top:8px;" onclick="guestIn('carrier')">Try as guest driver</button>
+   </div>
+
+   <div id="authRegister" class="hidden">
+    <label class="hint">I am a…</label>
+    <div class="seg" style="margin:6px 0 14px;">
+     <button id="segShipper" class="active" onclick="regRole('shipper')">Shipper</button>
+     <button id="segCarrier" onclick="regRole('carrier')">Driver</button>
+    </div>
+    <div id="regNameWrap">
+     <label class="hint">Full name or company</label>
+     <input class="input" id="regName" placeholder="Dominion Logistics Ltd" style="margin:6px 0 14px;">
+    </div>
+    <div id="regEmailWrap">
+     <label class="hint">Email</label>
+     <input class="input" id="regEmail" placeholder="you@company.com" style="margin:6px 0 14px;">
+    </div>
+    <div id="regPhoneWrap" class="hidden">
+     <label class="hint">Phone number</label>
+     <input class="input" id="regPhone" placeholder="0244 000 000" style="margin:6px 0 14px;">
+     <p class="hint" style="margin:-8px 0 14px;">Register with your phone number (Ghana).</p>
+    </div>
+    <label class="hint">Password</label>
+    <input class="input" id="regPass" type="password" placeholder="Minimum 8 characters" style="margin:6px 0 14px;">
+    <label class="hint">Phone number (for SMS order status and driver arrival alerts)</label>
+    <div style="display:flex;gap:8px;margin:6px 0 14px;">
+     <select class="input" id="regCC" style="max-width:170px;flex:none;"><option value="+233" selected>Ghana (+233)</option><option value="+234">Nigeria (+234)</option><option value="+254">Kenya (+254)</option><option value="+27">South Africa (+27)</option><option value="+20">Egypt (+20)</option><option value="+251">Ethiopia (+251)</option><option value="+255">Tanzania (+255)</option><option value="+256">Uganda (+256)</option><option value="+213">Algeria (+213)</option><option value="+212">Morocco (+212)</option><option value="+221">Senegal (+221)</option><option value="+225">Ivory Coast (+225)</option><option value="+237">Cameroon (+237)</option><option value="+250">Rwanda (+250)</option><option value="+260">Zambia (+260)</option><option value="+263">Zimbabwe (+263)</option><option value="+267">Botswana (+267)</option><option value="+264">Namibia (+264)</option><option value="+258">Mozambique (+258)</option><option value="+223">Mali (+223)</option><option value="+226">Burkina Faso (+226)</option><option value="+227">Niger (+227)</option><option value="+235">Chad (+235)</option><option value="+224">Guinea (+224)</option><option value="+229">Benin (+229)</option><option value="+228">Togo (+228)</option><option value="+241">Gabon (+241)</option><option value="+242">Congo (+242)</option><option value="+243">DR Congo (+243)</option><option value="+244">Angola (+244)</option><option value="+265">Malawi (+265)</option><option value="+266">Lesotho (+266)</option><option value="+268">Eswatini (+268)</option><option value="+252">Somalia (+252)</option><option value="+249">Sudan (+249)</option><option value="+211">South Sudan (+211)</option><option value="+218">Libya (+218)</option><option value="+216">Tunisia (+216)</option><option value="+230">Mauritius (+230)</option><option value="+261">Madagascar (+261)</option><option value="+257">Burundi (+257)</option><option value="+231">Liberia (+231)</option><option value="+232">Sierra Leone (+232)</option><option value="+220">Gambia (+220)</option><option value="+238">Cape Verde (+238)</option><option value="+245">Guinea-Bissau (+245)</option><option value="+240">Equatorial Guinea (+240)</option><option value="+239">Sao Tome & Principe (+239)</option><option value="+269">Comoros (+269)</option><option value="+253">Djibouti (+253)</option><option value="+291">Eritrea (+291)</option><option value="+248">Seychelles (+248)</option><option value="+236">CAR (+236)</option><option value="+222">Mauritania (+222)</option></select>
+     <input class="input" id="regPhoneMain" placeholder="244 000 000" inputmode="numeric">
+    </div>
+    <label class="hint">Referral code <span style="opacity:.6">(optional)</span></label>
+    <input class="input" id="regRef" placeholder="e.g. AB12CD34" style="margin:6px 0 14px;">
+    <div id="regErr" class="error"></div>
+    <button class="btn primary block" onclick="doRegister()" id="regBtn">Create account</button>
+    <p class="hint" style="margin-top:10px;text-align:center;">By continuing you agree to our
+     <a href="#terms" onclick="closeAuth();goTab('terms');return false;">Terms</a> and
+     <a href="#privacy" onclick="closeAuth();goTab('privacy');return false;">Privacy Policy</a>.</p>
+   </div>
+  </div>
+ </div>
+
+ <!-- ============ LOAD BOARD ============ -->
+ <section id="loads" class="tabpage">
+  <div class="panel">
+   <h2>Load board <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· open loads across Ghana</span>
+    <button class="btn primary sm" style="margin-left:auto;" onclick="goTab('post')">+ Post a load</button>
+    <button class="ghost btn sm" onclick="refreshLoads(true)">Refresh</button></h2>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="loadFilters">
+    <button class="fchip active" data-f="all">All</button>
+    <button class="fchip" data-f="flatbed">Flatbed</button>
+    <button class="fchip" data-f="box">Box truck</button>
+    <button class="fchip" data-f="tanker">Tanker</button>
+    <button class="fchip" data-f="tipper">Tipper</button>
+    <button class="fchip" data-f="reefer">Reefer</button>
+   </div>
+   <div id="loadList"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+  </div>
+ </section>
+
+ <!-- ============ POST A LOAD (Uber-style) ============ -->
+ <section id="post" class="tabpage">
+  <div class="panel" style="max-width:560px;margin:0 auto;padding:0;overflow:hidden;">
+   <div id="postMap" style="height:190px;background:#efe7d5;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px;text-align:center;padding:0 30px;">Your load, matched like a ride — fill Where from / Where to and prices appear instantly</div>
+   <div style="padding:20px 22px 14px;">
+    <div class="uber-field">
+     <span class="u-dot" style="background:var(--ok)"></span>
+     <input class="input u-in" id="poOrigin" placeholder="Where from?" oninput="quoteDebounce()">
+     <button class="btn ghost sm" title="Use my location" onclick="useMyLocation('poOrigin');quoteDebounce();"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:-2px"><path d="M12 21s-6.5-5.6-6.5-10.2A6.5 6.5 0 0 1 12 4.5a6.5 6.5 0 0 1 6.5 6.3C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.6" r="2.2"/></svg> GPS</button>
+    </div>
+    <div class="uber-field">
+     <span class="u-dot" style="background:var(--bad)"></span>
+     <input class="input u-in" id="poDest" placeholder="Where to?" oninput="quoteDebounce()">
+    </div>
+    <input id="poOriginLat" type="hidden"><input id="poOriginLng" type="hidden">
+    <input id="poDestLat" type="hidden"><input id="poDestLng" type="hidden">
+    <div style="display:flex;gap:8px;margin:2px 0 14px;">
+     <input class="input" id="poWeight" type="number" min="1" placeholder="Weight (kg) — e.g. 5000" style="flex:1;" oninput="quoteDebounce()">
+     <input class="input" id="poPickup" type="datetime-local" style="flex:1;">
+    </div>
+    <div class="hint" style="margin-bottom:8px;font:600 11px 'IBM Plex Mono';letter-spacing:1.5px;">PAYMENT METHOD</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="payMethods">
+     <button class="fchip active" data-pm="momo">MoMo</button>
+     <button class="fchip" data-pm="card">Card</button>
+     <button class="fchip" data-pm="cash">Cash on delivery</button>
+     <button class="fchip" data-pm="balance">Waynok balance</button>
+    </div>
+    <div class="hint" id="pmNote" style="margin:-6px 0 12px;font-size:12px;">Pay now with mobile money via Paystack.</div>
+    <div class="hint" style="margin-bottom:8px;font:600 11px 'IBM Plex Mono';letter-spacing:1.5px;">CHOOSE YOUR TRUCK</div>
+    <div id="equipRows"></div>
+    <div id="poErr" class="error"></div>
+    <div id="poOk" class="ok"></div>
+   </div>
+   <div style="padding:16px 22px;border-top:1px solid var(--line);background:#f3ecdc;display:flex;align-items:center;gap:16px;">
+    <div style="flex:1;">
+     <div class="hint" style="font-size:10px;letter-spacing:1.5px;">TOTAL PRICE</div>
+     <div id="poQuote" style="font:800 24px Sora;color:var(--acc);">—</div>
+     <div class="hint" style="font-size:11px;">pay on delivery</div>
+    </div>
+    <button class="btn primary" style="flex:1.4;padding:16px;font-size:16px;" id="poBtn" onclick="postLoad()">Request driver</button>
+   </div>
+  </div>
+ </section>
+
+ <!-- ============ TRACK (LIVE MAP) ============ -->
+ <section id="track" class="tabpage">
+  <div class="panel">
+   <h2>Live tracking <span class="pill"><span class="live-dot"></span> drivers online now</span></h2>
+   <div id="mapShell" class="map-shell" style="height:460px;"></div>
+   <p class="hint" style="margin-top:10px;">Drivers appear here when they go online. Select one of your loads to follow its truck.</p>
+   <div id="trackLoads" style="margin-top:14px;"></div>
+   <div id="trackEta" class="hint" style="margin-top:12px;font-size:13px;"></div>
+  </div>
+ </section>
+
+ <!-- ============ AI DISPATCHER ============ -->
+ <section id="agent" class="tabpage">
+  <div class="panel" style="max-width:680px;margin:0 auto;">
+   <h2>AI dispatcher</h2>
+   <p class="hint" style="margin-bottom:14px;">Ask anything about moving freight — pricing, routes, documents, regulations.</p>
+   <div id="agentThread" style="min-height:220px;max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+    <div class="msg other">Hello how can I help today?</div>
+   </div>
+   <div style="display:flex;gap:10px;">
+    <input class="input" id="agentInput" placeholder="How much to move 5t Accra Kumasi?" onkeydown="if(event.key==='Enter')askAgent()">
+    <button class="btn primary" onclick="askAgent()">Send</button>
+   </div>
+  </div>
+ </section>
+
+ <!-- ============ MESSAGES ============ -->
+ <section id="msgs" class="tabpage">
+  <div class="panel">
+   <h2>Messages</h2>
+   <div class="chat-shell">
+    <div class="chat-list" id="convList"><div class="empty">No conversations yet. Negotiate from a load to start one.</div></div>
+    <div class="chat-main">
+     <div style="flex:1;display:flex;align-items:center;justify-content:center;" class="hint" id="convPlaceholder">Select a conversation</div>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- ============ CHAT THREAD ============ -->
+ <section id="chat" class="tabpage">
+  <div class="panel">
+   <div class="chat-head" style="padding:0 0 14px;">
+    <button class="btn ghost sm" onclick="goTab('msgs')"> Back</button>
+    <div><b id="chatTitle">Chat</b><div class="hint" id="chatLoadInfo" style="margin:-6px 0 14px;"></div></div>
+    <a class="btn ghost sm hidden" id="chatCall" style="margin-left:auto;" title="Call the other party">
+     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z"/></svg>
+     Call</a>
+   </div>
+   <div class="chat-shell" style="height:520px;">
+    <div class="chat-main" style="grid-column:1 / -1;">
+     <div class="chat-body" id="chatThread"></div>
+     <div style="display:flex;gap:8px;padding:0 14px 10px;flex-wrap:wrap;">
+      <input class="input" id="chatPrice" type="number" placeholder="Price ₵ (optional)" style="max-width:170px;">
+      <input class="input" id="chatTime" type="datetime-local" style="max-width:200px;">
+      <input class="input" id="chatLoc" placeholder="Pickup location (optional)">
+     </div>
+     <div class="chat-foot">
+      <input class="input" id="chatInput" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn primary" onclick="sendChat()">Send</button>
+     </div>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- ============ PROFILE ============ -->
+ <section id="profile" class="tabpage">
+  <div style="max-width:640px;margin:0 auto;">
+   <div class="panel" style="text-align:center;">
+    <div class="avatar big-av" id="pfAvatar">?</div>
+    <h2 id="pfName" style="justify-content:center;">—</h2>
+    <div style="display:flex;gap:8px;justify-content:center;margin:10px 0;" id="pfBadges"></div>
+    <div class="kv"><span class="hint">Email / phone</span><b id="pfEmail" class="mono" style="font-size:12px;">—</b></div>
+    <div class="kv"><span class="hint">Wallet balance</span><b id="pfWallet">₵0.00</b></div>
+    <div class="kv"><span class="hint">Member since</span><b id="pfSince">—</b></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+     <button class="btn ghost sm" onclick="goTab('settings')">Settings</button>
+     <button class="btn ghost sm" onclick="logout()">Log out</button>
+    </div>
+   </div>
+   <div class="panel">
+    <div class="section-title">Referrals — earn GHS 20 per signup</div>
+    <div class="ref-code" id="pfRefCode">--------</div>
+    <button class="btn primary block copy-btn" onclick="copyRef()">Copy invite link</button>
+    <div class="grid3" style="margin-top:14px;">
+     <div class="stat"><div class="num" id="rfSignups">0</div><div class="lbl">SIGNUPS</div></div>
+     <div class="stat"><div class="num" id="rfEarned">₵0</div><div class="lbl">EARNED</div></div>
+     <div class="stat"><div class="num" id="rfPending">₵0</div><div class="lbl">PENDING</div></div>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- ============ TRUCKS ============ -->
+ <section id="trucks" class="tabpage">
+  <div class="panel">
+   <h2>My trucks <button class="btn primary sm" style="margin-left:auto;" onclick="goTab('truck-new')">+ List a truck</button></h2>
+   <div id="truckList"><div class="empty">No trucks yet. List your first truck to start receiving loads.</div></div>
+  </div>
+ </section>
+
+ <!-- ============ LIST A TRUCK ============ -->
+ <section id="truck-new" class="tabpage">
+  <div class="panel" style="max-width:560px;margin:0 auto;">
+   <h2>List your truck</h2>
+   <label class="hint">Truck name / description</label>
+   <input class="input" id="ltName" placeholder="Volvo FH12 — long chassis" style="margin:6px 0 14px;">
+   <div class="grid2">
+    <div>
+     <label class="hint">Plate number</label>
+     <input class="input" id="ltPlate" placeholder="GR 1234-22" style="margin:6px 0 14px;">
+    </div>
+    <div>
+     <label class="hint">Equipment type</label>
+     <select class="input" id="ltEquip" style="margin:6px 0 14px;">
+      <option value="flatbed">Flatbed</option>
+      <option value="box">Box truck</option>
+      <option value="tanker">Tanker</option>
+      <option value="tipper">Tipper</option>
+      <option value="reefer">Reefer</option>
+     </select>
+    </div>
+   </div>
+   <label class="hint">Capacity (kg)</label>
+   <input class="input" id="ltCapacity" type="number" min="1" placeholder="10000" style="margin:6px 0 14px;">
+   <label class="hint">Base city</label>
+   <input class="input" id="ltCity" placeholder="Accra" style="margin:6px 0 14px;">
+   <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <input class="input" id="ltLat" placeholder="Lat" type="number" step="any">
+    <input class="input" id="ltLng" placeholder="Lng" type="number" step="any">
+   </div>
+   <button class="btn ghost sm" onclick="useMyLocation('lt')" style="margin-bottom:14px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:-2px"><path d="M12 21s-6.5-5.6-6.5-10.2A6.5 6.5 0 0 1 12 4.5a6.5 6.5 0 0 1 6.5 6.3C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.6" r="2.2"/></svg> Use my current location</button>
+   <div id="ltErr" class="error"></div>
+   <button class="btn primary block" onclick="listTruck()" id="ltBtn">Go live on the board</button>
+   <p class="hint" style="margin-top:10px;">Going live shares your position with nearby shippers and matches you with open loads instantly.</p>
+  </div>
+ </section>
+
+ <!-- ============ DRIVER DASHBOARD (Uber-style) ============ -->
+ <section id="dash" class="tabpage hidden">
+  <div class="panel dash-hero">
+   <button class="dash-go" id="dOnline">GO</button>
+   <div style="flex:1;min-width:200px;">
+    <div style="font:700 17px 'Sora';">Driver HQ</div>
+    <div class="hint" id="dStatus" style="margin-top:4px;">Tap GO to start receiving loads and share your live position with clients.</div>
+   </div>
+  </div>
+  <div class="stat stat-hero">
+   <div class="num" id="dAvail">₵0</div>
+   <div class="lbl">AVAILABLE BALANCE — withdraw to MoMo or bank anytime</div>
+  </div>
+  <div class="grid3" style="margin-bottom:20px;">
+   <div class="stat"><div class="num" id="dCurrent">₵0</div><div class="lbl">CURRENT BALANCE</div></div>
+   <div class="stat"><div class="num" id="dPending">₵0</div><div class="lbl">PENDING</div></div>
+   <div class="stat"><div class="num" id="dWallet">₵0</div><div class="lbl">WALLET</div></div>
+  </div>
+  <div class="panel">
+   <h2>My orders <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· accepted loads — track, chat, and complete them here</span>
+    <button class="ghost btn sm" style="margin-left:auto;" id="myOrdersRefresh">Refresh</button></h2>
+   <div id="myOrders"><p class="hint">Orders you accept appear here — claim one from the offers or nearby loads below.</p></div>
+  </div>
+  <div class="panel">
+   <h2>Payout method <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· where your money goes when clients pay on the site</span></h2>
+   <div class="grid2">
+    <div>
+     <label class="hint">Mobile money provider</label>
+     <select class="input" id="pdMomoProvider" style="margin:6px 0 12px;">
+      <option value="">—</option><option>MTN</option><option>Vodafone</option>
+      <option>Telecel</option><option>AirtelTigo</option>
+     </select>
+     <label class="hint">MoMo number</label>
+     <input class="input" id="pdMomoNumber" placeholder="0244 000 000" style="margin:6px 0 12px;">
+    </div>
+    <div>
+     <label class="hint">Bank name</label>
+     <input class="input" id="pdBankName" placeholder="Ecobank" style="margin:6px 0 12px;">
+     <label class="hint">Account name</label>
+     <input class="input" id="pdAcctName" placeholder="Name on account" style="margin:6px 0 12px;">
+    </div>
+   </div>
+   <label class="hint">Account number</label>
+   <input class="input" id="pdAcctNumber" placeholder="0123456789" style="margin:6px 0 12px;">
+   <div id="pdMsg" class="ok"></div>
+   <button class="btn primary" id="pdSave">Save payout details</button>
+  </div>
+  <div class="panel">
+   <h2>Load offers <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· matched to your trucks — Accept to claim</span></h2>
+   <div id="dOffers"><p class="hint">Go online and list a truck — offers appear here the moment a matching load is posted.</p></div>
+  </div>
+  <div class="panel">
+   <h2>Nearby loads <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· all open loads — Accept to claim one</span></h2>
+   <div id="dNearby"><p class="hint">All open loads appear here — Accept to claim one.</p></div>
+  </div>
+ </section>
+
+ <!-- ============ EARN CALCULATOR ============ -->
+ <section id="earn" class="tabpage">
+  <div class="panel" style="max-width:560px;margin:0 auto;">
+   <h2>Earnings calculator</h2>
+   <label class="hint">Distance (km)</label>
+   <input class="input" id="erKm" type="number" placeholder="270" style="margin:6px 0 14px;">
+   <label class="hint">Load weight (kg)</label>
+   <input class="input" id="erWeight" type="number" placeholder="5000" style="margin:6px 0 14px;">
+   <button class="btn primary block" onclick="calcEarn()">Calculate my earnings</button>
+   <div id="erOut" style="margin-top:16px;"></div>
+  </div>
+ </section>
+
+ <!-- ============ SETTINGS ============ -->
+ <section id="settings" class="tabpage">
+  <div class="panel" style="max-width:560px;margin:0 auto;">
+   <h2>Settings</h2>
+   <label class="hint">Company / display name</label>
+   <input class="input" id="stName" style="margin:6px 0 14px;">
+   <label style="display:flex;gap:10px;align-items:center;margin-bottom:16px;cursor:pointer;">
+    <input type="checkbox" id="stEmailNotif" checked> <span>Email me about matches and payments</span>
+   </label>
+   <div id="stMsg" class="ok"></div>
+   <button class="btn primary" onclick="saveSettings()">Save settings</button>
+  </div>
+ </section>
+
+ <!-- ============ FORGOT / RESET ============ -->
+ <section id="ref" class="tabpage">
+  <div class="panel" style="max-width:440px;margin:0 auto;">
+   <h2>Reset password</h2>
+   <label class="hint">Email or phone</label>
+   <input class="input" id="fpEmail" style="margin:6px 0 14px;">
+   <div id="fpMsg" class="ok"></div>
+   <div id="fpErr" class="error"></div>
+   <button class="btn primary block" onclick="doForgot()">Email me a reset link</button>
+  </div>
+ </section>
+ <section id="reset" class="tabpage">
+  <div class="panel" style="max-width:440px;margin:0 auto;">
+   <h2>Choose a new password</h2>
+   <label class="hint">New password</label>
+   <input class="input" id="rsPass" type="password" style="margin:6px 0 14px;">
+   <div id="rsMsg" class="ok"></div>
+   <div id="rsErr" class="error"></div>
+   <button class="btn primary block" onclick="doReset()">Update password</button>
+  </div>
+ </section>
+
+ <!-- ============ SUPPORT ============ -->
+ <section id="support" class="tabpage">
+  <div class="panel" style="max-width:680px;margin:0 auto;">
+   <h2>Support</h2>
+   <details class="faq"><summary>How do I post a load?</summary><p>Open the Load board and tap "Post a load". Fill in origin, destination, weight and pickup time — you'll be matched with drivers instantly.</p></details>
+   <details class="faq"><summary>When does the driver get paid?</summary><p>When you confirm delivery, the payment is released to the driver's withdrawable balance. Drivers withdraw to MoMo or bank.</p></details>
+   <details class="faq"><summary>How do driver earnings work?</summary><p>Drivers keep 85% of the quoted price. The remaining 15% covers platform operations and payment processing.</p></details>
+   <details class="faq"><summary>Contact us</summary><p>Email support@waynok.net and we will reply within one business day.</p></details>
+   <div class="panel" style="margin-top:18px;max-width:560px;">
+    <h3 style="margin-bottom:6px;">File an insurance claim</h3>
+    <p class="hint" style="margin-bottom:12px;">Accident or cargo loss? Both parties submit evidence and Waynok compensates up to GHS 1,000,000. Reviewed within 72 hours (3 business days).</p>
+    <input class="input" id="clLoad" placeholder="Load ID" style="margin-bottom:10px;">
+    <textarea class="input" id="clDesc" placeholder="What happened?" style="margin-bottom:10px;min-height:80px;"></textarea>
+    <input class="input" id="clEvid" placeholder="Evidence summary (photos, police report ref, etc.)" style="margin-bottom:12px;">
+    <button class="btn primary" onclick="fileClaim()">Submit claim</button>
+    <div id="clMsg" class="ok" style="margin-top:10px;"></div>
+   </div>
+  </div>
+ </section>
+
+ <!-- ============ TERMS / PRIVACY / REFUND ============ -->
+ <section id="terms" class="tabpage">
+  <div class="panel prose" style="max-width:720px;margin:0 auto;">
+   <h2>Terms of service</h2>
+   <h3>1. The service</h3>
+   <p>Waynok connects shippers with independent truck drivers across Ghana. Waynok is a marketplace, not a carrier; the contract of carriage is between shipper and driver.</p>
+   <h3>2. Accounts</h3>
+   <p>You must provide accurate information. One account per person or company. You are responsible for activity under your account.</p>
+   <h3>3. Payments</h3>
+   <p>Quoted prices are system-generated from distance, weight and equipment. Shippers pay on delivery confirmation. Drivers receive 85% of the quoted price.</p>
+   <h3>4. Conduct</h3>
+   <p>No fraudulent loads, no off-platform payment solicitation, no abuse of other users. Violations lead to suspension.</p>
+   <h3>5. Insurance &amp; compensation</h3>
+   <p>Waynok provides accident compensation coverage of up to <b>GHS 1,000,000</b> per incident when both the shipper and the carrier provide sufficient evidence (photos, police report where applicable, and delivery documentation). Claims are reviewed within <b>72 hours (3 business days)</b> and approved payouts are paid within the same window.</p>
+   <h3>6. Liability</h3>
+   <p>Waynok facilitates matching and payment but is not liable for loss or damage to cargo. Drivers are responsible for the goods in their custody.</p>
+  </div>
+ </section>
+ <section id="privacy" class="tabpage">
+  <div class="panel prose" style="max-width:720px;margin:0 auto;">
+   <h2>Privacy policy</h2>
+   <h3>What we collect</h3>
+   <ul><li>Account details you give us: name, email or phone, payout details.</li>
+   <li>Load details you post and location you share while online.</li>
+   <li>Usage data that helps us keep the service fast and secure.</li></ul>
+   <h3>How we use it</h3>
+   <ul><li>To match loads with drivers and run payments.</li>
+   <li>To show your live position only while you are online, and only on the live map.</li>
+   <li>To send service emails you can switch off in Settings.</li></ul>
+   <h3>What we never do</h3>
+   <p>We never sell your data. We never share your payout details with other users.</p>
+   <h3>Your control</h3>
+   <p>Email privacy@waynok.net to export or delete your account data.</p>
+  </div>
+ </section>
+ <section id="refund" class="tabpage">
+  <div class="panel prose" style="max-width:720px;margin:0 auto;">
+   <h2>Refund policy</h2>
+   <h3>Shippers</h3>
+   <p>If a load is cancelled before pickup, your payment is refunded in full within <b>72 hours (3 business days)</b>. If delivery fails after pickup, contact support with your load ID for a full review.</p>
+   <h3>Drivers</h3>
+   <p>Earnings already released to your balance are yours. Withdrawals are processed within 48 hours to your saved MoMo or bank account.</p>
+   <h3>Disputes</h3>
+   <p>Email support@waynok.net with your load ID. We resolve most disputes within 72 hours.</p>
+  </div>
+ </section>
+
+ <!-- ============ ADMIN ============ -->
+ <section id="admin" class="tabpage hidden">
+  <div class="panel">
+   <h2>Admin</h2>
+  <div class="grid4" style="margin-bottom:16px;">
+   <div class="stat"><div class="num" id="adTotal">0</div><div class="lbl">TOTAL ORDERS</div></div>
+   <div class="stat"><div class="num" id="adDone" style="color:var(--ok)">0</div><div class="lbl">TASK COMPLETE</div></div>
+   <div class="stat"><div class="num" id="adPending" style="color:var(--warn)">0</div><div class="lbl">TASK PENDING</div></div>
+   <div class="stat"><div class="num" id="adCancelled" style="color:var(--bad)">0</div><div class="lbl">TASK CANCELED</div></div>
+  </div>
+  <div class="grid3" style="margin-bottom:16px;">
+   <div class="stat"><div class="num" id="adRevenue">₵0</div><div class="lbl">PLATFORM REVENUE (COMMISSION)</div></div>
+   <div class="stat"><div class="num" id="adBalAvail">₵0</div><div class="lbl">AVAILABLE BALANCE HELD</div></div>
+   <div class="stat"><div class="num" id="adBalCurrent">₵0</div><div class="lbl">CURRENT BALANCE (INCL. PENDING)</div></div>
+  </div>
+  <div class="panel" style="max-width:560px;">
+   <h2>System charge &amp; fare</h2>
+   <p class="hint" style="margin-bottom:12px;">These apply instantly to every new quote and payment.</p>
+   <div class="grid2">
+    <div>
+     <label class="hint">Fare markup (x base estimate)</label>
+     <input class="input" id="prMarkup" type="number" step="0.05" min="1" max="3" style="margin:6px 0 12px;">
+    </div>
+    <div>
+     <label class="hint">Platform commission (% of fare)</label>
+     <input class="input" id="prComm" type="number" step="0.5" min="5" max="40" style="margin:6px 0 12px;">
+    </div>
+   </div>
+   <div id="prMsg" class="ok"></div>
+   <button class="btn primary" onclick="savePricing()">Save pricing</button>
+  </div>
+  <div class="panel">
+   <h2>Orders <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">· every load on the platform</span>
+    <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;" id="adFilters">
+     <button class="fchip active" data-af="all">All</button>
+     <button class="fchip" data-af="pending">Pending</button>
+     <button class="fchip" data-af="completed">Complete</button>
+     <button class="fchip" data-af="cancelled">Canceled</button>
+    </span></h2>
+   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Route</th><th>Shipper</th><th>Status</th><th>Payment</th><th>Price</th><th></th></tr></thead><tbody id="adOrdersBody"></tbody></table></div>
+  </div>
+  <div class="panel">
+   <h2>Live activity <span class="pill"><span class="live-dot"></span> streaming</span></h2>
+   <div id="adActivity" style="max-height:320px;overflow-y:auto;"><p class="hint">Loading activity…</p></div>
+  </div>
+   <h3 style="margin:14px 0 8px;">Messages monitor</h3>
+   <p class="hint" style="margin-bottom:8px;">Every shipper-driver conversation. Click one to read it.</p>
+   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Load</th><th>Route</th><th>Shipper</th><th>Driver</th><th>Msgs</th></tr></thead><tbody id="adConvsBody"></tbody></table></div>
+   <div id="adConvMsgs" style="margin:14px 0;display:none;"></div>
+   <h3 style="margin:14px 0 8px;">Users</h3>
+   <div style="overflow-x:auto;"><table class="tb"><thead><tr><th>ID</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody id="adUsersBody"></tbody></table></div>
+  </div>
+ </section>
+
+ <div class="foot">
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+   <span>© 2026 Waynok. Move freight across Ghana. <b class="mono" style="font-size:10px;color:var(--dim)">build 2026-09-28.3</b></span>
+   <span style="display:flex;gap:16px;">
+    <a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#refund">Refunds</a><a href="#support">Support</a>
+   </span>
+  </div>
+ </div>
+</main>
+
+<nav id="bottomBar" aria-label="Mobile navigation">
+ <a href="#home" data-bnav="home">Home</a>
+ <a href="#loads" data-bnav="loads" id="bbLoads" class="m-ship">Loads</a>
+ <button class="post-tab m-ship" onclick="goTab('post')" aria-label="Post a load">+</button>
+ <a href="#track" data-bnav="track">Track</a>
+ <button onclick="openMenu()" aria-label="More">More</button>
+</nav>
+<div class="toast" id="toast"></div>
+<button id="gpsFab" title="Go online"></button>
+
+<script>
+/* ---- kill any stale service worker: it can serve cached old pages past no-store ---- */
+if ("serviceWorker" in navigator) {
+ navigator.serviceWorker.getRegistrations().then(function (rs) {
+  rs.forEach(function (r) { r.unregister(); });
+ }).catch(function () {});
+}
+
+/* ---- on-screen error reporter: any JS error draws itself here ---- */
+window.addEventListener("error", function (e) {
+ var d = document.getElementById("errBox");
+ if (!d) {
+  d = document.createElement("div");
+  d.id = "errBox";
+  d.style.cssText = "position:fixed;bottom:8px;left:8px;right:8px;background:#ffe9e9;color:#8a0000;border:2px solid #c00;border-radius:8px;padding:10px 12px;font:12px/1.5 monospace;z-index:999999;white-space:pre-wrap;max-height:45vh;overflow:auto";
+  document.body.appendChild(d);
+ }
+ d.textContent += (e.message || (e.error && e.error.message) || "error") + "  @ " + String(e.filename || "").split("/").pop() + ":" + e.lineno + "\n";
+});
+window.addEventListener("unhandledrejection", function (e) {
+ var d = document.getElementById("errBox");
+ if (!d) {
+  d = document.createElement("div");
+  d.id = "errBox";
+  d.style.cssText = "position:fixed;bottom:8px;left:8px;right:8px;background:#ffe9e9;color:#8a0000;border:2px solid #c00;border-radius:8px;padding:10px 12px;font:12px/1.5 monospace;z-index:999999;white-space:pre-wrap;max-height:45vh;overflow:auto";
+  document.body.appendChild(d);
+ }
+ d.textContent += "Promise: " + (e.reason && e.reason.message ? e.reason.message : e.reason) + "\n";
+});
+
+/* ================= Waynok SPA ================= */
+const $ = id => document.getElementById(id);
+const API_BASE = "";           // same origin; served by the FastAPI app
+let token = localStorage.getItem("waynok_token") || "";
+let guestId = localStorage.getItem("waynok_guest") || "";
+let me = null, myRole = null, myUid = null, myWallet = 0;
+let online = false, curConv = null, curChatPoll = null, map = null, mapMarkers = {};
+let regRoleSel = "shipper", authTab = "login", phoneMode = false;
+let notifTimer = null, convPoll = null;
+
+function toast(msg, isErr) {
+ const t = $("toast");
+ t.textContent = msg;
+ t.className = "toast show" + (isErr ? " err" : "");
+ clearTimeout(t._h);
+ t._h = setTimeout(() => t.className = "toast", 3200);
+}
+
+async function api(path, opts = {}) {
+ const headers = Object.assign({}, opts.headers || {});
+ if (opts.body) headers["Content-Type"] = "application/json";
+ if (token) headers["Authorization"] = "Bearer " + token;
+ else if (guestId) headers["X-Guest-Id"] = guestId;
+ const res = await fetch(API_BASE + path, Object.assign({}, opts, { headers }));
+ if (res.status === 401 && !path.startsWith("/auth/")) {
+  // session expired quietly: stay on page, but clear stale token
+  if (token) { token = ""; localStorage.removeItem("waynok_token"); renderNav(); }
+ }
+ let data = null;
+ try { data = await res.json(); } catch (e) { /* non-JSON */ }
+ if (!res.ok) throw new Error((data && data.detail) || ("HTTP " + res.status));
+ return data;
+}
+
+function fmtGHS(x) { return "₵" + Number(x || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtDT(s) { if (!s) return ""; const d = new Date(s); return d.toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+/* ---------------- tabs / routing ---------------- */
+const TABS = ["home", "loads", "post", "track", "agent", "msgs", "chat", "profile", "trucks", "truck-new",
+       "dash", "earn", "settings", "support", "terms", "privacy", "refund", "admin", "ref", "reset"];
+function goTab(name) {
+ if (!TABS.includes(name)) name = "home";
+ if (name === "loads" && myRole === "shipper") name = "dash";
+ document.querySelectorAll(".tabpage").forEach(s => s.classList.remove("active"));
+ const el = $(name); if (el) { el.classList.remove("hidden"); el.classList.add("active"); }
+ document.querySelectorAll("nav.main a").forEach(a =>
+  a.classList.toggle("active", a.dataset.nav === name));
+ location.hash = name === "home" ? "#home" : "#" + name;
+ document.querySelectorAll("#bottomBar [data-bnav]").forEach(a =>
+  a.classList.toggle("active", a.dataset.bnav === name));
+ if (name === "post" && !$("poOriginLat").value && navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(p => {
+   $("poOriginLat").value = p.coords.latitude.toFixed(6);
+   $("poOriginLng").value = p.coords.longitude.toFixed(6);
+   quoteDebounce();
+  });
+ }
+ if (name === "loads") refreshLoads();
+ if (name === "track") initMap();
+ if (name === "msgs") { refreshConversations(); }
+ if (name === "dash") loadDashboard();
+ if (name === "profile") loadProfile();
+ if (name === "trucks") refreshTrucks();
+ if (name === "settings") loadSettings();
+ if (name === "admin") loadAdmin();
+ window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", () => routeHash());
+function routeHash() {
+ const h = (location.hash || "#home").slice(1);
+ if (h.startsWith("verify")) return;     // handled by boot
+ if (h.startsWith("reset")) return;
+ if (h.startsWith("ref")) return;
+ goTab(h.split("?")[0] || "home");
+ if (h.startsWith("loads") && h.includes("paid=1")) toast("Payment received — your load is paid.");
+}
+
+/* ---------------- boot ---------------- */
+window.addEventListener("DOMContentLoaded", () => {
+ $("loadFilters").addEventListener("click", e => {
+  const b = e.target.closest(".fchip"); if (!b) return;
+  document.querySelectorAll("#loadFilters .fchip").forEach(c => c.classList.remove("active"));
+  b.classList.add("active"); refreshLoads();
+ });
+ $("myOrdersRefresh").onclick = () => loadMyOrders();
+ $("dOnline").onclick = () => setOnline(!online);
+ $("pdSave").onclick = savePayout;
+ renderEquipRows();
+ document.querySelectorAll('[data-nav]').forEach(a => a.addEventListener("click", e => {
+  e.preventDefault(); goTab(a.dataset.nav);
+ }));
+ renderNav();
+ const h = location.hash;
+ if (h.startsWith("#verify")) {
+  const tk = new URLSearchParams(h.split("?")[1] || "").get("token");
+  if (tk) api("/auth/verify-email?token=" + encodeURIComponent(tk)).then(() => {
+   toast("Email verified "); location.hash = "#profile"; boot();
+  }).catch(e => toast(e.message, true));
+  return;
+ }
+ if (h.startsWith("#reset")) {
+  goTab("reset");
+  $("rsPass").dataset.token = new URLSearchParams(h.split("?")[1] || "").get("token") || "";
+  return;
+ }
+ if (h.startsWith("#ref")) { goTab("ref"); return; }
+ boot();
+});
+function boot() {
+ if (token) enterApp(); else goTab("home");
+}
+function enterApp() {
+ loadMe().then(async () => {
+  if (!token || !myRole) { goTab("home"); return; }
+  if (me && me.is_admin) { goTab("admin"); return; }
+  goTab("dash");
+  if (navigator.geolocation) navigator.geolocation.getCurrentPosition(() => {}, () => {});
+ });
+}
+
+/* ---------------- auth ---------------- */
+function openAuth(mode) { authMode(mode || "login"); $("authModal").classList.add("open"); }
+function closeAuth() { $("authModal").classList.remove("open"); }
+function authMode(m) {
+ authTab = m;
+ $("segLogin").classList.toggle("active", m === "login");
+ $("segRegister").classList.toggle("active", m === "register");
+ $("authLogin").classList.toggle("hidden", m !== "login");
+ $("authRegister").classList.toggle("hidden", m !== "register");
+ $("authTitle").textContent = m === "login" ? "Sign in" : "Create your account";
+}
+function regRole(r) {
+ regRoleSel = r;
+ $("segShipper").classList.toggle("active", r === "shipper");
+ $("segCarrier").classList.toggle("active", r === "carrier");
+}
+async function doLogin() {
+ $("liErr").textContent = "";
+ $("liBtn").disabled = true;
+ try {
+  const d = await api("/auth/login", { method: "POST", body: JSON.stringify({ email: $("liEmail").value.trim(), password: $("liPass").value }) });
+  token = d.access_token; localStorage.setItem("waynok_token", token);
+  closeAuth(); enterApp();
+  toast("Welcome back" + (d.user ? ", " + (d.user.company_name || "") : ""));
+  setTimeout(checkPhoneVerification, 800);
+  if (navigator.geolocation) navigator.geolocation.getCurrentPosition(() => {});
+  if ("Notification" in window && Notification.permission === "default") {
+   Notification.requestPermission().then(p => { if (p === "granted") enablePush(); });
+  } else if ("Notification" in window && Notification.permission === "granted") {
+   enablePush();
+  }
+ } catch (e) { $("liErr").textContent = e.message; }
+ $("liBtn").disabled = false;
+}
+async function doRegister() {
+ $("regErr").textContent = "";
+ $("regBtn").disabled = true;
+ try {
+  const d = await api("/auth/register", { method: "POST", body: JSON.stringify({
+   email: $("regEmail").value.trim(), password: $("regPass").value,
+   name: $("regName").value.trim(), role: regRoleSel,
+   phone: (function () {
+     var digits = $("regPhoneMain").value.replace(/\D/g, "");
+     return digits ? $("regCC").value + digits : null;
+    })(),
+   referral_code: $("regRef").value.trim() || null }) });
+  token = d.access_token; localStorage.setItem("waynok_token", token);
+  if (d.user && d.user.company_name) localStorage.setItem("waynok_name", d.user.company_name);
+  closeAuth(); enterApp();
+  toast("Account created — welcome to Waynok");
+  setTimeout(checkPhoneVerification, 800);
+  if (navigator.geolocation) navigator.geolocation.getCurrentPosition(() => {});
+  if (d.user && d.user.role === "carrier") { goTab("dash"); setTimeout(() => setOnline(true), 400); }
+  else if (d.user && d.user.role === "shipper") { goTab("post"); }
+ } catch (e) { $("regErr").textContent = e.message; }
+ $("regBtn").disabled = false;
+}
+function guestIn(role) {
+ if (!guestId) { guestId = "g" + Math.random().toString(36).slice(2, 12); localStorage.setItem("waynok_guest", guestId); }
+ myRole = role; closeAuth();
+ goTab(role === "carrier" ? "dash" : "loads");
+ toast("You're browsing as a guest " + role + " — create an account to keep your data.");
+ loadMe();
+}
+function logout() {
+ token = ""; localStorage.removeItem("waynok_token");
+ me = null; myRole = null; myUid = null;
+ renderNav(); goTab("home");
+}
+
+/* ---------------- me / nav ---------------- */
+async function loadMe() {
+ if (!token) return;
+ try {
+  const u = await api("/me");
+  me = u; myUid = u.id; myRole = u.role;
+  localStorage.setItem("waynok_name", u.company_name || u.email);
+  document.body.classList.toggle("role-carrier", myRole === "carrier");
+  document.body.classList.toggle("role-shipper", myRole === "shipper");
+  document.body.classList.toggle("role-admin", !!u.is_admin);
+  const board = $("menuBoard");
+  if (board) {
+   if (myRole === "shipper") { board.textContent = "My loads"; board.setAttribute("href", "#dash"); }
+   else { board.textContent = "Load board"; board.setAttribute("href", "#loads"); }
+  }
+  const bb = $("bbLoads");
+  if (bb) bb.setAttribute("href", myRole === "shipper" ? "#dash" : "#loads");
+  document.querySelectorAll('nav.main a[data-nav="loads"]').forEach(a => {
+   a.style.display = myRole === "shipper" ? "none" : "";
+  });
+  renderNav();
+  if (myRole === "carrier") { loadDashboard(); refreshOffers(); }
+ } catch (e) { /* guest or expired */ }
+}
+function renderNav() {
+ document.body.classList.toggle("logged-in", !!(token && me));
+ const el = $("navAuth");
+ if (token && me) {
+  el.innerHTML = '<span class="role-chip ' + me.role + '">' + me.role + '</span>' +
+   '<div class="avatar">' + esc((me.company_name || me.email || "?")[0].toUpperCase()) + '</div>' +
+   '<button class="btn ghost sm" onclick="logout()">Log out</button>';
+ } else if (guestId) {
+  el.innerHTML = '<span class="role-chip">guest</span>' +
+   '<button class="btn primary sm" onclick="openAuth(\'register\')">Create account</button>';
+ } else {
+  el.innerHTML = '<button class="btn ghost sm" onclick="openAuth(\'login\')">Sign in</button>' +
+   '<button class="btn primary sm" onclick="openAuth(\'register\')">Create account</button>';
+ }
+}
+
+/* ---------------- profile ---------------- */
+async function loadProfile() {
+ if (!token) { openAuth("login"); goTab("home"); return; }
+ try {
+  const u = await api("/me");
+  $("pfAvatar").textContent = (u.company_name || u.email || "?")[0].toUpperCase();
+  $("pfName").textContent = u.company_name || "Your account";
+  $("pfBadges").innerHTML = '<span class="badge ' + u.role + '">' + u.role + '</span>' +
+   (u.verified ? '<span class="badge" style="color:var(--ok);border-color:#1f5c3a;">verified </span>' : "");
+  $("pfEmail").textContent = u.email;
+  $("pfSince").textContent = new Date(u.created_at).toLocaleDateString(undefined, { month: "short", year: "numeric" });
+  const bal = await api("/me/balance");
+  $("pfWallet").textContent = fmtGHS((bal.available_ghs || 0) + (bal.pending_ghs || 0));
+  const ref = await api("/me/referral");
+  $("pfRefCode").textContent = ref.code || "--------";
+  $("rfSignups").textContent = ref.signups || 0;
+  $("rfEarned").textContent = "₵" + Number(ref.credit_ghs || 0).toLocaleString();
+  $("rfPending").textContent = "₵" + Number(ref.pending_ghs || 0).toLocaleString();
+ } catch (e) { toast(e.message, true); }
+}
+function copyRef() {
+ const code = $("pfRefCode").textContent.trim();
+ const link = location.origin + "/#home?ref=" + code;
+ navigator.clipboard?.writeText(link).then(() => toast("Invite link copied"));
+}
+async function loadSettings() {
+ if (!token || !me) return;
+ $("stName").value = me.company_name || "";
+ $("stEmailNotif").checked = me.email_notifications !== 0;
+}
+async function saveSettings() {
+ try {
+  await api("/me", { method: "PATCH", body: JSON.stringify({
+   company_name: $("stName").value.trim(),
+   email_notifications: $("stEmailNotif").checked }) });
+  $("stMsg").textContent = "Saved.";
+  loadMe();
+ } catch (e) { $("stMsg").textContent = ""; toast(e.message, true); }
+}
+
+/* ---------------- loads ---------------- */
+let allLoads = [];
+async function refreshLoads(force) {
+ try {
+  const data = await api("/loads?status=open");
+  allLoads = Array.isArray(data) ? data : [];
+  renderLoads();
+ } catch (e) { $("loadList").innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; }
+}
+function renderLoads() {
+ const f = document.querySelector("#loadFilters .fchip.active");
+ const filter = f ? f.dataset.f : "all";
+ const list = filter === "all" ? allLoads : allLoads.filter(l => l.equipment_type === filter);
+ if (!list.length) { $("loadList").innerHTML = '<div class="empty">No open loads right now. Check back soon — or post one.</div>'; return; }
+ $("loadList").innerHTML = list.map(l => {
+  const mine = myUid && l.shipper_id === myUid;
+  return '<div class="load-card">' +
+   '<div class="route"><div class="cities">' + esc(l.origin_city) + " " + esc(l.dest_city) + '</div>' +
+   '<div class="meta mono">' + esc(l.equipment_type) + " · " + Number(l.weight_kg).toLocaleString() + " kg · pickup " + fmtDT(l.pickup_time) + "</div></div>" +
+   '<div style="text-align:right;"><div class="price">' + fmtGHS(l.budget_ghs) + '</div><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></div>" +
+   (mine ? loadActions(l) : '<div class="row-actions"><button class="btn primary sm" onclick="negotiateFromBoard(' + l.id + ')">Negotiate</button></div>') +
+   "</div>";
+ }).join("");
+}
+function loadActions(l) {
+ let h = '<div class="row-actions" style="flex-basis:100%;">';
+ if (l.status === "open") h += '<button class="btn primary sm" onclick="payLoad(' + l.id + ')">Pay ' + fmtGHS(l.budget_ghs) + "</button>" +
+  '<button class="btn ghost sm" onclick="connectDriver(' + l.id + ')">Connect nearest driver</button>';
+ if (l.status === "assigned") h += '<span class="tag assigned">driver assigned</span><button class="btn ghost sm" onclick="trackLoad(' + l.id + ')">Track live</button><button class="btn primary sm" onclick="chatForLoad(' + l.id + ')">' + svgIcon('chat', 14) + ' Chat with driver</button>';
+ if (l.status === "in_transit") h += '<span class="tag in_transit">on the way</span><button class="btn ghost sm" onclick="trackLoad(' + l.id + ')">Track live</button><button class="btn primary sm" onclick="chatForLoad(' + l.id + ')">' + svgIcon('chat', 14) + ' Chat with driver</button>';
+ if (l.status === "delivered") h += '<button class="btn primary sm" onclick="confirmDelivery(' + l.id + ')">Confirm delivery </button>' +
+  (l.proof_image ? '<a class="btn ghost sm" target="_blank" href="/loads/' + l.id + '/proof?token=' + encodeURIComponent(String(l.proof_image).slice(0, 12)) + '">View proof</a>' : "");
+ h += "</div>";
+ return h;
+}
+const ICONS = {
+ truck: '<path d="M1.5 6.5h11v8h-11z"/><path d="M12.5 9h3.8l3.2 3.2v2.3h-7z"/><circle cx="5.5" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/>',
+ flatbed: '<path d="M1.5 11h12"/><path d="M13.5 9h3l3 3v2.5h-6"/><circle cx="5.5" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/>',
+ tanker: '<rect x="1.5" y="7" width="11" height="6.5" rx="3.2"/><path d="M12.5 9h3l3.2 3.2v2.3h-6.2"/><circle cx="5.5" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/>',
+ tipper: '<path d="M1.5 12.5h4l2-4.5h4.5l-1.5 4.5h3"/><path d="M13.5 9h3l3 3v2.5h-6"/><circle cx="5.5" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/>',
+ reefer: '<path d="M1.5 6.5h11v8h-11z"/><path d="M12.5 9h3.8l3.2 3.2v2.3h-7z"/><circle cx="5.5" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/><path d="M7 8v5M5 9.5l4 2M9 9.5l-4 2"/>',
+ pin: '<path d="M12 21s-6.5-5.6-6.5-10.2A6.5 6.5 0 0 1 12 4.5a6.5 6.5 0 0 1 6.5 6.3C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.6" r="2.2"/>',
+ chat: '<path d="M4 5.5h16v10H9.5L5 19z"/><path d="M8 9.5h8M8 12h5"/>'
+};
+function svgIcon(name, size) {
+ const s = size || 22;
+ return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px">' + (ICONS[name] || ICONS.truck) + '</svg>';
+}
+
+const EQUIP = [
+ { t: "flatbed", n: "Flatbed",  i: "flatbed", h: "steel, machinery, containers" },
+ { t: "box",   n: "Box truck", i: "truck",   h: "pallets, packaged goods" },
+ { t: "tanker", n: "Tanker",   i: "tanker",  h: "fuel, water, liquids" },
+ { t: "tipper", n: "Tipper",   i: "tipper",  h: "sand, gravel, aggregates" },
+ { t: "reefer", n: "Reefer",   i: "reefer",  h: "cold chain, perishables" },
+];
+let selEquip = "flatbed", quoteCache = {}, quoteTimer = null;
+
+function renderEquipRows() {
+ $("equipRows").innerHTML = EQUIP.map(e =>
+  '<div class="equip-row' + (e.t === selEquip ? " sel" : "") + '" data-t="' + e.t + '" onclick="selectEquip(\'' + e.t + '\')">' +
+  '<div class="ei">' + svgIcon(e.i, 24) + '</div>' +
+  '<div style="flex:1;"><div class="en">' + e.n + '</div><div class="eh">' + e.h + '</div></div>' +
+  '<div class="ep" id="ep-' + e.t + '">' + (quoteCache[e.t] != null ? fmtGHS(quoteCache[e.t]) : "—") + "</div></div>"
+ ).join("");
+ updateQuoteBar();
+}
+let selectedPayment = "momo";
+const PM_NOTES = { momo: "Pay now with mobile money via Paystack.", card: "Pay now with debit/credit card via Paystack.", cash: "Pay the driver in person at delivery. The driver's 15% commission is collected from their Waynok balance.", balance: "Pay instantly from your Waynok balance (available earnings)." };
+$("payMethods").addEventListener("click", async e => {
+ const b = e.target.closest(".fchip"); if (!b) return;
+ document.querySelectorAll("#payMethods .fchip").forEach(c => c.classList.remove("active"));
+ b.classList.add("active");
+ selectedPayment = b.dataset.pm;
+ let note = PM_NOTES[selectedPayment];
+ if (selectedPayment === "balance" && token) {
+  try { const bal = await api("/me/balance"); note += " You have " + fmtGHS(bal.available_ghs || 0) + " available."; } catch (err) {}
+ }
+ $("pmNote").textContent = note;
+});
+function selectEquip(t) { selEquip = t; renderEquipRows(); }
+function updateQuoteBar() {
+ const q = quoteCache[selEquip];
+ $("poQuote").textContent = q != null ? fmtGHS(q) : "—";
+}
+function collectPostBody(allowPartial) {
+ const o = {
+  origin_city: $("poOrigin").value.trim(),
+  origin_lat: parseFloat($("poOriginLat").value),
+  origin_lng: parseFloat($("poOriginLng").value),
+  dest_city: $("poDest").value.trim(),
+  dest_lat: parseFloat($("poDestLat").value),
+  dest_lng: parseFloat($("poDestLng").value),
+  equipment_type: selEquip,
+  payment_method: selectedPayment,
+  weight_kg: parseFloat($("poWeight").value),
+  pickup_time: $("poPickup").value ? new Date($("poPickup").value).toISOString() : undefined,
+ };
+ const valid = o.origin_city && o.dest_city && o.weight_kg > 0;
+ return (valid || allowPartial) ? o : null;
+}
+function quoteDebounce() { clearTimeout(quoteTimer); quoteTimer = setTimeout(fetchQuotes, 500); }
+async function fetchQuotes() {
+ const body = collectPostBody(true);
+ if (!body || !body.origin_city || !body.dest_city || !body.weight_kg) {
+  quoteCache = {}; renderEquipRows(); return;
+ }
+ for (const e of EQUIP) {
+  try {
+   const d = await api("/loads/quote", { method: "POST", body: JSON.stringify(Object.assign({}, body, { equipment_type: e.t })) });
+   quoteCache[e.t] = d.budget_ghs;
+  } catch (err) { delete quoteCache[e.t]; }
+ }
+ renderEquipRows();
+}
+async function postLoad() {
+ $("poErr").textContent = ""; $("poOk").textContent = "";
+ try {
+  const mine = await api("/loads/mine");
+  const act = (mine || []).find(l => ["open", "assigned", "in_transit"].includes(l.status));
+  if (act) { $("poErr").textContent = "You already have an active load (" + act.id + "). Complete or cancel it first."; return; }
+ } catch (e) {}
+ const body = collectPostBody(false);
+ if (!body) { $("poErr").textContent = "Fill in Where from, Where to, and weight (kg)."; return; }
+ $("poBtn").disabled = true;
+ try {
+  const d = await api("/loads", { method: "POST", body: JSON.stringify(body) });
+  $("poOk").textContent = "Load " + d.id + " requested at " + fmtGHS(d.budget_ghs) + " — drivers see it now.";
+  toast("Driver request sent — " + fmtGHS(d.budget_ghs));
+  refreshLoads();
+  goTab("track"); trackFocus = d.id; initMap(); refreshDriverLocations();
+ } catch (e) { $("poErr").textContent = e.message; }
+ $("poBtn").disabled = false;
+}
+function useMyLocation(prefix) {
+ if (!navigator.geolocation) return toast("Geolocation not supported", true);
+ navigator.geolocation.getCurrentPosition(pos => {
+  $(prefix + "Lat").value = pos.coords.latitude.toFixed(6);
+  $(prefix + "Lng").value = pos.coords.longitude.toFixed(6);
+  toast("Location captured ");
+ }, () => toast("Couldn't get your location", true), { timeout: 8000 });
+}
+async function payLoad(id) {
+ try {
+  const d = await api("/loads/" + id + "/pay", { method: "POST" });
+  if (d.authorization_url) location.href = d.authorization_url;
+  else toast("Paid ");
+ } catch (e) { toast(e.message, true); }
+}
+async function connectDriver(id) {
+ try { const d = await api("/loads/" + id + "/connect", { method: "POST" }); toast("Driver connected — chat is open"); refreshLoads(); }
+ catch (e) { toast(e.message, true); }
+}
+async function confirmDelivery(id) {
+ try { await api("/loads/" + id + "/confirm", { method: "POST" }); toast("Delivery confirmed — payment released"); refreshLoads(); }
+ catch (e) { toast(e.message, true); }
+}
+function trackLoad(id) { goTab("track"); trackFocus = id; refreshDriverLocations(); }
+function renderEta(eta) {
+ const el = $("trackEta");
+ if (!el) return;
+ if (!eta.assigned) { el.textContent = "Waiting for a carrier to pick up the order..."; return; }
+ if (!eta.tracking) { el.textContent = "Carrier assigned - live GPS starts when the carrier goes online."; return; }
+ el.innerHTML = '<span class="live-dot" style="margin-right:8px"></span>Driver is <b>' + eta.distance_km +
+  ' km</b> away - arriving in about <b>' + eta.eta_minutes + ' min</b>';
+}
+let trackFocus = null;
+async function negotiateFromBoard(loadId) { openNegotiation(loadId); }
+
+/* ---------------- trucks ---------------- */
+async function refreshTrucks() {
+ try {
+  const mine = await api("/trucks/mine");
+  $("truckList").innerHTML = mine.length ? mine.map(t =>
+   '<div class="truck-row"><div class="info"><b>' + esc(t.name || "Truck") + '</b> <span class="plate">' + esc(t.plate_no) + '</span>' +
+   '<div class="hint">' + esc(t.equipment_type) + " · " + Number(t.capacity_kg).toLocaleString() + " kg · " + esc(t.origin_city || "") +
+   ' · <span class="tag ' + esc(t.status) + '">' + esc(t.status) + "</span></div></div>" +
+   '<div class="row-actions"><button class="btn danger sm" onclick="deleteTruck(' + t.id + ')">Remove</button></div></div>'
+  ).join("") : '<div class="empty">No trucks yet. List your first truck to start receiving loads.</div>';
+ } catch (e) { $("truckList").innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; }
+}
+async function listTruck() {
+ $("ltErr").textContent = ""; $("ltBtn").disabled = true;
+ try {
+  await api("/trucks", { method: "POST", body: JSON.stringify({
+   name: $("ltName").value.trim(), plate_no: $("ltPlate").value.trim(),
+   equipment_type: $("ltEquip").value, capacity_kg: parseFloat($("ltCapacity").value),
+   origin_city: $("ltCity").value.trim(),
+   origin_lat: parseFloat($("ltLat").value), origin_lng: parseFloat($("ltLng").value) }) });
+  toast("Truck listed — taking you to your dashboard");
+  if (token) { goTab("dash"); setTimeout(() => setOnline(true), 400); } else { goTab("track"); }
+ } catch (e) { $("ltErr").textContent = e.message; }
+ $("ltBtn").disabled = false;
+}
+async function deleteTruck(id) {
+ try { await api("/trucks/" + id, { method: "DELETE" }); refreshTrucks(); }
+ catch (e) { toast(e.message, true); }
+}
+
+/* ---------------- driver dashboard ---------------- */
+function shipRow(l) {
+  return '<div class="load-card">' +
+   '<div class="route"><div class="cities">' + esc(l.origin_city) + " \u2192 " + esc(l.dest_city) + '</div>' +
+   '<div class="meta mono">' + esc(l.equipment_type) + " \u00b7 " + Number(l.weight_kg).toLocaleString() + " kg \u00b7 pickup " + fmtDT(l.pickup_time) + "</div></div>" +
+   '<div style="text-align:right;"><div class="price">' + fmtGHS(l.budget_ghs) + '</div><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></div>" +
+   loadActions(l) + "</div>";
+ }
+ async function renderShipperDash() {
+  $("dash").classList.remove("hidden");
+  document.querySelectorAll("#dash > *").forEach(el => el.style.display = "none");
+  let p = $("shipperPanel");
+  if (!p) {
+   p = document.createElement("div");
+   p.id = "shipperPanel"; p.className = "panel";
+   p.innerHTML = '<h2>My loads <span class="hint" style="font-weight:400;text-transform:none;letter-spacing:0;">\u00b7 live status \u2014 track, chat, pay</span>' +
+    '<button class="ghost btn sm" style="margin-left:auto;" onclick="loadDashboard()">Refresh</button></h2>' +
+    '<div id="shipLoads"><div class="skeleton"></div><div class="skeleton"></div></div>';
+   $("dash").appendChild(p);
+  }
+  p.style.display = "";
+  try {
+   const mine = await api("/loads/mine");
+   const active = (mine || []).filter(l => ["open", "assigned", "in_transit"].includes(l.status));
+   const done = (mine || []).filter(l => !["open", "assigned", "in_transit"].includes(l.status)).slice(0, 5);
+   $("shipLoads").innerHTML = active.map(shipRow).join("") + done.map(shipRow).join("") ||
+    '<p class="hint">No loads yet. Tap the <b>+</b> below to post your first load.</p>';
+  } catch (e) { $("shipLoads").innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; }
+ }
+
+async function loadDashboard() {
+ if (!token) { goTab("home"); return toast("Sign in to open your dashboard", true); }
+ if (myRole === "shipper") { await renderShipperDash(); return; }
+ try {
+  const debt = await api("/me/debt");
+  if (debt.owed_ghs > 0) {
+   const old = document.getElementById("debtBanner"); if (old) old.remove();
+   const dv = document.createElement("div"); dv.id = "debtBanner";
+   dv.className = "panel"; dv.style.borderColor = "rgba(255,93,93,.5)"; dv.style.background = "rgba(255,93,93,.07)";
+   dv.innerHTML = '<b style="color:#ffb3b3">Commission due: ' + fmtGHS(debt.owed_ghs) + '</b>' +
+    '<p class="hint" style="margin:6px 0 10px;">A load was paid in cash. Pay your 15% from your balance.' +
+    (debt.warnings > 0 ? ' Warning ' + debt.warnings + '/3 - account suspends on the 3rd failed attempt.' : '') + '</p>' +
+    '<button class="btn primary sm" onclick="payDebt()">Pay from balance</button>';
+   $("myOrders").insertAdjacentElement("beforebegin", dv);
+  }
+ } catch (e) {}
+ if (myRole && myRole !== "carrier") { $("dash").classList.add("hidden"); return; }
+ $("dash").classList.remove("hidden");
+ loadMyOrders(); refreshOffers();
+ try {
+  const bal = await api("/me/balance");
+  countUp($("dAvail"), Math.round(bal.available_ghs || 0), "₵");
+  countUp($("dCurrent"), Math.round(bal.current_ghs != null ? bal.current_ghs : (bal.available_ghs || 0) + (bal.pending_ghs || 0)), "₵");
+  countUp($("dPending"), Math.round(bal.pending_ghs || 0), "₵");
+ } catch (e) {}
+ try { const w = await api("/me/wallet"); countUp($("dWallet"), Math.round(w.balance || 0), "₵"); }
+ catch (e) { $("dWallet").textContent = "—"; }
+ try {
+  const p = await api("/me/payout");
+  $("pdMomoProvider").value = p.momo_provider || "";
+  $("pdMomoNumber").value = p.momo_number || "";
+  $("pdBankName").value = p.bank_name || "";
+  $("pdAcctName").value = p.bank_account_name || "";
+  $("pdAcctNumber").value = p.bank_account_number || "";
+ } catch (e) {}
+}
+function countUp(el, val, prefix) {
+ if (!el) return;
+ const start = parseInt(String(el.textContent).replace(/[^0-9-]/g, "")) || 0;
+ const t0 = performance.now(), dur = 500;
+ function step(t) {
+  const k = Math.min(1, (t - t0) / dur);
+  el.textContent = (prefix || "") + Math.round(start + (val - start) * k).toLocaleString();
+  if (k < 1) requestAnimationFrame(step);
+ }
+ requestAnimationFrame(step);
+}
+async function savePayout() {
+ try {
+  await api("/me/payout", { method: "PUT", body: JSON.stringify({
+   momo_provider: $("pdMomoProvider").value || null, momo_number: $("pdMomoNumber").value || null,
+   bank_name: $("pdBankName").value || null, bank_account_name: $("pdAcctName").value || null,
+   bank_account_number: $("pdAcctNumber").value || null }) });
+  $("pdMsg").textContent = "Payout details saved.";
+ } catch (e) { $("pdMsg").textContent = ""; toast(e.message, true); }
+}
+
+function setOnline(on) {
+ online = on;
+ $("dOnline").classList.toggle("online", on);
+ $("dOnline").textContent = on ? "END" : "GO";
+ $("gpsFab").style.display = on ? "flex" : "none";
+ if (on) {
+  $("dStatus").textContent = "You're online — finding loads near you…";
+  pingLocation(true);
+  if (!window._pingTimer) window._pingTimer = setInterval(() => { if (online) pingLocation(false); }, 60000);
+  if (!curChatPoll) refreshOffers();
+ } else {
+  $("dStatus").textContent = "You're offline. Tap GO to receive loads.";
+  $("dOffers").innerHTML = '<p class="hint">Go online to see offers.</p>';
+ }
+}
+function pingLocation(first) {
+ if (!navigator.geolocation) { toast("Geolocation not supported", true); setOnline(false); return; }
+ navigator.geolocation.getCurrentPosition(async pos => {
+  try {
+   const r = await api("/drivers/location", { method: "POST", body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }) });
+   $("dStatus").textContent = "You're online — " + (r && r.new_offers > 0 ? r.new_offers + " new offer(s) near you!" : "watching for new loads…");
+   if (r && r.new_offers > 0) toast(r.new_offers + " new load offer(s) near you!");
+   refreshOffers();
+  } catch (e) { $("dStatus").textContent = "Online (location note: " + e.message + ")"; }
+ }, () => { if (first) toast("Location permission denied — enable it to go live", true); },
+   { enableHighAccuracy: false, timeout: 10000 });
+}
+
+async function refreshOffers() {
+ if (myRole && myRole !== "carrier") return;
+ let offers = [], near = [], nearOk = true;
+ try { offers = await api("/drivers/offers"); } catch (e) {}
+ try { near = await api("/drivers/nearby-loads"); } catch (e) {
+  nearOk = false;
+  $("dNearby").innerHTML = '<div class="empty">Could not reach the loads endpoint (' + esc(e.message) +
+   '). The latest <b>main.py</b> and <b>driver_routes.py</b> must be uploaded to the server.</div>';
+ }
+ renderOfferList($("dOffers"), offers.map(o => o.load), true, offers);
+ if (nearOk) renderOfferList($("dNearby"), near.map(n => n.load), false, near);
+ else if (!offers.length) {
+  $("dOffers").innerHTML = '<div class="empty">Offers unavailable — check that the latest backend files are deployed.</div>';
+ }
+}
+function renderOfferList(el, loads, isOffers, raw) {
+ if (window.activeOrder) {
+  el.innerHTML = '<p class="hint">One order at a time - finish order ' + window.activeOrder.load.id +
+   ' first, then new offers appear here.</p>';
+  return;
+ }
+ if (!loads.length) {
+  el.innerHTML = isOffers
+   ? '<p class="hint">No offers right now. List a truck and go online — offers arrive instantly when a matching load is posted.</p>'
+   : '<p class="hint">No open loads right now.</p>';
+  return;
+ }
+ el.innerHTML = loads.map((l, i) => {
+  const oid = isOffers && raw[i] ? raw[i].offer_id : null;
+  const dk = !isOffers && raw[i] && raw[i].distance_km != null ? raw[i].distance_km + " km away" : "near you";
+  const earning = l.budget_ghs ? Math.round(l.budget_ghs * 0.85) : null;
+  return '<div class="match">' +
+   '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+   '<div class="route" style="font:700 15px Sora;">' + esc(l.origin_city) + " " + esc(l.dest_city) + "</div>" +
+   '<div class="price" style="font:800 17px Sora;color:var(--ok);">' + (earning != null ? "you earn " + fmtGHS(earning) : "") + "</div></div>" +
+   '<div class="meta mono" style="margin:6px 0;">' + esc(l.equipment_type) + " · " + Number(l.weight_kg).toLocaleString() + " kg · " + dk + " · pickup " + fmtDT(l.pickup_time) + "</div>" +
+   '<div class="row-actions">' +
+   (oid ? '<button class="btn primary sm" data-accoffer="' + oid + '" onclick="acceptOffer(this,' + oid + ',\'/offers/' + oid + '/accept\')">Accept</button>' +
+       '<button class="btn ghost sm" data-neg="' + l.id + '" onclick="openNegotiation(' + l.id + ')">Negotiate</button>' +
+       '<button class="btn danger sm" onclick="declineOffer(' + oid + ')">Decline</button>'
+      : '<button class="btn primary sm" data-accnear="' + l.id + '" onclick="acceptOffer(this,' + l.id + ',\'/loads/' + l.id + '/accept\')">Accept</button>' +
+       '<button class="btn ghost sm" data-neg="' + l.id + '" onclick="openNegotiation(' + l.id + ')">Negotiate</button>') +
+   "</div></div>";
+ }).join("");
+}
+async function acceptOffer(btn, id, endpoint) {
+ btn.disabled = true;
+ try {
+  const r = await api(endpoint, { method: "POST" });
+  toast("Load accepted — chat with the client is open");
+  openNegotiation(r.load_id);
+  refreshOffers(); loadMyOrders(); refreshLoads();
+ } catch (e) { toast(e.message, true); }
+ btn.disabled = false;
+}
+async function declineOffer(offerId) {
+ try { await api("/offers/" + offerId + "/decline", { method: "POST" }); refreshOffers(); }
+ catch (e) { toast(e.message, true); }
+}
+
+async function loadMyOrders() {
+ const box = $("myOrders");
+ try {
+  const orders = await api("/drivers/my-loads");
+  window.activeOrder = (orders || []).find(o => o.load && ["assigned", "in_transit"].includes(o.load.status)) || null;
+  if (!orders.length) { box.innerHTML = '<p class="hint">No orders yet. Accept a load from the offers or nearby loads above.</p>'; return; }
+  box.innerHTML = orders.map(o => orderCardHtml(o)).join("");
+ } catch (e) { box.innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; }
+}
+function orderCardHtml(o) {
+ const l = o.load || {};
+ const st = l.status;
+ let actions = "";
+ if (st === "assigned") actions = '<button class="btn primary sm" onclick="driverPickup(' + l.id + ')">Confirm pickup</button>' +
+  '<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + l.origin_lat + ',' + l.origin_lng + '">' + svgIcon('pin', 13) + ' Navigate to pickup</a>';
+ if (st === "in_transit") actions = '<button class="btn primary sm" onclick="driverDeliver(' + l.id + ')">Deliver + proof</button>' +
+  '<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + l.dest_lat + ',' + l.dest_lng + '">' + svgIcon('pin', 13) + ' Navigate to delivery</a>' +
+  '<button class="btn ghost sm" onclick="trackLoad(' + l.id + ')">Track</button>';
+ if (st === "delivered") actions = '<span class="tag delivered">delivered — awaiting client confirm</span>';
+ return '<div class="match">' +
+  '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+  '<div class="route" style="font:700 15px Sora;">' + esc(l.origin_city) + " " + esc(l.dest_city) + "</div>" +
+  '<div style="text-align:right;"><div class="price" style="font:800 16px Sora;color:var(--ok);">' + (o.earning_ghs != null ? fmtGHS(o.earning_ghs) : "—") + '</div>' +
+  '<div class="hint">' + esc(st) + "</div></div></div>" +
+  '<div class="meta mono" style="margin:6px 0;">Client: ' + esc(o.client_name || "Shipper") + " · pickup " + fmtDT(l.pickup_time) + "</div>" +
+  '<div class="row-actions">' + actions +
+  (o.conversation_id ? '<button class="btn ghost sm" onclick="openConversation(' + o.conversation_id + ')">' + svgIcon('chat', 14) + ' Client chat</button>' : "") +
+  "</div></div>";
+}
+async function payDebt() {
+ try {
+  const d = await api("/me/debt/pay", { method: "POST" });
+  toast("Commission settled - thank you");
+  loadDashboard();
+ } catch (e) { toast(e.message, true); if (/suspended/i.test(e.message)) setTimeout(() => logout(), 2500); }
+}
+
+async function driverPickup(loadId) {
+ try { await api("/loads/" + loadId + "/pickup", { method: "POST" }); toast("Pickup confirmed — safe trip!"); loadMyOrders(); }
+ catch (e) { toast(e.message, true); }
+}
+function driverDeliver(loadId) {
+ const inp = document.createElement("input");
+ inp.type = "file"; inp.accept = "image/*,.pdf";
+ inp.onchange = async () => {
+  if (!inp.files[0]) return;
+  const fd = new FormData(); fd.append("file", inp.files[0]);
+  const headers = {};
+  if (token) headers["Authorization"] = "Bearer " + token;
+  else if (guestId) headers["X-Guest-Id"] = guestId;
+  const res = await fetch("/loads/" + loadId + "/deliver", { method: "POST", headers, body: fd });
+  const data = await res.json().catch(() => null);
+  if (res.ok) { toast("Delivered — client notified to confirm"); loadMyOrders(); }
+  else toast((data && data.detail) || "Upload failed", true);
+ };
+ inp.click();
+}
+
+/* ---------------- conversations / chat ---------------- */
+async function refreshConversations() {
+ if (!token && !guestId) return;
+ try {
+  const convs = await api("/conversations");
+  const list = $("convList");
+  if (!convs.length) { list.innerHTML = '<div class="empty">No conversations yet. Negotiate from a load to start one.</div>'; return; }
+  list.innerHTML = convs.map(c =>
+   '<div class="conv" data-cid="' + c.id + '" onclick="openConversation(' + c.id + ')">' +
+   '<div class="name">' + esc(c.other_name) + (c.unread ? '<span class="unread">' + c.unread + "</span>" : "") + "</div>" +
+   '<div class="prev">' + esc(c.load_route || "") + (c.last_text ? " · " + esc(c.last_text.slice(0, 40)) : "") + "</div></div>"
+  ).join("");
+ } catch (e) { /* silent */ }
+}
+async function openConversation(cid) {
+ curConv = cid;
+ goTab("chat");
+ stopThreadPoll();
+ await loadThread();
+ curChatPoll = setInterval(loadThread, 4000);
+ refreshConversations();
+}
+function stopThreadPoll() { if (curChatPoll) { clearInterval(curChatPoll); curChatPoll = null; } }
+async function loadThread() {
+ if (!curConv) return;
+ try {
+  const msgs = await api("/conversations/" + curConv + "/messages");
+  const convs = await api("/conversations").catch(() => []);
+  const meta = (convs || []).find(c => c.id === curConv) || {};
+  $("chatTitle").textContent = meta.other_name || "Chat";
+  if (meta.other_phone) {
+   $("chatCall").classList.remove("hidden");
+   $("chatCall").href = "tel:" + String(meta.other_phone).replace(/[^+\d]/g, "");
+  } else {
+   $("chatCall").classList.add("hidden");
+  }
+  $("chatLoadInfo").textContent = meta.load_route ? "Load " + meta.load_id + ": " + meta.load_route + " · " + (meta.load_status || "") : "";
+  $("chatThread").innerHTML = msgs.map(m => msgHtml(m)).join("") ||
+   '<div class="empty">Say hello — agree the terms below and send.</div>';
+  const b = $("chatThread"); b.scrollTop = b.scrollHeight;
+ } catch (e) { /* silent */ }
+}
+function msgHtml(m) {
+ const mine = m.sender_id === myUid;
+ let terms = "";
+ if (m.price_ghs != null || m.pickup_time || m.location) {
+  terms = '<div class="terms">' +
+   (m.price_ghs != null ? "Price " + fmtGHS(m.price_ghs) + " · " : "") +
+   (m.pickup_time ? "Time " + fmtDT(m.pickup_time) + " · " : "") +
+   (m.location ? "At " + esc(m.location) : "") +
+   (m.proposal_status === "pending" && !mine ?
+    '<div class="row-actions" style="margin-top:8px;">' +
+    '<button class="btn primary sm" onclick="respondProposal(' + m.id + ',\'accept\')">Accept</button>' +
+    '<button class="btn danger sm" onclick="respondProposal(' + m.id + ',\'decline\')">Decline</button></div>'
+    : m.proposal_status ? '<div class="hint" style="margin-top:6px;">' + esc(m.proposal_status) + "</div>" : "") +
+   "</div>";
+ }
+ return '<div class="msg ' + (mine ? "user" : "other") + '">' + esc(m.text || "") + terms +
+  '<span class="t">' + fmtDT(m.created_at) + "</span></div>";
+}
+async function sendChat() {
+ const text = $("chatInput").value.trim();
+ const price = parseFloat($("chatPrice").value);
+ const body = { text };
+ if (!isNaN(price)) body.price_ghs = price;
+ if ($("chatTime").value) body.pickup_time = new Date($("chatTime").value).toISOString();
+ if ($("chatLoc").value.trim()) body.location = $("chatLoc").value.trim();
+ if (!text && !body.price_ghs && !body.pickup_time && !body.location) return;
+ try {
+  await api("/conversations/" + curConv + "/messages", { method: "POST", body: JSON.stringify(body) });
+  $("chatInput").value = ""; $("chatPrice").value = ""; $("chatTime").value = ""; $("chatLoc").value = "";
+  if (myUid) {
+   $("chatThread").innerHTML += msgHtml({ sender_id: myUid, text: text, price_ghs: body.price_ghs,
+    pickup_time: body.pickup_time, location: body.location, proposal_status: null,
+    created_at: new Date().toISOString() });
+   const b = $("chatThread"); b.scrollTop = b.scrollHeight;
+  }
+  loadThread();
+  refreshConversations();
+ } catch (e) { toast("Message failed: " + e.message, true); }
+}
+async function respondProposal(mid, action) {
+ try {
+  const r = await api("/messages/" + mid + "/respond?action=" + action, { method: "POST" });
+  toast(action === "accept" ? "Terms accepted — load assigned to the driver " : "Proposal declined");
+  loadThread();
+ } catch (e) { toast(e.message, true); }
+}
+async function openNegotiation(loadId) {
+ try {
+  const d = await api("/loads/" + loadId + "/conversations", { method: "POST", body: "{}" });
+  openConversation(d.id);
+ } catch (e) { toast(e.message, true); }
+}
+
+/* ---------------- live map ---------------- */
+let leafletLoaded = false;
+function loadLeaflet(cb) {
+ if (leafletLoaded) return cb();
+ const css = document.createElement("link");
+ css.rel = "stylesheet"; css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+ document.head.appendChild(css);
+ const js = document.createElement("script");
+ js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+ js.onload = () => { leafletLoaded = true; cb(); };
+ document.head.appendChild(js);
+}
+function initMap() {
+ loadLeaflet(() => {
+  if (map) { map.invalidateSize(); refreshDriverLocations(); return; }
+  map = L.map("mapShell").setView([7.9465, -1.0232], 7);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "© OpenStreetMap" }).addTo(map);
+  refreshDriverLocations();
+  setInterval(refreshDriverLocations, 20000);
+ });
+}
+async function refreshDriverLocations() {
+ if (!map) return;
+ try {
+  const drivers = await api("/drivers/locations");
+  const seen = {};
+  (drivers || []).forEach(d => {
+   const key = "c" + d.carrier_id;
+   seen[key] = true;
+   if (!mapMarkers[key]) {
+    mapMarkers[key] = L.marker([d.lat, d.lng], { icon: truckIcon() }).addTo(map)
+     .bindPopup("Driver · " + (d.equipment_type || ""));
+   } else {
+    mapMarkers[key].setLatLng([d.lat, d.lng]);
+   }
+  });
+  Object.keys(mapMarkers).forEach(k => { if (!seen[k]) { map.removeLayer(mapMarkers[k]); delete mapMarkers[k]; } });
+  if (trackFocus) {
+   try {
+    const loc = await api("/loads/" + trackFocus + "/driver-location");
+    if (!mapMarkers["focus"]) mapMarkers["focus"] = L.marker([loc.lat, loc.lng], { icon: truckIcon("#ff7a1a") }).addTo(map);
+    else mapMarkers["focus"].setLatLng([loc.lat, loc.lng]);
+    map.setView([loc.lat, loc.lng], 12);
+   } catch (e) {}
+   try { renderEta(await api("/loads/" + trackFocus + "/eta")); } catch (e) {}
+  }
+ } catch (e) {}
+}
+let _truckIcon;
+function truckIcon(color) {
+ if (!_truckIcon) {
+  _truckIcon = L.divIcon({ className: "", html: '<div style="background:#ffb020;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 12px Sora;color:#161006;box-shadow:0 2px 10px rgba(0,0,0,.5);">W</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
+ }
+ return _truckIcon;
+}
+
+/* ---------------- AI dispatcher ---------------- */
+async function askAgent() {
+ const q = $("agentInput").value.trim();
+ if (!q) return;
+ $("agentInput").value = "";
+ const th = $("agentThread");
+ th.innerHTML += '<div class="msg user">' + esc(q) + "</div>";
+ th.scrollTop = th.scrollHeight;
+ try {
+  const d = await api("/agent/chat", { method: "POST", body: JSON.stringify({ message: q }) });
+  th.innerHTML += '<div class="msg other">' + esc(d.reply || d.message || "…") + "</div>";
+ } catch (e) {
+  th.innerHTML += '<div class="msg other">I couldn\'t reach dispatch — try again. (' + esc(e.message) + ")</div>";
+ }
+ th.scrollTop = th.scrollHeight;
+}
+
+/* ---------------- earn calculator ---------------- */
+function calcEarn() {
+ const km = parseFloat($("erKm").value) || 0;
+ const w = parseFloat($("erWeight").value) || 0;
+ const market = km * (0.9 + Math.min(w / 10000, 2) * 0.55) + 40;
+ const gross = market * 1.5, net = gross * 0.85;
+ $("erOut").innerHTML = '<div class="grid2">' +
+  '<div class="stat"><div class="num">' + fmtGHS(gross) + '</div><div class="LBL">SHIPPER PAYS</div></div>'.replace("LBL", "lbl") +
+  '<div class="stat"><div class="num" style="color:var(--ok);">' + fmtGHS(net) + '</div><div class="lbl">YOU EARN (85%)</div></div></div>' +
+  '<p class="hint" style="margin-top:10px;">Indicative only — final price is quoted per load by the system.</p>';
+}
+
+/* ---------------- admin ---------------- */
+async function loadAdmin() {
+ if (!me || !me.is_admin) { goTab("home"); return toast("Admin only", true); }
+ if (!window._adFilt) {
+  window._adFilt = 1;
+  $("adFilters").addEventListener("click", e => {
+   const b = e.target.closest(".fchip"); if (!b) return;
+   document.querySelectorAll("#adFilters .fchip").forEach(c => c.classList.remove("active"));
+   b.classList.add("active");
+   if (b.dataset.af === "all") window._adUser = null;
+   renderAdOrders(b.dataset.af);
+  });
+ }
+ try {
+  const s = await api("/admin/stats");
+  $("adTotal").textContent = (s.orders_total != null ? s.orders_total : s.loads || 0).toLocaleString();
+  $("adDone").textContent = (s.orders_completed != null ? s.orders_completed : s.delivered || 0).toLocaleString();
+  $("adPending").textContent = (s.orders_pending != null ? s.orders_pending : s.open_loads || 0).toLocaleString();
+  $("adCancelled").textContent = (s.orders_cancelled || 0).toLocaleString();
+  $("adRevenue").textContent = "₵" + Number(s.revenue_ghs || s.commission_ghs || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+  const held = Number(s.drivers_balance_ghs || 0);
+  $("adBalAvail").textContent = "₵" + held.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  $("adBalCurrent").textContent = "₵" + (held + Number(s.users_pending_ghs || 0)).toLocaleString(undefined, { minimumFractionDigits: 2 });
+  try {
+   const pr = await api("/admin/pricing");
+   $("prMarkup").value = pr.price_markup;
+   $("prComm").value = Math.round(pr.commission_pct * 1000) / 10;
+  } catch (e) {}
+  window._adOrders = await api("/admin/loads");
+  renderAdOrders((document.querySelector("#adFilters .fchip.active") || {}).dataset ? document.querySelector("#adFilters .fchip.active").dataset.af : "all");
+  try {
+   const acts = await api("/admin/activity");
+   $("adActivity").innerHTML = (acts || []).map(a =>
+    '<div class="act-line"><span><b>' + esc(a.title) + '</b> \u2014 ' + esc((a.body || "").slice(0, 80)) +
+    ' <span class="hint">(' + esc(a.user) + ')</span></span><span class="when">' + fmtDT(a.at) + '</span></div>'
+   ).join("") || '<p class="hint">No activity yet.</p>';
+  } catch (e) { $("adActivity").innerHTML = '<p class="hint">Activity feed unavailable</p>'; }
+  const convs = await api("/admin/conversations");
+  $("adConvsBody").innerHTML = convs.map(c =>
+   "<tr style=\"cursor:pointer\" onclick=\"adminViewConv(" + c.id + ")\"><td class=\"mono\">" + c.id + "</td><td class=\"mono\">" + c.load_id + "</td><td>" + esc(c.route) + "</td><td>" + esc(c.shipper) + "</td><td>" + esc(c.carrier) + "</td><td>" + c.messages + "</td></tr>"
+  ).join("") || '<tr><td colspan="6" class="hint">No conversations yet</td></tr>';
+  const users = await api("/admin/users");
+  window._adUserMap = {};
+  users.forEach(u => window._adUserMap[u.id] = u.email);
+  $("adUsersBody").innerHTML = users.map(u =>
+   "<tr><td class=\"mono\">" + u.id + "</td><td>" + esc(u.email) + '</td><td><span class="badge ' + esc(u.role) + '">' + esc(u.role) + "</span></td>" +
+   "<td>" + (u.disabled ? "disabled" : "active") + '</td><td style="white-space:nowrap;">' +
+   '<button class="btn ghost sm" onclick="adUserOrders(' + u.id + ', \'' + esc(u.email) + '\')">Orders</button> ' +
+   '<button class="btn ghost sm" onclick="toggleDisable(' + u.id + ')">' + (u.disabled ? "Enable" : "Disable") + "</button></td></tr>"
+  ).join("");
+ } catch (e) { toast(e.message, true); }
+}
+async function savePricing() {
+ const msg = $("prMsg");
+ try {
+  const d = await api("/admin/pricing", { method: "PUT", body: JSON.stringify({
+   price_markup: parseFloat($("prMarkup").value),
+   commission_pct: parseFloat($("prComm").value) / 100 }) });
+  msg.className = "ok"; msg.textContent = "Saved - markup x" + d.price_markup + ", commission " + (d.commission_pct * 100).toFixed(1) + "%";
+ } catch (e) { msg.className = "error"; msg.textContent = e.message; }
+}
+
+function adUserOrders(uid, email) {
+ window._adUser = uid;
+ renderAdOrders((document.querySelector("#adFilters .fchip.active") || {}).dataset ? document.querySelector("#adFilters .fchip.active").dataset.af : "all");
+ toast("Showing orders for " + email + " - tap All to reset");
+}
+function renderAdOrders(filter) {
+ const rows = (window._adOrders || []).filter(l => {
+  if (window._adUser && l.shipper_id !== window._adUser) return false;
+  if (filter === "pending") return ["open", "assigned", "in_transit"].includes(l.status);
+  if (filter === "completed") return l.status === "delivered";
+  if (filter === "cancelled") return l.status === "cancelled";
+  return true;
+ }).slice(0, 100);
+ $("adOrdersBody").innerHTML = rows.map(l => {
+  const canCancel = ["open", "assigned"].includes(l.status);
+  const ship = (window._adUserMap && window._adUserMap[l.shipper_id]) || ("#" + l.shipper_id);
+  return "<tr><td class=\"mono\">" + l.id + "</td>" +
+   "<td>" + esc(l.origin_city) + " \u2192 " + esc(l.dest_city) + "</td>" +
+   "<td class=\"hint\" style=\"font-size:12px;\">" + esc(ship) + "</td>" +
+   '<td><span class="tag ' + esc(l.status) + '">' + esc(l.status) + "</span></td>" +
+   "<td>" + esc(l.payment_status || "") + "</td>" +
+   "<td>" + fmtGHS(l.budget_ghs) + "</td>" +
+   "<td>" + (canCancel ? '<button class="btn danger sm" onclick="adminCancelOrder(' + l.id + ')">Cancel</button>' : "") + "</td></tr>";
+ }).join("") || '<tr><td colspan="7" class="hint">No orders in this view</td></tr>';
+}
+async function adminCancelOrder(id) {
+ if (!confirm("Cancel order " + id + "?")) return;
+ try {
+  await api("/admin/loads/" + id + "/cancel", { method: "POST" });
+  toast("Order " + id + " canceled");
+  loadAdmin();
+ } catch (e) { toast(e.message, true); }
+}
+
+async function adminViewConv(cid) {
+ try {
+  const msgs = await api("/admin/conversations/" + cid + "/messages");
+  $("adConvMsgs").style.display = "block";
+  $("adConvMsgs").innerHTML = "<h4 style=\"margin-bottom:10px\">Conversation " + cid + "</h4>" +
+   msgs.map(m => '<div class="msg ' + (m.proposal_status ? "other" : "user") + '" style="max-width:100%;margin-bottom:6px">' +
+    esc(m.text || "") +
+    (m.price_ghs != null ? ' <span class="hint">[GHS ' + m.price_ghs + "]</span>" : "") +
+    '<span class="t">from user ' + m.sender_id + " - " + fmtDT(m.created_at) + "</span></div>"
+   ).join("") || '<p class="hint">No messages</p>';
+ } catch (e) { toast(e.message, true); }
+}
+
+async function toggleDisable(uid) {
+ try { await api("/admin/users/" + uid + "/toggle-disable", { method: "POST" }); loadAdmin(); }
+ catch (e) { toast(e.message, true); }
+}
+
+async function fileClaim() {
+ const msg = $("clMsg");
+ try {
+  const d = await api("/claims", { method: "POST", body: JSON.stringify({
+   load_id: parseInt($("clLoad").value), description: $("clDesc").value, evidence: $("clEvid").value }) });
+  msg.className = "ok"; msg.textContent = d.message;
+  $("clLoad").value = ""; $("clDesc").value = ""; $("clEvid").value = "";
+ } catch (e) { msg.className = "error"; msg.textContent = e.message; }
+}
+
+/* ---------------- forgot / reset ---------------- */
+async function doForgot() {
+ $("fpErr").textContent = ""; $("fpMsg").textContent = "";
+ try {
+  await api("/auth/forgot", { method: "POST", body: JSON.stringify({ email: $("fpEmail").value.trim(), password: "x" }) });
+  $("fpMsg").textContent = "If that account exists, a reset link is on its way.";
+ } catch (e) { $("fpErr").textContent = e.message; }
+}
+async function doReset() {
+ $("rsErr").textContent = ""; $("rsMsg").textContent = "";
+ try {
+  await api("/auth/reset", { method: "POST", body: JSON.stringify({ email: $("rsPass").dataset.token || "", password: $("rsPass").value }) });
+  $("rsMsg").textContent = "Password updated — sign in with your new password.";
+ } catch (e) { $("rsErr").textContent = e.message; }
+}
+
+/* ---------------- mobile menu ---------------- */
+function openMenu() { $("menuDrawer").classList.add("open"); $("menuBackdrop").style.display = "block"; }
+function closeMenu() { $("menuDrawer").classList.remove("open"); $("menuBackdrop").style.display = "none"; }
+$("menuBtn").onclick = openMenu;
+$("menuClose").onclick = closeMenu;
+$("menuBackdrop").onclick = closeMenu;
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
+
+/* ---------------- in-app notifications ---------------- */
+let lastNotifId = 0, notifPrimed = false;
+async function pollNotifications() {
+ if (!token) return;
+ try {
+  const items = await api("/notifications");
+  if (!notifPrimed) {
+   notifPrimed = true;
+   lastNotifId = items.length ? Math.max.apply(null, items.map(n => n.id)) : 0;
+   return;
+  }
+  items.slice().reverse().forEach(n => {
+   if (n.id > lastNotifId) {
+    lastNotifId = n.id;
+    toast(n.title + (n.body ? " — " + n.body.slice(0, 90) : ""));
+   }
+  });
+ } catch (e) { /* silent */ }
+}
+
+async function chatForLoad(loadId) {
+ try {
+  const d = await api("/loads/" + loadId + "/conversation");
+  openConversation(d.id);
+ } catch (e) { toast(e.message, true); }
+}
+
+/* ---------------- web push ---------------- */
+const VAPID_PUBLIC = "BO3lrjo95itC_rS9menCZKRUbREtvfVUm2GXFeJLayd0gZxP-mdOrtVWNOqxVwUQXRqrJXgvcDKYurLaF_Je2L4";
+function _b64ToBytes(b64) {
+ const pad = "=".repeat((4 - b64.length % 4) % 4);
+ const raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
+ return Uint8Array.from(raw, c => c.charCodeAt(0));
+}
+async function enablePush() {
+ if (!token || !("serviceWorker" in navigator) || !("PushManager" in window)) return;
+ try {
+  const reg = await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub) {
+   sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: _b64ToBytes(VAPID_PUBLIC),
+   });
+  }
+  await api("/push/subscribe", { method: "POST", body: JSON.stringify(sub.toJSON()) });
+ } catch (e) { /* permission denied or unsupported — feed still works */ }
+}
+
+/* ---------------- newsletter ---------------- */
+(function () {
+ const wrap = document.querySelector(".foot .wrap");
+ if (!wrap) return;
+ const f = document.createElement("form");
+ f.id = "nlForm";
+ f.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap";
+ f.innerHTML = '<span class="hint" style="font-size:12px">Fare deals and new routes, weekly:</span>' +
+  '<input class="input" id="nlEmail" placeholder="your@email.com" style="max-width:220px;padding:8px 12px;font-size:13px;">' +
+  '<button class="btn ghost sm" type="submit">Subscribe</button><span class="hint" id="nlMsg" style="font-size:12px"></span>';
+ wrap.appendChild(f);
+ f.onsubmit = async ev => {
+  ev.preventDefault();
+  try {
+   await api("/newsletter", { method: "POST", body: JSON.stringify({ email: $("nlEmail").value.trim() }) });
+   $("nlMsg").textContent = "Subscribed!";
+   $("nlEmail").value = "";
+  } catch (e) { $("nlMsg").textContent = e.message; }
+ };
+})();
+
+/* ---------------- phone verification ---------------- */
+function ensureVerifyModal() {
+ if ($("verifyModal")) return;
+ const m = document.createElement("div");
+ m.className = "modal"; m.id = "verifyModal";
+ m.innerHTML = '<div class="box"><h2 style="margin-bottom:6px;">Verify your number</h2>' +
+  '<p class="hint" style="margin-bottom:14px;">We sent a 6-digit code by SMS. Enter it to activate posting and accepting.</p>' +
+  '<input class="input" id="vPhone" placeholder="Phone number" style="margin-bottom:10px;">' +
+  '<input class="input" id="vCode" placeholder="6-digit code" maxlength="6" style="margin-bottom:10px;">' +
+  '<button class="btn primary block" id="vGo">Verify</button>' +
+  '<p class="hint" style="margin-top:10px;text-align:center;"><a href="javascript:void(0)" id="vResend">Resend code</a></p>' +
+  '<div id="vMsg" class="error"></div></div>';
+ document.body.appendChild(m);
+ $("vGo").onclick = async () => {
+  try {
+   const d = await api("/auth/verify-phone", { method: "POST", body: JSON.stringify({ phone: $("vPhone").value.trim(), code: $("vCode").value.trim() }) });
+   if (d.access_token) { token = d.access_token; localStorage.setItem("waynok_token", token); }
+   m.classList.remove("open"); toast("Number verified - you are fully active"); loadMe();
+  } catch (e) { $("vMsg").textContent = e.message; }
+ };
+ $("vResend").onclick = async () => {
+  try { await api("/auth/resend-code", { method: "POST", body: JSON.stringify({ phone: $("vPhone").value.trim() }) }); $("vMsg").className = "ok"; $("vMsg").textContent = "New code sent."; }
+  catch (e) { $("vMsg").textContent = e.message; }
+ };
+}
+async function checkPhoneVerification() {
+ if (!token || !me) return;
+ if (me.phone && !me.phone_verified) {
+  ensureVerifyModal();
+  $("vPhone").value = me.phone;
+  $("verifyModal").classList.add("open");
+ }
+}
+
+/* ---------------- misc ---------------- */
+if ("serviceWorker" in navigator) {
+ navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+setInterval(() => { if (token) refreshConversations().catch(() => {}); }, 30000);
+setInterval(pollNotifications, 12000);
+pollNotifications();
+</script>
+<!-- Brevo Conversations -->
+<script>
+    (function(d, w, c) {
+        w.BrevoConversationsID = '6abe77d8c779b2b54604f36e';
+        w[c] = w[c] || function() {
+            (w[c].q = w[c].q || []).push(arguments);
+        };
+        var s = d.createElement('script');
+        s.async = true;
+        s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
+        if (d.head) d.head.appendChild(s);
+    })(document, window, 'BrevoConversations');
+</script>
+<!-- /Brevo Conversations -->
+</body>
+</html>
