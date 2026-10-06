@@ -71,6 +71,7 @@ class LoadCreate(BaseModel):
     equipment_type: str
     weight_kg: float = Field(gt=0)
     pickup_time: Optional[datetime] = None
+    payment_method: Optional[str] = None  # cash | momo | card | balance (default momo)
     # budget_ghs is system-determined on purpose — never accepted from clients
     # coordinates are optional: the backend resolves known city names itself
 
