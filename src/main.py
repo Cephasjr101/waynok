@@ -2219,6 +2219,20 @@ def set_pricing(body: dict, db: Session = Depends(get_db), _=Depends(_admin)):
 
 
 # ---------------------------------------------------------------- health & misc
+from fastapi.responses import JSONResponse as _JSONResponse
+
+
+@app.get("/.well-known/assetlinks.json")
+def assetlinks():
+    return _JSONResponse([{
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.waynokafrica.app",
+            "sha256_cert_fingerprints": ["REPLACE_WITH_SHA256_FROM_BUBBLEWRAP"]
+        }
+    }])
+
 @app.get("/api/health")
 def health():
     return {"ok": True, "service": "waynok", "time": datetime.utcnow().isoformat() + "Z"}
